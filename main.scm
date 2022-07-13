@@ -91,7 +91,7 @@
         (if (number? msg) (number->string msg) 
             (begin (display "Error") (user-input))))))
 
-(define blog "https://nodokaha.github.io/SCP-EEE.github.io/blog.html")
+(define blog "https://nodokaha.github.io/blog.html")
 (define soundcloud "https://soundcloud.com/rx220mt")
 (define pixiv "https://www.pixiv.net/users/54386498")
 (define twitter "https://twitter.com/Error_Linux")
