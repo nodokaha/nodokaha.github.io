@@ -1,0 +1,26 @@
+;;; -*- scheme -*-
+
+(use-modules (srfi srfi-41)
+	     (srfi srfi-19)
+             (haunt utils))
+
+(define fib
+  (stream-cons 0 (stream-cons 1 (stream-map + fib (stream-cdr fib)))))
+
+(define count 30)
+
+`((title . "Hello, world!")
+  (date . ,(time-utc->date (current-time)))
+  (tags "first")
+  (summary . "First post?")
+  (content
+   ((h2 "はじめまして")
+    (p "ここは、私の作品を解説する場所です。")
+    (p "もうひとつの初めましてと同様ただのサンプルです。")
+    (p ,count
+       "フィボナッチ数列だーーー!")
+    (p ,(object->string
+           (stream->list
+            (stream-take count fib))))
+    (p "私の姿?いちようこんなの書いてたよ。")
+    (img (@ (src "/images/scp-eee.jpg"))))))
