@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TKCTF-club!!</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="stylesheet"
+      href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/styles/default.min.css">
+  </head>
+  <body>
+    <!-- Navbar -->
+    <div class="w3-top">
+      <div class="w3-bar w3-theme w3-top w3-left-align w3-large">
+	<a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1" href="javascript:void(0)" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+	<image src="5C81231B-81BE-493E-A71F-57EE9051E444.png" style="max-height: 100; max-width: 100px;" class="w3-bar-item w3-button w3-theme-l1"></a>
+<a href="./setup.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">TKCTF-club?</a>
+<a href="./setup.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">作品達</a>
+<a href="./setup.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Blog</a>
+<a href="./setup.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">News</a>
+<a href="./setup.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Contact</a>
+</div>
+</div>
+
+<br></br>
+
+<!-- Sidebar -->
+<nav class="w3-sidebar w3-bar-block w3-collapse w3-large w3-theme-l5 w3-animate-left" id="mySidebar">
+  <a href="javascript:void(0)" onclick="w3_close()" class="w3-right w3-xlarge w3-padding-large w3-hover-black w3-hide-large" title="Close Menu">
+    <i class="fa fa-remove"></i>
+  </a>
+  <h4 class="w3-bar-item"><b>Menu</b></h4>
+  <a class="w3-bar-item w3-button w3-hover-black" href="./setup.html">TKCTF-club?</a>
+  <a class="w3-bar-item w3-button w3-hover-black" href="./setup.html">作品達</a>
+  <a class="w3-bar-item w3-button w3-hover-black" href="./setup.html">Blog</a>
+  <a class="w3-bar-item w3-button w3-hover-black" href="./setup.html">News</a>
+  <a class="w3-bar-item w3-button w3-hover-black" href="#工事中">Contact</a>
+</nav>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- Main -->
+<div class="w3-main" style="margin-left:250px">
+
+  <div class="w3-row w3-padding-64">
+    <div class="w3-twothird w3-container">
+      <h1 class="w3-text-teal">ゲーム試作始めました！</h1>
+      <p>部員AnsaがPythonを学んだ結果</p>
+      <p>以下のコードが生まれました。</p>
+      <pre>
+	<code class="language-python">
+import os
+import time
+from random import *
+
+# prayer status
+Level = 1
+HP = randint(8,12)+1*Level
+ATK = randint(3,7)+1*Level
+DEF = randint(1,3)+1*Level
+
+# enemy status
+Level_e = 1
+HP_e = randint(10,15)+1*Level_e
+ATK_e = randint(2,5)+1*Level_e
+DEF_e = randint(1,3)+1*Level_e
+
+
+
+# game system
+game_map = []
+x_list = []
+
+for i in range(10):
+	for j in range(10):
+		x = randint(1,3)
+		x_list.append(x)
+	game_map.append(x_list)
+
+
+player_x = 0
+player_y = 0
+
+while True:
+	map_move = str(input("どちらに進みますか："))
+
+	if map_move == "x":
+		player_x = player_x + 1
+
+	elif map_move == "y":
+		player_y = player_y + 1
+
+	player_map = game_map[player_x][player_y]
+	if player_map == 3:
+		fight_HP = HP
+		fight_HP_e = HP_e
+		while fight_HP > 0 and fight_HP_e > 0:
+			print("プレイヤーのHP:" + str(fight_HP))
+			print("モンスターのHP:" + str(fight_HP_e))
+			print("atk")
+			com = str(input("行動を選んでください："))
+			if com == "atk":
+				to_e_damage = ATK - DEF_e
+				if to_e_damage < 1:
+					to_e_damage = 1
+				fight_HP_e = fight_HP_e - to_e_damage
+				print("プレイヤーの攻撃！")
+				print(str(to_e_damage) + "ダメージ与えた！")
+				time.sleep(1.0)
+
+			com_e = "atk"
+			if com_e == "atk":
+				to_p_damage = ATK_e - DEF
+				if to_p_damage < 1:
+					to_p_damage = 1
+				fight_HP = fight_HP - to_p_damage
+				print("モンスターの攻撃！")
+				print(str(to_p_damage) + "ダメージ食らった！")
+				time.sleep(1.5)
+				os.system("clear")
+
+		if fight_HP_e < 1:
+			Level = Level + 1
+		if fight_HP < 1:
+			print("you dead")
+			break
+		HP = 10+1*Level
+		ATK = 5+1*Level
+		DEF = 3+1*Level
+
+	if player_x > 8 or player_y > 8:
+		print("fin")
+		break
+	 </code>
+      </pre>
+    </div>
+    <div class="w3-third w3-container">
+    </div>
+  </div>
+
+
+
+
+  <!-- Pagination -->
+  <div class="w3-center w3-padding-32">
+    <div class="w3-bar">
+      <a class="w3-button w3-black" href="#">1</a>
+      <!-- <a class="w3-button w3-hover-black" href="#">2</a> -->
+      <!-- <a class="w3-button w3-hover-black" href="#">3</a> -->
+      <!-- <a class="w3-button w3-hover-black" href="#">4</a> -->
+      <!-- <a class="w3-button w3-hover-black" href="#">5</a> -->
+      <a class="w3-button w3-hover-black" href="#">»</a>
+    </div>
+  </div>
+
+  <footer id="myFooter">
+    <div class="w3-container w3-theme-l2 w3-padding-32">
+      <h4>Footer</h4>
+    </div>
+
+    <div class="w3-container w3-theme-l1">
+      <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+    </div>
+  </footer>
+
+  <!-- END MAIN -->
+</div>
+
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/highlight.min.js"></script>
+<script>
+  // Get the Sidebar
+  var mySidebar = document.getElementById("mySidebar");
+
+  // Get the DIV with overlay effect
+  var overlayBg = document.getElementById("myOverlay");
+
+  // Toggle between showing and hiding the sidebar, and add overlay effect
+  function w3_open() {
+      if (mySidebar.style.display === 'block') {
+	  mySidebar.style.display = 'none';
+	  overlayBg.style.display = "none";
+      } else {
+	  mySidebar.style.display = 'block';
+	  overlayBg.style.display = "block";
+      }
+  }
+
+  // Close the sidebar with the close button
+  function w3_close() {
+      mySidebar.style.display = "none";
+      overlayBg.style.display = "none";
+  }
+  hljs.highlightAll();
+</script>
+</body>
+</html>
+
