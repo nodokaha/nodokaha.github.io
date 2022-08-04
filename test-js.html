@@ -1,0 +1,107 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <link href="jquery.css" rel="stylesheet" type="text/css">
+  <link href="prism-coy.css" rel="stylesheet" type="text/css">
+  <link href="screen.css" rel="stylesheet" type="text/css">
+  <link href="main.css" rel="stylesheet" type="text/css">
+  <script src="jquery.terminal.js" type="text/javascript"></script>
+  <script src="prism.js" type="text/javascript"></script>
+  <script src="jquery.terminal.prism.js" type="text/javascript"></script>
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0"/>
+  <script src="https://cdn.jsdelivr.net/npm/brython@3/brython.min.js">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js">
+  </script>
+</head>
+<body onload="brython()">
+  <script type="text/python">
+from browser import document, html
+import os
+import random
+
+# prayer status
+Level = 1
+HP = random.randint(8,12)+1*Level
+ATK = random.randint(3,7)+1*Level
+DEF = random.randint(1,3)+1*Level
+
+# enemy status
+Level_e = 1
+HP_e = random.randint(10,15)+1*Level_e
+ATK_e = random.randint(2,5)+1*Level_e
+DEF_e = random.randint(1,3)+1*Level_e
+
+
+
+# game system
+game_map = []
+x_list = []
+
+for i in range(10):
+	for j in range(10):
+		x = random.randint(1,3)
+		x_list.append(x)
+	game_map.append(x_list)
+
+
+player_x = 0
+player_y = 0
+
+while True:
+        document["value"].clear()
+	map_move = str(input("どちらに進みますか："))
+
+	if map_move == "x":
+		player_x = player_x + 1
+
+	elif map_move == "y":
+		player_y = player_y + 1
+
+	player_map = game_map[player_x][player_y]
+	if player_map == 3:
+		fight_HP = HP
+		fight_HP_e = HP_e
+		while fight_HP > 0 and fight_HP_e > 0:
+			print("プレイヤーのHP:" + str(fight_HP))
+			print("モンスターのHP:" + str(fight_HP_e))
+			print("atk")
+			com = str(input("(atkのみ)行動を選んでください："))
+			if com == "atk":
+				to_e_damage = ATK - DEF_e
+				if to_e_damage < 1:
+					to_e_damage = 1
+				fight_HP_e = fight_HP_e - to_e_damage
+				document["value"] <= html.P("プレイヤーの攻撃！")
+				document["value"] <= html.P(str(to_e_damage) + "ダメージ与えた！>")
+
+			com_e = "atk"
+			if com_e == "atk":
+				to_p_damage = ATK_e - DEF
+				if to_p_damage < 1:
+					to_p_damage = 1
+				fight_HP = fight_HP - to_p_damage
+				document["value"] <= html.P("モンスターの攻撃！")
+				document["value"] <= html.P(str(to_p_damage) + "ダメージ食らった！")
+
+
+		if fight_HP_e < 1:
+			Level = Level + 1
+		if fight_HP < 1:
+			document["value"] <= html.H1("you dead")
+			break
+		HP = 10+1*Level
+		ATK = 5+1*Level
+		DEF = 3+1*Level
+
+	if player_x > 8 or player_y > 8:
+		document["value"] <= html.H1("fin")
+		break
+	 
+
+  </script>
+  <div id="value"></div>
+  <!-- <input id="input"><button id="mybutton">click !</button> -->
+</body>
+
+</html>
