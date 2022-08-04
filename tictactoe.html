@@ -62,95 +62,99 @@
 
   <div class="w3-row w3-padding-64">
     <div class="w3-twothird w3-container">
-      <h1 class="w3-text-teal">ゲーム試作始めました！</h1>
-      <p>部員(RSA)がPythonを学んだ結果</p>
-      <p>以下のコードが生まれました。</p>
-      <p>動かしてみたかったらこれを</p>
-      <a class="w3-button" href="./test-js.html">これ</a>
+      <h1 class="w3-text-teal">今さら○×ゲーム</h1>
+      <p>部員(海産)が課せられてる○×ゲーム、ではなくクラシックな○×ゲームを部長は実装しました。</p>
+      <p>正直今さら感はありますが(しかもバグがありちゃんとした勝利判定になってない)</p>
+      <p>もしも暇な部員が居たら直してくれるでしょう…多分(まあ難読化されていて、さらにネットの強い人のコード丸パクりだから無理かも知れないけど)</p>
+      <p>部長は動作を理解してるのかって？してる訳ないじゃん</p>
       <pre>
 	<code class="language-python">
-import os
-import time
 from random import *
 
-# prayer status
-Level = 1
-HP = randint(8,12)+1*Level
-ATK = randint(3,7)+1*Level
-DEF = randint(1,3)+1*Level
+def init():
+	print("-------")
+	print("| | | |")
+	print("-------")
+	print("| | | |")
+	print("-------")
+	print("| | | |")
+	print("-------")
+	player = randint(1,2) #1で○2で×
+	print("あなたは○、先行です" if player == 1 else "あなたは×、後攻です")
+	return player == 1
 
-# enemy status
-Level_e = 1
-HP_e = randint(10,15)+1*Level_e
-ATK_e = randint(2,5)+1*Level_e
-DEF_e = randint(1,3)+1*Level_e
+def null(map):
+        return not ([] == list(filter(lambda x: True if x == 0 else False, map)))
 
+def check(map, mark):
+        def subcheck(x, null):
+                if x and mark and (not null):
+                        print("You win!" if mark else "You lose")
+                        exit()
+                elif x and (not mark) and (not null):
+                        print("You win!" if mark else "You lose")
+                        exit()
+                        
+        for x in range(0,9,3): #横一列の勝利判定
+                subcheck(map[x+0] == map[x+1] == map[x+2], 0 == map[x+0] + map[x+1] + map[x+2])
+                
+        for y in range(0,3): #縦一列の勝利判定
+                subcheck(map[y+0] == map[y+3] == map[y+6], 0 == map[y+0] + map[y+3] + map[y+6])
+                
+        subcheck(map[0] == map[4] == map[8], 0 == map[0] + map[4] + map[8])
+        subcheck(map[2] == map[4] == map[6], 0 == map[2] + map[4] + map[6])
+        
 
+def update(x, mark, map): #引数はマス選択
+        #	print(mark)
+        print(map)
+        print(map[x])
+        map[x] = 1 if mark else 2
+        print("-------\n|", end="")
+        for x in range(0,9):
+                print( "○" if map[x] == 1 else "×" if map[x] == 2 else " ", end="|")
+                if (x+1)%3 == 0: 	print("\n-------\n|", end="") if not (x+1 == 9) else print("\n-------\n")
 
-# game system
-game_map = []
-x_list = []
+def enemy_ai草ww(map, mark):
+        map_copy = list(map)
+        enemy_map = []
+        for x in range(0,len(map)):
+                if map_copy.pop(0) == 0:
+                      enemy_map.insert(0, x)
+        print(enemy_map)
+        return enemy_map
+                
+def main():
+        map = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+#        enemy_map = []
+        #        map = [0, 1, 1, , 0, 0, 0, 0, 0]
+        mark = init()
+        turn = True
+#        update(int(input("あなたの番です。マスを選んでください： ")), mark, map)
+        while null(map):
+                if mark == turn:
+                        def test_input():
+                                user_input = int(input("あなたの番です。マスを選んでください： "))
+                                if (map[user_input] == 0 or map[user_input] == mark):
+                                        update(user_input, mark, map)
+                                        return
+                                else:
+                                        test_input()
+                        test_input()
+                        check(map,mark)
+                else:
+                        a = int(choice(enemy_ai草ww(map, mark)))
+                        print(a)
+                        update(a, not mark, map)
+                        check(map,mark)
+                print(map)
+#                check(map, mark)
+                turn = not turn
 
-for i in range(10):
-	for j in range(10):
-		x = randint(1,3)
-		x_list.append(x)
-	game_map.append(x_list)
+        print("draw")
 
-
-player_x = 0
-player_y = 0
-
-while True:
-	map_move = str(input("どちらに進みますか："))
-
-	if map_move == "x":
-		player_x = player_x + 1
-
-	elif map_move == "y":
-		player_y = player_y + 1
-
-	player_map = game_map[player_x][player_y]
-	if player_map == 3:
-		fight_HP = HP
-		fight_HP_e = HP_e
-		while fight_HP > 0 and fight_HP_e > 0:
-			print("プレイヤーのHP:" + str(fight_HP))
-			print("モンスターのHP:" + str(fight_HP_e))
-			print("atk")
-			com = str(input("行動を選んでください："))
-			if com == "atk":
-				to_e_damage = ATK - DEF_e
-				if to_e_damage < 1:
-					to_e_damage = 1
-				fight_HP_e = fight_HP_e - to_e_damage
-				print("プレイヤーの攻撃！")
-				print(str(to_e_damage) + "ダメージ与えた！")
-				time.sleep(1.0)
-
-			com_e = "atk"
-			if com_e == "atk":
-				to_p_damage = ATK_e - DEF
-				if to_p_damage < 1:
-					to_p_damage = 1
-				fight_HP = fight_HP - to_p_damage
-				print("モンスターの攻撃！")
-				print(str(to_p_damage) + "ダメージ食らった！")
-				time.sleep(1.5)
-				os.system("clear")
-
-		if fight_HP_e < 1:
-			Level = Level + 1
-		if fight_HP < 1:
-			print("you dead")
-			break
-		HP = 10+1*Level
-		ATK = 5+1*Level
-		DEF = 3+1*Level
-
-	if player_x > 8 or player_y > 8:
-		print("fin")
-		break
+main()        
+ 
 	 </code>
       </pre>
     </div>
@@ -164,8 +168,8 @@ while True:
   <!-- Pagination -->
   <div class="w3-center w3-padding-32">
     <div class="w3-bar">
-      <a class="w3-button w3-black" href="#">1</a>
-      <a class="w3-button w3-hover-black" href="./tictactoe.html">2</a>
+      <a class="w3-button w3-hover-black" href="./minigame.html">1</a>
+      <a class="w3-button w3-black" href="./tictactoe.html">2</a>
       <!-- <a class="w3-button w3-hover-black" href="#">3</a> -->
       <!-- <a class="w3-button w3-hover-black" href="#">4</a> -->
       <!-- <a class="w3-button w3-hover-black" href="#">5</a> -->
@@ -176,8 +180,7 @@ while True:
   <footer id="myFooter">
     <div class="w3-container w3-theme-l2 w3-padding-32">
       <h4>TKCTF-club site. All Right Receive © nodokaha</h4>
-      <p>update 2022-08-4 23:25</p>
-      <p>2022-07-27 8:00</p>
+      <p>2022-08-4 23:23</p>
     </div>
 
     <div class="w3-container w3-theme-l1">
