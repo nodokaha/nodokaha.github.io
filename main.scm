@@ -265,7 +265,8 @@
 (cond ((string=? user-msg "はい") (display "そうですか"))
       ((string=? user-msg "いいえ") (display "……えー。"))
       (else (display "……次に進めますよ。")))
-
+(display "驚きました。よくこんなところに来ましたね。")
+(display "ここはもう捨てられた場所です。でも…")
 (display "あなたにお願いしたいことがあります。")
 
 (display "聞いてくれますか？")
