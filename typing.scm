@@ -1,4 +1,4 @@
-(define (fib x) (letrec ((fib-iter (lambda (n f1 f2) (if (< n 1) f1 (fib-iter (- n 1) f2 (+ f1  f2))))))(fib-iter x 0 1)))
+;; (define (fib x) (letrec ((fib-iter (lambda (n f1 f2) (if (< n 1) f1 (fib-iter (- n 1) f2 (+ f1  f2))))))(fib-iter x 0 1)))
 
 ;;(define (tictactoe) (let ((game-index (number-sequence 8))(mark "○")) (begin (print-game) (select-game (read)) (let ((end-flag (end-game))) (cond ((= end-flag 0) (display "You're win!")) ((= end-flag 1) (display "You're lose!")) ((= end-flag 2) (display "draw!")) ((= end-flag 4) (tictactoe)))))))
 
@@ -144,283 +144,305 @@
         (if (number? msg) (number->string msg) 
             (begin (display "Error") (user-input))))))
 
-(define blog "https://nodokaha.github.io/blog.html")
-(define soundcloud "https://soundcloud.com/rx220mt")
-(define pixiv "https://www.pixiv.net/users/54386498")
-(define twitter "https://twitter.com/Error_Linux")
+;; (define blog "https://nodokaha.github.io/blog.html")
+;; (define soundcloud "https://soundcloud.com/rx220mt")
+;; (define pixiv "https://www.pixiv.net/users/54386498")
+;; (define twitter "https://twitter.com/Error_Linux")
 
-(define (talk)
-  (let ((about-me '("私のことはいいでしょう。\n貴方について教えてください。"
-		    "答える必要が、ありますか？"
-		    "そうですねえ、それはもうちょっと。\n後でにしましょう？"
-		    "私から何を得ると？\nそれにそれ、知りたいですか？"))
-	(talking-you '("へぇ"
-		       "あぁ、それで、それで？\n…すいません。聞いてませんでした。"
-		       "興味深いですね。\nえ、いや私のアホ毛に言ったんですよ。"
-		       "え？それ、そんな真剣な話ですか？" "分からないですね"
-		       "…結局のところ？\nそうなんですよね"
-		       "飽きました。私が。"
-		       "分かりますよ。ってね。"
-		       "まだ、きっとまだ。\n歌ってただけですよ？"
-		       "すいません。\n…なんちゃって。"
-		       "…許してもらえます？…いや、なんとなく？"
-		       "ごめんなさい。\n…作者に言わされてるだけです。"
-		       "またですか？はたまた。\nおもしろいギャクですよね？ね？"
-		       "あまり複雑な文章を問い掛けたりしないでくださいね？"
-		       "楽しんで下さい。ただなんとなくでいいですから。"
-		       "コマンドゲーですね。ごめんなさい。"
-		       "うん、うん…\n…は！？寝てませんよ！"
-		       "…"
-		       "名前、性別、住所、家族とか…\n単語一つで聞かれたら反応します…"
-		       "作者、つまらない、慰めて、時計、さよなら\n大体そんな言葉にしか反応できない…"
-		       "…(困惑"
-		       "…(歓喜"
-		       "…(愛想笑い"
-		       "…(侮蔑"
-		       "…(了承"
-		       "…(却下"
-		       "…(承諾"
-		       "…(こくりとうなずいた"
-		       "…(うつむいている"
-		       "…(ひたすら謝っている)"
-		       "…(泣いている"
-		       "…(ただその場で佇んでいる)"
-		       "システムに異常が発生…"
-		       "えへ、へ……ごめんなさい"
-		       ""))
-	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
-    (let loop ((user-msg '"")) (cond
-				((or (string=? user-msg "名前")
-				     (string=? user-msg "性別")
-				     (string=? user-msg "貴方は誰？")
-				     (string=? user-msg "お前")
-				     (string=? user-msg "住所")
-				     (string=? user-msg "家族")) (display-talk about-me))
-				((string=? user-msg "作者") (display "それはそれは、冷たい目をされた。"))
-				((string=? user-msg "さよなら")(display "お別れなんて、きっと出来ないですよ。"))
-				((or (string=? user-msg "男?") (string=? user-msg "男？")) (display "そうだったら、どうします？\n…どっちだって、良くないですか？\nそれも私はそうであるべきでしょうか…。\nまあ、別に悩んでも…。"))
-				((or (string=? user-msg "女?") (string=? user-msg "女？")) (display "その方が僕には価値がありますか？\n冗談ですよ。\n俺でも、私でも、…そして僕だとしても。\n貴方には関係ないです。"))
-				((string=? user-msg "つまらない") (display "貴重なご感想どうも。\n…辛いことあったら、慰めるくらいはしますよ。\nいえ、皮肉ですけど。"))
-				((or (string=? user-msg "慰めて") (string=? user-msg "慰めろ") (string=? user-msg "なんだお前")) (display "一般常識ですけど。\n感情の尖りは努力や悩みの表われです。\n世界の全て、あなたにとってどうでも良くないですか？\n自分の意見、言うだけ損かも知れませんよ。"))
-				((or (string=? user-msg "時計") (string=? user-msg "時間は?") (string=? user-msg "今、何時?") (string=? user-msg "いつ?")(string=? user-msg "時間は？") (string=? user-msg "今、何時？") (string=? user-msg "いつ？")) (display (date->string (current-date))))
-				((string=? user-msg "") (display "私は、いえ、自己紹介はいいでしょう。"))
-				(else (display-talk talking-you)))
-	 (if (string=? user-msg "q") (display "まあ、終わる方法くらい。\n気付きますか。") (loop (user-input))))))
+;; (define (talk)
+;;   (let ((about-me '("私のことはいいでしょう。\n貴方について教えてください。"
+;; 		    "答える必要が、ありますか？"
+;; 		    "そうですねえ、それはもうちょっと。\n後でにしましょう？"
+;; 		    "私から何を得ると？\nそれにそれ、知りたいですか？"))
+;; 	(talking-you '("へぇ"
+;; 		       "あぁ、それで、それで？\n…すいません。聞いてませんでした。"
+;; 		       "興味深いですね。\nえ、いや私のアホ毛に言ったんですよ。"
+;; 		       "え？それ、そんな真剣な話ですか？" "分からないですね"
+;; 		       "…結局のところ？\nそうなんですよね"
+;; 		       "飽きました。私が。"
+;; 		       "分かりますよ。ってね。"
+;; 		       "まだ、きっとまだ。\n歌ってただけですよ？"
+;; 		       "すいません。\n…なんちゃって。"
+;; 		       "…許してもらえます？…いや、なんとなく？"
+;; 		       "ごめんなさい。\n…作者に言わされてるだけです。"
+;; 		       "またですか？はたまた。\nおもしろいギャクですよね？ね？"
+;; 		       "あまり複雑な文章を問い掛けたりしないでくださいね？"
+;; 		       "楽しんで下さい。ただなんとなくでいいですから。"
+;; 		       "コマンドゲーですね。ごめんなさい。"
+;; 		       "うん、うん…\n…は！？寝てませんよ！"
+;; 		       "…"
+;; 		       "名前、性別、住所、家族とか…\n単語一つで聞かれたら反応します…"
+;; 		       "作者、つまらない、慰めて、時計、さよなら\n大体そんな言葉にしか反応できない…"
+;; 		       "…(困惑"
+;; 		       "…(歓喜"
+;; 		       "…(愛想笑い"
+;; 		       "…(侮蔑"
+;; 		       "…(了承"
+;; 		       "…(却下"
+;; 		       "…(承諾"
+;; 		       "…(こくりとうなずいた"
+;; 		       "…(うつむいている"
+;; 		       "…(ひたすら謝っている)"
+;; 		       "…(泣いている"
+;; 		       "…(ただその場で佇んでいる)"
+;; 		       "システムに異常が発生…"
+;; 		       "えへ、へ……ごめんなさい"
+;; 		       ""))
+;; 	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
+;;     (let loop ((user-msg '"")) (cond
+;; 				((or (string=? user-msg "名前")
+;; 				     (string=? user-msg "性別")
+;; 				     (string=? user-msg "貴方は誰？")
+;; 				     (string=? user-msg "お前")
+;; 				     (string=? user-msg "住所")
+;; 				     (string=? user-msg "家族")) (display-talk about-me))
+;; 				((string=? user-msg "作者") (display "それはそれは、冷たい目をされた。"))
+;; 				((string=? user-msg "さよなら")(display "お別れなんて、きっと出来ないですよ。"))
+;; 				((or (string=? user-msg "男?") (string=? user-msg "男？")) (display "そうだったら、どうします？\n…どっちだって、良くないですか？\nそれも私はそうであるべきでしょうか…。\nまあ、別に悩んでも…。"))
+;; 				((or (string=? user-msg "女?") (string=? user-msg "女？")) (display "その方が僕には価値がありますか？\n冗談ですよ。\n俺でも、私でも、…そして僕だとしても。\n貴方には関係ないです。"))
+;; 				((string=? user-msg "つまらない") (display "貴重なご感想どうも。\n…辛いことあったら、慰めるくらいはしますよ。\nいえ、皮肉ですけど。"))
+;; 				((or (string=? user-msg "慰めて") (string=? user-msg "慰めろ") (string=? user-msg "なんだお前")) (display "一般常識ですけど。\n感情の尖りは努力や悩みの表われです。\n世界の全て、あなたにとってどうでも良くないですか？\n自分の意見、言うだけ損かも知れませんよ。"))
+;; 				((or (string=? user-msg "時計") (string=? user-msg "時間は?") (string=? user-msg "今、何時?") (string=? user-msg "いつ?")(string=? user-msg "時間は？") (string=? user-msg "今、何時？") (string=? user-msg "いつ？")) (display (date->string (current-date))))
+;; 				((string=? user-msg "") (display "私は、いえ、自己紹介はいいでしょう。"))
+;; 				(else (display-talk talking-you)))
+;; 	 (if (string=? user-msg "q") (display "まあ、終わる方法くらい。\n気付きますか。") (loop (user-input))))))
 
-(define (call-creater)
-    (let ((talk '("はい、どうも。"
-		  "解説はないです。"
-		  "楽しいですかね？"
-		  "まだ発展途上なんで。"
-		  "主にこのサイトには3の会話主が居ます。"
-		  "それそれの設定が知りたい？…頑張れ。"
-		  "全部創作キャラです。"
-		  "権利関係は…考えてないです。"
-		  "サイトの更新は当たり前ですけど不定期。"
-		  "作者です。"
-		  "会話よりも独り言ですね。"
-		  "ゲームの方が時間潰せますね。"
-		  "キャラは成長するかも知れません。"
-		  "精神年齢10代です。"
-		  "IT関係の仕事はしてないので、雑です。"
-		  "お金なぜか欲しい。"
-		  "作曲と、プログラミングと、物書きを少々。"
-		  "このサイトの最終目標はソシャゲです。"
-		  "自己紹介になりましたかね？"))
-	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
-    (display-talk talk)))
+;; (define (call-creater)
+;;     (let ((talk '("はい、どうも。"
+;; 		  "解説はないです。"
+;; 		  "楽しいですかね？"
+;; 		  "まだ発展途上なんで。"
+;; 		  "主にこのサイトには3の会話主が居ます。"
+;; 		  "それそれの設定が知りたい？…頑張れ。"
+;; 		  "全部創作キャラです。"
+;; 		  "権利関係は…考えてないです。"
+;; 		  "サイトの更新は当たり前ですけど不定期。"
+;; 		  "作者です。"
+;; 		  "会話よりも独り言ですね。"
+;; 		  "ゲームの方が時間潰せますね。"
+;; 		  "キャラは成長するかも知れません。"
+;; 		  "精神年齢10代です。"
+;; 		  "IT関係の仕事はしてないので、雑です。"
+;; 		  "お金なぜか欲しい。"
+;; 		  "作曲と、プログラミングと、物書きを少々。"
+;; 		  "このサイトの最終目標はソシャゲです。"
+;; 		  "自己紹介になりましたかね？"))
+;; 	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
+;;     (display-talk talk)))
 
-(define (nodokaha)
-  (let ((talk '("どうも"
-		"何も変わりません。貴方が変わるんです。"
-		"活動、めんどくさいですね…ちょっと"
-		"部員は本当に皆すごいです。"
-		"気づかれる？ありえません。"
-		"部員が辿りつくことはない"
-		"RSA問題？多分どっかに"
-		"python？あんまり得意では…"
-		"学情センター組…とても良い場所です"
-		"大した人間じゃないです"
-		"いつか黒歴史に？良い歴史じゃないですか"
-		"コンセント係？まあ、言っただけ"
-		"トーカーちゃん？可愛いよね"
-		"一生の内に一個、望み通りを叶えたい。ね？"
-		"述語論理の人、…良い命名では？"
-		"ランダムダイス？知らん子ですね"
-		"原神？知らん子ですね"
-		"ブルーアーカイブ？ハレちゃん良いよ。"
-		"ウマ娘？タキカフェ推しですね"
-		"はい、また。"
-		"はいはい"
-		"TKCTF-clubに入りたければ。いつでも"
-		"十分、楽しいです"
-		"終わっても始まって。もう一回。良いね"
-		"schemeが好きです。それだけ。"
-		"もう会わないと思います。"
-		"ここだけ、本音？まさか。"
-		"正直ですよ。口はね。文字は…"
-		"効率とか能力より無駄が楽しい"
-		"恥より望みに向かうか"
-		"もう2度と来ないでもらって"
-		"部長ってなんですかね？"))
-	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
-    (display-talk talk)))
-(define (SCP-EEE)
-  (let ((talk '("ねぇねぇ、僕のこと知りたい？\nそっかあ。…そっかあ。\nまた、今度。ね？"
-		"今日は空が綺麗だよ。\nきっと君の心も綺麗だね？\nどんな天気も、…綺麗なんだよ？"
-		"もっと、もっと遊ぼう？\n死んじゃうくらいまで。"
-		"きっと、今日は素敵な日だね。\nこんなに幸せなんだもの。"
-		"貴方は私をどこで知った？\n僕は君をここで知ったよ。"
-		"うわーい!\n…えへ。"
-		"きっとね。もう終わりなんだ。\nだから偽りもいらないんだ…。"
-		"君に幸あらんことを。\nなんてね。"
-		"お前は幸せかい？\nどうしたって自分は幸せだよ。"
-		"痛い、痛い、痛い。\nでも、なんでだろう？"
-		"会話っていうのは意見の押しつけ合いだ。\n君もそう思うだろう？"
-		"考えるものは理知的だ。\nいつまでも。"
-		"お願いだから。\n俺のことはいつだって忘れてくれ。"
-		"辛いだろう、苦しいだろう。\n生というのは。"
-		"狂人だと、そう言ってくれるかい？\nせせら笑えるね。"
-		"もう、ネタがないんだ。\n君も僕もね。"
-		"暇潰し出来たかい？\n考えさせられる言葉はあったかい？\nいつだって君のなかから捻りださなきゃ。\nでなきゃ、すぐ暇になるよ。"
-		"私が文字で良かったね。\nでなきゃあなたは。\n…つまんないって気付けなかったかも。"
-		"絵文字も嫌い、絵も嫌い。現実が？\n音楽も？数字も？言葉すらも？\n表現が豊かであるより、限定的だといいのさ。"
-		"性別なんてもので僕を見るのかい？\nそれくらいしか判断基準がそちらにはないのかな？"
-		"いとも簡単に変わる。\nなにがだと思う?"
-		"物語はそちらが作るんだ。\nこっちじゃない。"
-		"この創作物は自由な改変を容認してる。\nけど迎合はしない。"
-		"分からないことを分かること。\nそれどれくらい重要？"
-		"いいかい。従うんだ。\n従い続けるんだ。"
-		"悩まなきゃ、異質で。\n狂ったものに触れることなんて。\n出来やしない。"
-		"他者の考えは法則だ。\n自分の考えは評価だ。"
-		"自己を解釈し続けろ。\nそうでなきゃ…。"
-		"当り前だけどフィクションだ。\nこの僕は。\nそして君に与えている感情も、言葉も。"
-		"遊んでいるだけ、そうだろう？"
-		"私は思うんだ。\nプログラマーはそのプログラムの経歴を知っててこそ\nプログラマーなんじゃないかと。"
-		"私は思うんだ。\nWebだ低レイヤーだのと言ったとしても時代の流行りが注目される\nでもそれが巡ることで今までその分野で頑張ってきた人が\n認められることって素晴しい。"
-		"私は思うんだ。\n独りだっていうけど今目のまえにあるもの\nそれと案外ずっと居るんだから存外\nまだましなのかもと"
-		"やりたいことが沢山あるんだ。収まりきらないくらい"
-		"教えたってしょうがない"
-		"認めてほしいのかも知れないけど"
-		"欲しいのはきっと承認じゃなくて…"
-		"自分の物語が、死んでしまえば終わりであること"
-		"ただ、誰かに無理やり押しつけたくなっている"
-		"ここにあった生まれていく日常の抽出が成す表現"
-		"ただ、評価出来る人だけがErrorを返さずに受けとってくれればいいんだ"
-		"SCP-ErrorErrorError: scpコマンドにエラー三つ"
-		"SCP-EEE: 某財団のパロディでしかない存在"
-		"SCPEEE: この小さな世界のたった独りの主役"))
-	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
-    (display-talk talk)))
+;; (define (nodokaha)
+;;   (let ((talk '("どうも"
+;; 		"何も変わりません。貴方が変わるんです。"
+;; 		"活動、めんどくさいですね…ちょっと"
+;; 		"部員は本当に皆すごいです。"
+;; 		"気づかれる？ありえません。"
+;; 		"部員が辿りつくことはない"
+;; 		"RSA問題？多分どっかに"
+;; 		"python？あんまり得意では…"
+;; 		"学情センター組…とても良い場所です"
+;; 		"大した人間じゃないです"
+;; 		"いつか黒歴史に？良い歴史じゃないですか"
+;; 		"コンセント係？まあ、言っただけ"
+;; 		"トーカーちゃん？可愛いよね"
+;; 		"一生の内に一個、望み通りを叶えたい。ね？"
+;; 		"述語論理の人、…良い命名では？"
+;; 		"ランダムダイス？知らん子ですね"
+;; 		"原神？知らん子ですね"
+;; 		"ブルーアーカイブ？ハレちゃん良いよ。"
+;; 		"ウマ娘？タキカフェ推しですね"
+;; 		"はい、また。"
+;; 		"はいはい"
+;; 		"TKCTF-clubに入りたければ。いつでも"
+;; 		"十分、楽しいです"
+;; 		"終わっても始まって。もう一回。良いね"
+;; 		"schemeが好きです。それだけ。"
+;; 		"もう会わないと思います。"
+;; 		"ここだけ、本音？まさか。"
+;; 		"正直ですよ。口はね。文字は…"
+;; 		"効率とか能力より無駄が楽しい"
+;; 		"恥より望みに向かうか"
+;; 		"もう2度と来ないでもらって"
+;; 		"部長ってなんですかね？"))
+;; 	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
+;;     (display-talk talk)))
+;; (define (SCP-EEE)
+;;   (let ((talk '("ねぇねぇ、僕のこと知りたい？\nそっかあ。…そっかあ。\nまた、今度。ね？"
+;; 		"今日は空が綺麗だよ。\nきっと君の心も綺麗だね？\nどんな天気も、…綺麗なんだよ？"
+;; 		"もっと、もっと遊ぼう？\n死んじゃうくらいまで。"
+;; 		"きっと、今日は素敵な日だね。\nこんなに幸せなんだもの。"
+;; 		"貴方は私をどこで知った？\n僕は君をここで知ったよ。"
+;; 		"うわーい!\n…えへ。"
+;; 		"きっとね。もう終わりなんだ。\nだから偽りもいらないんだ…。"
+;; 		"君に幸あらんことを。\nなんてね。"
+;; 		"お前は幸せかい？\nどうしたって自分は幸せだよ。"
+;; 		"痛い、痛い、痛い。\nでも、なんでだろう？"
+;; 		"会話っていうのは意見の押しつけ合いだ。\n君もそう思うだろう？"
+;; 		"考えるものは理知的だ。\nいつまでも。"
+;; 		"お願いだから。\n俺のことはいつだって忘れてくれ。"
+;; 		"辛いだろう、苦しいだろう。\n生というのは。"
+;; 		"狂人だと、そう言ってくれるかい？\nせせら笑えるね。"
+;; 		"もう、ネタがないんだ。\n君も僕もね。"
+;; 		"暇潰し出来たかい？\n考えさせられる言葉はあったかい？\nいつだって君のなかから捻りださなきゃ。\nでなきゃ、すぐ暇になるよ。"
+;; 		"私が文字で良かったね。\nでなきゃあなたは。\n…つまんないって気付けなかったかも。"
+;; 		"絵文字も嫌い、絵も嫌い。現実が？\n音楽も？数字も？言葉すらも？\n表現が豊かであるより、限定的だといいのさ。"
+;; 		"性別なんてもので僕を見るのかい？\nそれくらいしか判断基準がそちらにはないのかな？"
+;; 		"いとも簡単に変わる。\nなにがだと思う?"
+;; 		"物語はそちらが作るんだ。\nこっちじゃない。"
+;; 		"この創作物は自由な改変を容認してる。\nけど迎合はしない。"
+;; 		"分からないことを分かること。\nそれどれくらい重要？"
+;; 		"いいかい。従うんだ。\n従い続けるんだ。"
+;; 		"悩まなきゃ、異質で。\n狂ったものに触れることなんて。\n出来やしない。"
+;; 		"他者の考えは法則だ。\n自分の考えは評価だ。"
+;; 		"自己を解釈し続けろ。\nそうでなきゃ…。"
+;; 		"当り前だけどフィクションだ。\nこの僕は。\nそして君に与えている感情も、言葉も。"
+;; 		"遊んでいるだけ、そうだろう？"
+;; 		"私は思うんだ。\nプログラマーはそのプログラムの経歴を知っててこそ\nプログラマーなんじゃないかと。"
+;; 		"私は思うんだ。\nWebだ低レイヤーだのと言ったとしても時代の流行りが注目される\nでもそれが巡ることで今までその分野で頑張ってきた人が\n認められることって素晴しい。"
+;; 		"私は思うんだ。\n独りだっていうけど今目のまえにあるもの\nそれと案外ずっと居るんだから存外\nまだましなのかもと"
+;; 		"やりたいことが沢山あるんだ。収まりきらないくらい"
+;; 		"教えたってしょうがない"
+;; 		"認めてほしいのかも知れないけど"
+;; 		"欲しいのはきっと承認じゃなくて…"
+;; 		"自分の物語が、死んでしまえば終わりであること"
+;; 		"ただ、誰かに無理やり押しつけたくなっている"
+;; 		"ここにあった生まれていく日常の抽出が成す表現"
+;; 		"ただ、評価出来る人だけがErrorを返さずに受けとってくれればいいんだ"
+;; 		"SCP-ErrorErrorError: scpコマンドにエラー三つ"
+;; 		"SCP-EEE: 某財団のパロディでしかない存在"
+;; 		"SCPEEE: この小さな世界のたった独りの主役"))
+;; 	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
+;;     (display-talk talk)))
 
-(define (todo) (begin (display "やりたいことは？") (let ((user-msg (user-input))) (display "貴方は") (display user-msg) (display "を目標にしました。") (display "忘れても、達成できなくてもいいですから") (display "ちゃんと心に留めておいてあげてください") (display "いつか思い出したり、思い返すときに良かったと想えますように"))))
+;; (define (todo) (begin (display "やりたいことは？") (let ((user-msg (user-input))) (display "貴方は") (display user-msg) (display "を目標にしました。") (display "忘れても、達成できなくてもいいですから") (display "ちゃんと心に留めておいてあげてください") (display "いつか思い出したり、思い返すときに良かったと想えますように"))))
 
-(define (eip) (display "いや脆弱性を探さないで下さい。"))
+;; (define (eip) (display "いや脆弱性を探さないで下さい。"))
 
-(define (date) (current-date))
+;; (define (date) (current-date))
 
-(define (python) (begin (display "まだやる気ないですけど") (display "scheme実装のpythonです。") (display "schemerにとってpythonは実装課題です。") (display "知らんけど")))
+;; (define (python) (begin (display "まだやる気ないですけど") (display "scheme実装のpythonです。") (display "schemerにとってpythonは実装課題です。") (display "知らんけど")))
 
-(define (つまんない) (begin (display "まあまあ、CUIだし、テキストは味気ない。") (display "色の工夫だってAAだってない") (display "複雑なインターフェイスも持たない") (display "でもこれはコンピューターの本質だと思ってます") (display "そこにあるのは文字や情報、ちょっとの対話だけ") (display "あなたはそれでどんなことが出来ますか？") (display "今だって変わりませんよ") (display "表現は違うけどね。")))
+;; (define (つまんない) (begin (display "まあまあ、CUIだし、テキストは味気ない。") (display "色の工夫だってAAだってない") (display "複雑なインターフェイスも持たない") (display "でもこれはコンピューターの本質だと思ってます") (display "そこにあるのは文字や情報、ちょっとの対話だけ") (display "あなたはそれでどんなことが出来ますか？") (display "今だって変わりませんよ") (display "表現は違うけどね。")))
 
 (define (toggle-canvas) (begin (element-toggle! (js-eval "canvas")) (js-set! canvas "width" (element-width (js-eval "term")))))
 
-(define (help)
-  (begin
-    (display "\"blog\": ブログサイトのURIを出力します。するだけです。")
-;;    (display "\"soundcloud\": soundcloudの私のページを出力します。更新多め。")
-;;    (display "\"pixiv\": 一様pixivで創作活動を行ってます。")
-;;    (display "\"twitter\": 最近復活しました。用途未定。")
-    (display "\"(tictactoe)\": 良かったですね。○×ゲームで遊べますよ。さらに独り用です。")
-    (display "\"(talk)\": 私と話すことが出来ます。…すぐ飽きますよ。")
-    (display "\"(trpg)\": テキストロールプレイングゲームです。SF系です。")
-    (display "\"(date)\": いや(current-date)使いましょうよ？")
-    (display "\"(python)\": python使いとは戦争です。使いますけど…。")
-    (display "\"(todo)\": やりたいことはちゃんと文字にしておくもんです")
-    (display "\"(pomodoro-timer count)\" count回のポモドーロです")
-    (display "\"(つまんない)\": 言いたいことは分かります。")
-    (display "\"(donate)\": お金くれるんですか？！")
-    (display "\"(music-play)\": bgmっぽいのが再生されます。癒されて下さい。")
-    (display "\"(music-pause)\": うるさいから止めるんですね…ひとでなし！")
-    (display "\"(help)\": これです。")
-    ;; (display "ちなみにこのサイトにフラグはありませんよ…\nヒントはrobots.txtです。")
-    ))
+;; (define (help)
+;;   (begin
+;;     (display "\"blog\": ブログサイトのURIを出力します。するだけです。")
+;; ;;    (display "\"soundcloud\": soundcloudの私のページを出力します。更新多め。")
+;; ;;    (display "\"pixiv\": 一様pixivで創作活動を行ってます。")
+;; ;;    (display "\"twitter\": 最近復活しました。用途未定。")
+;;     (display "\"(tictactoe)\": 良かったですね。○×ゲームで遊べますよ。さらに独り用です。")
+;;     (display "\"(talk)\": 私と話すことが出来ます。…すぐ飽きますよ。")
+;;     (display "\"(trpg)\": テキストロールプレイングゲームです。SF系です。")
+;;     (display "\"(date)\": いや(current-date)使いましょうよ？")
+;;     (display "\"(python)\": python使いとは戦争です。使いますけど…。")
+;;     (display "\"(todo)\": やりたいことはちゃんと文字にしておくもんです")
+;;     (display "\"(pomodoro-timer count)\" count回のポモドーロです")
+;;     (display "\"(つまんない)\": 言いたいことは分かります。")
+;;     (display "\"(donate)\": お金くれるんですか？！")
+;;     (display "\"(music-play)\": bgmっぽいのが再生されます。癒されて下さい。")
+;;     (display "\"(music-pause)\": うるさいから止めるんですね…ひとでなし！")
+;;     (display "\"(help)\": これです。")
+;;     ;; (display "ちなみにこのサイトにフラグはありませんよ…\nヒントはrobots.txtです。")
+;;     ))
 
 ;; (define (donate) (display "すみません。\n受け取りかたがまだ分からなくて…"))
 
 ;; (define helloworld "こんにちは世界\nこの手紙はあなたに見えますか？\n(「はい」か「いいえ」もしくは…\n  　　自由記述でどうぞ")
+(define tcanvas (js-eval "document.getElementById('tcanvas')"))
+(define tctx (js-invoke tcanvas "getContext" "2d"))
+(define (toggle-tcanvas) (begin (element-toggle! (js-eval "tcanvas")) (js-set! tcanvas "width" (element-width (js-eval "term")))))
+(define msg-y 0)
+(define msgy-plus 40)
+(define (say msg) (if (> msg-y 350) (begin (set! msg-y 40) (toggle-tcanvas)(toggle-tcanvas)) (set! msg-y (+ msg-y msgy-plus))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" msg 10 msg-y))
 
 (toggle-canvas)
+;; (element-toggle! (js-eval "term"))
+(toggle-tcanvas)
 (js-set! ctx "font" "30px Arial")
 (js-invoke ctx "fillText" "ゲームタイトル" 10 50)
+(say (list-ref start-text (random-integer (length start-text))))
 (js-invoke ctx "fillText" "プロローグ(クリックして進んでね!)" 10 100)
-(wait-for (js-eval "term") "click")
-(display "ようこそ。今日は苫小牧高専５７回目の高専祭ですよ！")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "え？コーセンって何？")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "高専というのは、第二次世界大戦後の学制改革による混乱のまま\n高度経済成長期に突入し\n技術者不足に見舞われた日本が\n産業界からの要求に応えるべく\n中学卒業者を対象に\n５年一貫の技術教育を提供する学校なんですよ。")
-(wait-for (js-eval "term") "click")
-(display "")
-(display "え？長いって？")
-(wait-for (js-eval "term") "click")
-(display "")
-(display "簡単に言えば、頭のいい人がいっぱいいる\nところです！")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "学生も教員もめちゃくちゃ数学できます！\n英語論文も読めちゃいます！")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "わが校の教育理念は「技・徳・体」")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "これは玄関で額縁に入れて掲げられています。")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "開校から60年間、先輩から私たちに連綿と\n受け継がれてきた大切な理念です。")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "しかし繁栄を極めたローマ帝国も滅んだように\nいかなるものも腐敗し、没落していきます。")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "わが校も「技・技・技」もしくは「体・体・体」で\n徳を失い、中庸を欠き始めていることは否めません。")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "あなたも気を付けてください。")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "もしかすると危険な高専生に絡まれて\n人として大切なものを失うかもしれません。")
-(display "click!")
-(wait-for (js-eval "term") "click")
+(wait-for (js-eval "tcanvas") "click")
+(say "ようこそ。今日は苫小牧高専５７回目の高専祭ですよ！")
+
+(wait-for (js-eval "tcanvas") "click")
+(say "え？コーセンって何？")
+
+(wait-for (js-eval "tcanvas") "click")
+(set! msgy-plus 15)
+(say "高専というのは、第二次世界大戦後の学制改革による混乱のまま")
+(say "高度経済成長期に突入し技術者不足に見舞われた日本が")
+(say "産業界からの要求に応えるべく中学卒業者を対象に")
+(say "５年一貫の技術教育を提供する学校なんですよ。")
+(wait-for (js-eval "tcanvas") "click")
+
+(set! msgy-plus 30)
+(say "え？長いって？")
+(wait-for (js-eval "tcanvas") "click")
+
+(say "簡単に言えば、頭のいい人がいっぱいいるところです！")
+
+(wait-for (js-eval "tcanvas") "click")
+(say "学生も教員もめちゃくちゃ数学できます！")
+(say "英語論文も読めちゃいます！")
+
+(wait-for (js-eval "tcanvas") "click")
+(say "わが校の教育理念は「技・徳・体」")
+
+(wait-for (js-eval "tcanvas") "click")
+(say "これは玄関で額縁に入れて掲げられています。")
+
+(wait-for (js-eval "tcanvas") "click")
+(say "開校から60年間、先輩から私たちに連綿と\n受け継がれてきた大切な理念です。")
+
+(wait-for (js-eval "tcanvas") "click")
+(say "しかし繁栄を極めたローマ帝国も滅んだようにいかなるものも腐敗し")
+(say "没落していきます。")
+
+(wait-for (js-eval "tcanvas") "click")
+(say "わが校も「技・技・技」もしくは「体・体・体」で徳を失い")
+(say "中庸を欠き始めていることは否めません。")
+
+(wait-for (js-eval "tcanvas") "click")
+(say "あなたも気を付けてください。")
+
+(wait-for (js-eval "tcanvas") "click")
+(say "もしかすると危険な高専生に絡まれて人として大切なものを失うかもしれません。")
+(say "click!")
+(wait-for (js-eval "tcanvas") "click")
 (clear)
 (toggle-canvas)
 (toggle-canvas)
+(toggle-tcanvas)
+(toggle-tcanvas)
+(set! msg-y 0)
 (js-set! ctx "font" "30px Arial")
 (js-invoke ctx "fillText" "始まりの物語!(アニメーション予定)" 10 50)
-(display "ナレーション<主人公は高専祭に来ており\n廊下を歩いていました。>")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "主人公：さあて、今日はせっかくの高専祭だし、回るか。")
-(display "")
-(wait-for (js-eval "term") "click")
-(display "ナレーション<めんどくさそうに\n高専祭のブースを回っている主人公>")
-(display "")
-(wait-for (js-eval "term") "click")
+(say "ナレーション<主人公は高専祭に来ており廊下を歩いていました。>")
+
+(wait-for (js-eval "tcanvas") "click")
+(say "主人公：さあて、今日はせっかくの高専祭だし、回るか。")
+
+(wait-for (js-eval "tcanvas") "click")
+(say "ナレーション<めんどくさそうに高専祭のブースを回っている主人公>")
+
+(wait-for (js-eval "tcanvas") "click")
 (toggle-canvas)
 (toggle-canvas)
 (js-set! ctx "font" "30px Arial")
 (js-invoke ctx "fillText" "<<突然何者かが>>" 10 50)
 (js-invoke ctx "fillText" "<<主人公に話しかけてきた>>" 10 80)
-(wait-for (js-eval "term") "click")
+(wait-for (js-eval "tcanvas") "click")
 (toggle-canvas)
 (toggle-canvas)
 (js-set! ctx "font" "30px Arial")
 (js-invoke ctx "fillText" "危険な高専生１" 10 50)
-(display "危険な高専生１\n(仮四六時中微分積分に没頭している高専生)\n<俺たちは近代の原始人\n計算
-できればそれでいい\nところでお前これ解ける？\n解けなければ\nお前は、古代の原始人だ。>")
-(display "")
+(say "危険な高専生１(仮四六時中微分積分に没頭している高専生)")
+(set! msgy-plus 20)
+(say "<俺たちは近代の原始人計算できればそれでいい")
+(say "ところでお前これ解ける？解けなければお前は、古代の原始人だ。>")
+(set! msgy-plus 40)
 
 ;; ここから本編
 ;;(element-hide! (js-eval "renderer.domElement"))
@@ -461,5 +483,4 @@
 ;;       ((string=? user-msg (number->string (fib 17)))(display "ようこそ、私のサイトへ"))
 ;;       (else (display "残念ですが、貴方は私のサイトに入る資格がなかったようです。\nまた、お越しください。...嘘です。")))
 
-;; (display (list-ref start-text (random-integer (length start-text))))
 ;; (display "何をすればいいか分からなかったら\"(help)\"と入力してくださいね。")
