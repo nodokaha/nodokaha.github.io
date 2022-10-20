@@ -64,8 +64,11 @@
 ;; (add-handler! (js-eval "document.getElementById('show')") "animationend" alert-msg)
 ;; (define (dorakue)
 ;;   (js-invoke 
+(define (say msg) (if (> msg-y 350) (begin (set! msg-y 40) (toggle-tcanvas)(toggle-tcanvas)) (set! msg-y (+ msg-y msgy-plus))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" msg 10 msg-y))
+(define (chara-say msg) (let ((msgy-plus 20)) (if (> msg-y 350) (begin (set! msg-y 40) (toggle-tcanvas)(toggle-tcanvas)) (set! msg-y (+ msg-y msgy-plus))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" msg 10 msg-y)))
 
 (define (type msg) (set! msg-y (+ msg-y 15)) (let loop ((msg-x 0)(strlist (cons #\▼ (string->list msg)))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "clearRect" msg-x msg-y (element-width (js-eval "tcanvas")) (+ msg-y 15)) (js-invoke tctx "fillText" (string (car strlist)) msg-x msg-y) (if (> msg-x (element-width (js-eval "term"))) (begin (if (> (+ msg-y 30) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0) (timer (lambda ()  (loop (+ msg-x 15) (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop 0 (cdf strlist))) 0.0125)) (if (null? (cdr strlist)) (if (> (+ msg-y 20) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0)(timer (lambda ()  (loop 0 (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop (+ msg-x 15) (cdr strlist))) 0.0125)))) (wait-for (js-eval "tcanvas") "click"))
+(define (type-nowait msg) (set! msg-y (+ msg-y 15)) (let loop ((msg-x 0)(strlist (cons #\▼ (string->list msg)))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "clearRect" msg-x msg-y (element-width (js-eval "tcanvas")) (+ msg-y 15)) (js-invoke tctx "fillText" (string (car strlist)) msg-x msg-y) (if (> msg-x (element-width (js-eval "term"))) (begin (if (> (+ msg-y 30) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0) (timer (lambda ()  (loop (+ msg-x 15) (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop 0 (cdf strlist))) 0.0125)) (if (null? (cdr strlist)) (if (> (+ msg-y 20) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0)(timer (lambda ()  (loop 0 (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop (+ msg-x 15) (cdr strlist))) 0.0125)))) )
 
 (define music (js-new "Audio" "audio/tap.mp3"))
 (define (music-play) (begin (js-invoke music "play") (js-set! music "loop" #t)))
@@ -106,6 +109,8 @@
 
 (define img (js-new "Image"))
 (js-set! img "src" "images/IMG_3207.png")
+(define four-img (js-new "Image"))
+(js-set! four-img "src" "images/IMG_3209.gif")
 
 (define (quize-game)
   (toggle-canvas)
@@ -132,6 +137,7 @@
 
 (define (game-init)
   (call/cc (lambda (return)
+	     (begin
 	     (toggle-canvas)
 	     (toggle-tcanvas)
 	     (js-set! ctx "font" "30px Arial")
@@ -254,11 +260,25 @@
 	     (js-set! ctx "font" "30px Arial")
 	     (js-invoke ctx "fillText" "目の前に屈強な男(仮)が現れた。" 10 50)
 	     (type "屈強な男:ウェーイ")
-	     (quize-game)
-	     (let ((usertext (user-input)))
-	       (cond ((string=? usertext "2") (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "正解!" 0 40)(type "危険な学生１:なかなか、やるじゃないか、またな。"))
-		     (else (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "不正解" 0 40)(type "危険な学生１:おいおい、式を雑に扱うな。ニュートンに祟られるぜ。 ")(type "主人公：ちーん")(type "ナレーション：主人公はメンタルが破壊され、人として大切なものを失った。")(return (gameover)))))
+	     (type "毎日筋トレに励んでいる、脳まで筋肉な屈強な男が現れた。")
+	     (js-invoke tctx "drawImage" four-img 100 110 300 300)
+	     (js-set! tctx "font" "20px Arial")
+	     (timer (lambda () (let loop
+		 ((msg '("「ミス！相手の腹筋がすごくてダメージをあたえられない!」"
+			 "「ミス！相手の上腕二頭筋がすごくて効果がない!」"
+			 "「ミス！相手の鍛え上げられた大胸筋によって弾かれた!」")))
+	       (toggle-tcanvas)
+	       (toggle-tcanvas)
+	       (set! msg-y 0)
+	       (js-set! tctx "font" "50px Arial")
+	       (say "1：こうげき")
+	       (say "2：まもる")
+	       (let ((usertext (user-input)))
+		 (cond ((string=? usertext "1") (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "ミス!" 0 40)(type (car msg)))
+		       (else (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "ゲームオーバー" 0 40)(type "「だめだ、筋肉によって押し潰された」")(return (gameover)))))
+	       (if (null? (cdr msg)) (display "開発者の声：どうやら、防御力とヒット率を高くし過ぎたようだ。\n隠しコマンドを使いなさい。") (loop (cdr msg))))) 2)
+	     
 
-	     )))
+	     ))))
 (game-init)
 (display "restart?")
