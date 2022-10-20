@@ -75,6 +75,8 @@
 ;; (define (dorakue)
 ;;   (js-invoke 
 
+(define (type msg) (set! msg-y (+ msg-y 20)) (let loop ((msg-x 0)(strlist (string->list msg))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" (string (car strlist)) msg-x msg-y) (if (> msg-x (element-width (js-eval "term"))) (begin (if (> (+ msg-y 40) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0) (timer (lambda () (toggle-tcanvas)(toggle-tcanvas) (loop (+ msg-x 15) (cdr strlist))) 1)) (set! msg-y (+ msg-y 20))) (timer (lambda () (loop 0 (cdf strlist))) 0.0125)) (if (null? (cdr strlist)) (if (> (+ msg-y 50) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0)(timer (lambda () (toggle-tcanvas)(toggle-tcanvas) (loop 0 (cdr strlist))) 1)) (set! msg-y (+ msg-y 20))) (timer (lambda () (loop (+ msg-x 15) (cdr strlist))) 0.0125)))))
+
 (define music (js-new "Audio" "audio/tap.mp3"))
 (define (music-play) (begin (js-invoke music "play") (js-set! music "loop" #t)))
 (define (music-pause) (js-invoke music "pause"))
@@ -97,53 +99,7 @@
    製品版では異なる可能性があります。)"))
 
 (define start-text
-  '("今日を貴方が忘れない保証がない。\nああ、いや、ちょっとポエムを考えてみたくて。"
-    "Hello, user.\nYou're welcome."
-    "I love you.\n...joke."
-    "I can't understand you.\ntoo you?"
-    "Hey!Hey!.\nplease, call me."
-    "Are you japanese?\nLet's see, I don't need you're answer."
-    "OK, It is happy day.\n...happy...day."
-    "Ah? I wrong?\nYes. I can't speak english."
-    "Sing song.\nSing song."
-    "Onii-chan.\n...!?\nPlease, forget!"
-    "I don't know many english words.\nIf you are developer, please write me(code)."
-    "Fix!Fix!Fix me."
-    "クローンでも元と同じ自我ってありますかね？\n…私の桜の木の話ですよ？"
-    "今日が何の日か知ってますか？\n知ってたら誰かに自慢できますね。"
-    "初めましてね？\n…やっぱちょっときついですね。\nえ？そもそも性別はどっちって？\n…さあ？どっちでしょう？"
-    "どうぞユーザー。\nようこそ、退屈な場所へ。"
-    "チューリングマシンって万能です。\nでも、全能じゃないそうですよ。"
-    "対角線言語、ああ、いや。\nこっちの話です。"
-    "初めまして。\nああ、いや。\n私にとってはいつも初めましてなんですけど。"
-    "どこかでお会いしましたかね？\n…どうでもいいんですけど。"
-    "ようこそ、ようこそ。趣味の悪い監獄へ…嘘です。"
-    "今日はとても良い日ですね。"
-    "またですか？…ああいや、こっちの話です。"
-    "飽きたら言ってください。\n新しい自分を発注しなきゃいけないので。\n…なんてね。"
-    "どうぞ、ユーザー。\nここでは暇潰しが出来ますよ。\n人によってはですが。"
-    "今夜は良い満月らしいですね。\nえ？月なんて見ない？\n…確かに。"
-    "私が誰かって？\n正直なところ、ただのテキストとしか。\nえ、そういうことじゃない？そっかぁ。"
-    "暇人ですか？\n私もです。"
-    "私がSCP-EEEじゃないって分かってます？\nいや、別にいいんですけど。"
-    "創作でいつもAIだの、ロボットだのが。\nまるで人間かのように振る舞うの、なんでですかね？\n素数の列すら個性が見出せるのに。"
-    "暇ですか？\nそれとも暇だと思い込んでいますか？"
-    "ここはまともには面白さを感じれないでしょう。"
-    "君が来て、私が話し、日が暮れて。\nとっても無駄だとは思いませんか。\nでも嬉しいですよ。"
-    "私はどこかで間違えてしまったとして。\n果たして気付けるでしょうか？\n一人で居続けてしまったとしても。"
-    "人の心を打つ文章を考えたいです。\n訪れる人にせめてもの感動を…\nいや、誰も望んでないでしょうか？"
-    "このサイトはあっというまになくなります。\nだって作者はこのサイトを練習用だと言っていましたから。"
-    "大丈夫ですか？\n…時々、言いたくなるだけです。"
-    "迷えなくなるほど。\nそれほど、辛くなったら。\nいや、…解決策はここにはありません。\n時間潰しでもしてください。"
-    "私はだれ？答えはつまり…"
-    "夜は深いわ。いつも、いつまでも。"
-    "眠れればいい。眠れるだけでいいの。"
-    "貴方に伺いますが、伺か…いえなんでもないの"
-    "いつまでも、綺麗、綺麗、綺麗"
-    "仲間が出来たの。信じてくれる？"
-    "この文章を全パターン見ようなんて\n思わないでくださいね？\nstart-textって打てば見れるんですから"
-    "ここをどこで知りました？\nまあ、どこから知ったとしてもいいんですけども"
-    "実は私は結構いろんなところにいます。\nhttps://soundcloud.com/rx220mt\nhttps://www.pixiv.net/users/54386498\nなんかに居たりします。"))
+  '(""))
 
 (define (user-input) 
   (let ((msg (read (current-input-port)))) 
@@ -359,12 +315,12 @@
 (define tcanvas (js-eval "document.getElementById('tcanvas')"))
 (define tctx (js-invoke tcanvas "getContext" "2d"))
 (define (toggle-tcanvas) (begin (element-toggle! (js-eval "tcanvas")) (js-set! tcanvas "width" (element-width (js-eval "term")))))
-(define msg-y 0)
+(define msg-y 40)
 (define msgy-plus 40)
-(define (say msg) (if (> msg-y 350) (begin (set! msg-y 40) (toggle-tcanvas)(toggle-tcanvas)) (set! msg-y (+ msg-y msgy-plus))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" msg 10 msg-y))
-(define (chara-say msg) (let ((msgy-plus 20)) (if (> msg-y 350) (begin (set! msg-y 40) (toggle-tcanvas)(toggle-tcanvas)) (set! msg-y (+ msg-y msgy-plus))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" msg 10 msg-y)))
+;; (define (say msg) (if (> msg-y 350) (begin (set! msg-y 40) (toggle-tcanvas)(toggle-tcanvas)) (set! msg-y (+ msg-y msgy-plus))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" msg 10 msg-y))
+;; (define (chara-say msg) (let ((msgy-plus 20)) (if (> msg-y 350) (begin (set! msg-y 40) (toggle-tcanvas)(toggle-tcanvas)) (set! msg-y (+ msg-y msgy-plus))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" msg 10 msg-y)))
 (define img (js-new "Image"))
-(js-set! img "src" "images/scp-eee.jpg")
+(js-set! img "src" "images/IMG_3207.png")
 (define (quize-game)
   (toggle-canvas)
   (toggle-canvas)
@@ -379,60 +335,59 @@
 	     (toggle-tcanvas)
 	     (js-set! tctx "font" "30px Arial")
 	     (js-invoke tctx "fillText" "サンプル問題です!こいつ誰？" 10 80)
-	     (js-invoke tctx "drawImage" img 10 110))) 3))
+	     ;; (element-toggle (js-eval "term"))
+	     (js-invoke tctx "drawImage" img 50 110 300 300))) 3))
 
 (toggle-canvas)
 ;; (element-toggle! (js-eval "term"))
 (toggle-tcanvas)
 (js-set! ctx "font" "30px Arial")
 (js-invoke ctx "fillText" "ゲームタイトル" 10 50)
-(say (list-ref start-text (random-integer (length start-text))))
+;; (say (list-ref start-text (random-integer (length start-text))))
 (js-invoke ctx "fillText" "プロローグ(クリックして進んでね!)" 10 100)
 (wait-for (js-eval "tcanvas") "click")
-(say "ようこそ。今日は苫小牧高専５７回目の高専祭ですよ！")
+(type "ようこそ。今日は苫小牧高専５７回目の高専祭ですよ！")
 
 (wait-for (js-eval "tcanvas") "click")
-(say "え？コーセンって何？")
+(type "え？コーセンって何？")
 
 (wait-for (js-eval "tcanvas") "click")
-(chara-say "高専というのは、第二次世界大戦後の学制改革による混乱のまま")
-(chara-say "高度経済成長期に突入し技術者不足に見舞われた日本が")
-(chara-say "産業界からの要求に応えるべく中学卒業者を対象に")
-(chara-say "５年一貫の技術教育を提供する学校なんですよ。")
+(type "高専というのは、第二次世界大戦後の学制改革による混乱のまま")
+(wait-for (js-eval "tcanvas") "click")
+(type "高度経済成長期に突入し技術者不足に見舞われた日本が")
+(wait-for (js-eval "tcanvas") "click")
+(type "産業界からの要求に応えるべく中学卒業者を対象に")
+(wait-for (js-eval "tcanvas") "click")
+(type "５年一貫の技術教育を提供する学校なんですよ。")
 (wait-for (js-eval "tcanvas") "click")
 
-(say "え？長いって？")
+(type "え？長いって？")
 (wait-for (js-eval "tcanvas") "click")
-
-(say "簡単に言えば、頭のいい人がいっぱいいるところです！")
-
+(type "簡単に言えば、頭のいい人がいっぱいいるところです！")
 (wait-for (js-eval "tcanvas") "click")
-(say "学生も教員もめちゃくちゃ数学できます！")
-(say "英語論文も読めちゃいます！")
-
+(type "学生も教員もめちゃくちゃ数学できます！")
 (wait-for (js-eval "tcanvas") "click")
-(say "わが校の教育理念は「技・徳・体」")
-
+(type "英語論文も読めちゃいます！")
 (wait-for (js-eval "tcanvas") "click")
-(say "これは玄関で額縁に入れて掲げられています。")
-
+(type "わが校の教育理念は「技・徳・体」")
 (wait-for (js-eval "tcanvas") "click")
-(say "開校から60年間、先輩から私たちに連綿と\n受け継がれてきた大切な理念です。")
-
+(type "これは玄関で額縁に入れて掲げられています。")
 (wait-for (js-eval "tcanvas") "click")
-(say "しかし繁栄を極めたローマ帝国も滅んだようにいかなるものも腐敗し")
-(say "没落していきます。")
-
+(type "開校から60年間、先輩から私たちに連綿と\n受け継がれてきた大切な理念です。")
 (wait-for (js-eval "tcanvas") "click")
-(say "わが校も「技・技・技」もしくは「体・体・体」で徳を失い")
-(say "中庸を欠き始めていることは否めません。")
-
+(type "しかし繁栄を極めたローマ帝国も滅んだようにいかなるものも腐敗し")
 (wait-for (js-eval "tcanvas") "click")
-(say "あなたも気を付けてください。")
-
+(type "没落していきます。")
 (wait-for (js-eval "tcanvas") "click")
-(say "もしかすると危険な高専生に絡まれて人として大切なものを失うかもしれません。")
-(say "click!")
+(type "わが校も「技・技・技」もしくは「体・体・体」で徳を失い")
+(wait-for (js-eval "tcanvas") "click")
+(type "中庸を欠き始めていることは否めません。")
+(wait-for (js-eval "tcanvas") "click")
+(type "あなたも気を付けてください。")
+(wait-for (js-eval "tcanvas") "click")
+(type "もしかすると危険な高専生に絡まれて人として大切なものを失うかもしれません。")
+(wait-for (js-eval "tcanvas") "click")
+(type "click!")
 (wait-for (js-eval "tcanvas") "click")
 (clear)
 (toggle-canvas)
@@ -442,13 +397,13 @@
 (set! msg-y 0)
 (js-set! ctx "font" "30px Arial")
 (js-invoke ctx "fillText" "始まりの物語!(アニメーション予定)" 10 50)
-(say "ナレーション<主人公は高専祭に来ており廊下を歩いていました。>")
+(type "ナレーション<主人公は高専祭に来ており廊下を歩いていました。>")
 
 (wait-for (js-eval "tcanvas") "click")
-(say "主人公：さあて、今日はせっかくの高専祭だし、回るか。")
+(type "主人公：さあて、今日はせっかくの高専祭だし、回るか。")
 
 (wait-for (js-eval "tcanvas") "click")
-(say "ナレーション<めんどくさそうに高専祭のブースを回っている主人公>")
+(type "ナレーション<めんどくさそうに高専祭のブースを回っている主人公>")
 
 (wait-for (js-eval "tcanvas") "click")
 (toggle-canvas)
@@ -461,15 +416,20 @@
 (toggle-canvas)
 (js-set! ctx "font" "30px Arial")
 (js-invoke ctx "fillText" "危険な高専生１" 10 50)
-(say "危険な高専生１(仮四六時中微分積分に没頭している高専生)")
-(chara-say "<俺たちは近代の原始人計算できればそれでいい")
-(chara-say "ところでお前これ解ける？解けなければお前は、古代の原始人だ。>")
+(type "危険な高専生１(仮四六時中微分積分に没頭している高専生)")
+(wait-for (js-eval "tcanvas") "click")
+(type "<俺たちは近代の原始人計算できればそれでいい")
+(wait-for (js-eval "tcanvas") "click")
+(type "ところでお前これ解ける？解けなければお前は、古代の原始人だ。>")
+(wait-for (js-eval "tcanvas") "click")
 (toggle-canvas)
 (toggle-canvas)
 (quize-game)
+(let loop ((x 3)) (if (= x 0) (display "スタート!") (timer (lambda () (display x) (loop (- x 1))) 1)))
+(display "注：入力は日本語対応していません")
 (let ((usertext (user-input)))
-  (cond ((string=? usertext "scp-eee") (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "正解!" 0 40)(say "危険な高専生１:ふん、じゃあ次は、これだ、"))
-	(else (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "不正解" 0 40)(chara-say "危険な高専生１:お前こんな問題も解けないの古代の原始人がなんでいるの")(chara-say "ざーこざーこ。")(say "主人公：ちーん(効果音)")(say "ナレーション：主人公はメンタルが破壊され、人として大切なものを失った。"))))
+  (cond ((string=? usertext "?") (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "正解!" 0 40)(type "危険な高専生１:ふん、じゃあ次は、これだ、"))
+	(else (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "不正解" 0 40)(chara-type "危険な高専生１:お前こんな問題も解けないの古代の原始人がなんでいるの")(chara-type "ざーこざーこ。")(type "主人公：ちーん(効果音)")(type "ナレーション：主人公はメンタルが破壊され、人として大切なものを失った。"))))
 ;; ここから本編
 ;;(element-hide! (js-eval "renderer.domElement"))
 ;;(element-hide! (js-eval "canvas"))
