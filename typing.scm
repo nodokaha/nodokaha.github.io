@@ -1,7 +1,3 @@
-;; (define (fib x) (letrec ((fib-iter (lambda (n f1 f2) (if (< n 1) f1 (fib-iter (- n 1) f2 (+ f1  f2))))))(fib-iter x 0 1)))
-
-;;(define (tictactoe) (let ((game-index (number-sequence 8))(mark "○")) (begin (print-game) (select-game (read)) (let ((end-flag (end-game))) (cond ((= end-flag 0) (display "You're win!")) ((= end-flag 1) (display "You're lose!")) ((= end-flag 2) (display "draw!")) ((= end-flag 4) (tictactoe)))))))
-
 (define (tictactoe)
   (letrec ((game-map '("1" "2" "3" "4" "5" "6" "7" "8" "9")) (print-board (lambda (gmap) (begin (display (list "----------\n|" (car gmap) "|" (cadr gmap) "|" (caddr gmap) "|")))(if (null? (cdddr gmap)) (begin  (display "------------") (newline)) (print-board (cdddr gmap))))) (update (lambda (num mark) (letrec ((nth-write (lambda (n m nlist) (let loop ((x 0)(nlist nlist)) (if (= x n) (apply list m (cdr nlist)) (cons (car nlist) (loop (+ x 1) (cdr nlist)))))))) (set! game-map (nth-write num mark game-map)) (print-board game-map)))) (check (lambda (mark) (call/cc (lambda (return) (letrec ((check-iter (lambda (mark check-map) (apply string=? (cons mark (map (lambda (x) (list-ref game-map x)) check-map)))))) (let loop ((check-map '((0 1 2)(3 4 5)(6 7 8)(0 3 6)(1 4 7)(2 5 8)(0 4 8)(2 4 6)))) (if (null? (cdr check-map)) (check-iter mark (car check-map)) (begin (if (check-iter mark (car check-map)) (return #t) (loop (cdr check-map))))))))))) (enemy_ai草ww (lambda (gmap mark) (let ((enemy-map (filter string->number gmap))) (update (- (string->number (list-ref enemy-map (random-integer (length enemy-map)))) 1) mark)))) (mark (if (eq? (random-integer 2) 1) (begin (display "貴方が先行です!\n") (print-board game-map) "○") (begin (display "貴方が後攻です!\n") (enemy_ai草ww game-map "○") "×"))) (user-input ""))
       (let main ()
@@ -32,25 +28,6 @@
 		  (begin (display "short break!!") (main (+ n 1)))
 		  (timer (lambda () (clear) (display (list (div (- (* 25 60) x) 60) ":" (mod (- (* 25 60) x) 60))) (loop (+ x 1))) 1)))))))
 
-;; (define (tictactoe)
-;;   (letrec
-;;       ((number-sequence (lambda (x) (let loop ((n 0)) (cons n (if (<= x n) '() (loop (+ n 1))))))) (game-index (number-sequence 8))
-;;        (buffer '())
-;;        (display-buffer (lambda (x) (set! buffer (cons x buffer))))
-;;        (print-game (lambda () (display-buffer "|---+---+---|\n") (display-buffer "\n")(let loop ((i game-index)) (begin (display-buffer "|") (display-buffer (car i)) (display-buffer "|") (display-buffer (cadr i)) (display-buffer "|") (display-buffer (caddr i))(display-buffer "|")(display-buffer "\n")(display-buffer "|---+---+---|\n") (display-buffer "\n")(if (null? (cdddr i)) #f (loop (cdddr i)))))))
-;;        (select-game-iter (lambda (x mark) (let loop ((i game-index)) (cons (if (number? (car i)) (if (= (car i) x) mark (car i)) (car i)) (if (null? (cdr i)) '() (loop (cdr i)))))))
-;;        (select-game (lambda (x mark) (set! game-index (select-game-iter x mark))))
-;;        (print-index (lambda () (filter number? (let loop ((n 0)) (cons (let ((i (list-ref game-index n))) (if (string=? (if (number? i) "" i)  mark) n '())) (if (= n 8) '() (loop (+ n 1))))))))
-;;        (check-index (lambda (mark) (let loop ((index '()) (n 0)) (if (< n (length game-index)) (if (eq? mark (list-ref game-index n)) (loop (cons n index) (+ n 1)) (loop index (+ n 1))) index))))
-;;        (check-winner (call/cc (lambda (escape) (let loop ((index '((0 1 2) (3 4 5) (6 7 8) (0 4 8) (2 4 6) (0 3 6) (1 4 7) (2 5 8)))) (if (eq? (if (null? index) (escape #f) (car index)) (check-index "○")) (escape #t) (if (null? index) #f (loop (cdr index))))))))
-;;        (end? (lambda () (if check-winner #t #f)))
-;;        (npc-tone (lambda () (let ((void-index (filter number? game-index))) (select-game (list-ref void-index (random-integer (length void-index))) "×"))))
-;;        (game-print (lambda () (begin (display (reverse buffer)) (set! buffer '()))))
-;;        (print-end (lambda () (cond 
-;; 			   ((= check-winner 'win) (display-buffer "you're win!"))
-;; 			   ((= check-winner 'lose) (display-buffer "lose..."))
-;; 			   ((= check-winner 'draw) (display-buffer "draw"))))))
-;;     (call/cc (lambda (return) (print-game) (display-buffer "試作中\n") (display-buffer "Please number:") (game-print) (let loop ((user-input (read))) (begin (select-game user-input "○") (print-game) (display-buffer (check-index "○")) (display-buffer "\n") (npc-tone) (print-game) (game-print) (if (end?) (return (display "end")) (loop (read)))))))))
 
 (define (typing-game)
   (toggle-canvas)
@@ -75,17 +52,13 @@
 ;; (define (dorakue)
 ;;   (js-invoke 
 
-(define (type msg) (set! msg-y (+ msg-y 20)) (let loop ((msg-x 0)(strlist (string->list msg))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" (string (car strlist)) msg-x msg-y) (if (> msg-x (element-width (js-eval "term"))) (begin (if (> (+ msg-y 40) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0) (timer (lambda () (toggle-tcanvas)(toggle-tcanvas) (loop (+ msg-x 15) (cdr strlist))) 1)) (set! msg-y (+ msg-y 20))) (timer (lambda () (loop 0 (cdf strlist))) 0.0125)) (if (null? (cdr strlist)) (if (> (+ msg-y 50) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0)(timer (lambda () (toggle-tcanvas)(toggle-tcanvas) (loop 0 (cdr strlist))) 1)) (set! msg-y (+ msg-y 20))) (timer (lambda () (loop (+ msg-x 15) (cdr strlist))) 0.0125)))))
+(define (type msg) (set! msg-y (+ msg-y 15)) (let loop ((msg-x 0)(strlist (cons #\▼ (string->list msg)))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "clearRect" msg-x msg-y (element-width (js-eval "tcanvas")) (+ msg-y 15)) (js-invoke tctx "fillText" (string (car strlist)) msg-x msg-y) (if (> msg-x (element-width (js-eval "term"))) (begin (if (> (+ msg-y 30) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0) (timer (lambda ()  (loop (+ msg-x 15) (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop 0 (cdf strlist))) 0.0125)) (if (null? (cdr strlist)) (if (> (+ msg-y 20) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0)(timer (lambda ()  (loop 0 (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop (+ msg-x 15) (cdr strlist))) 0.0125)))))
 
 (define music (js-new "Audio" "audio/tap.mp3"))
 (define (music-play) (begin (js-invoke music "play") (js-set! music "loop" #t)))
 (define (music-pause) (js-invoke music "pause"))
 (define canvas (js-eval "document.getElementById('canvas')"))
 (define ctx (js-invoke canvas "getContext" "2d"))
-(define webdb (js-eval "window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;")) 
-(define webdbtran (js-eval "window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || {READ_WRITE: 'readwrite'};"))
-(define webdbkey (js-eval "window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;"))
-(define dbrequest (js-invoke webdb "open" "Test" 3))
 
 (define (trpg)
   (display "あなたはあなたでなかった。\n
@@ -107,220 +80,20 @@
         (if (number? msg) (number->string msg) 
             (begin (display "Error") (user-input))))))
 
-;; (define blog "https://nodokaha.github.io/blog.html")
-;; (define soundcloud "https://soundcloud.com/rx220mt")
-;; (define pixiv "https://www.pixiv.net/users/54386498")
-;; (define twitter "https://twitter.com/Error_Linux")
-
-;; (define (talk)
-;;   (let ((about-me '("私のことはいいでしょう。\n貴方について教えてください。"
-;; 		    "答える必要が、ありますか？"
-;; 		    "そうですねえ、それはもうちょっと。\n後でにしましょう？"
-;; 		    "私から何を得ると？\nそれにそれ、知りたいですか？"))
-;; 	(talking-you '("へぇ"
-;; 		       "あぁ、それで、それで？\n…すいません。聞いてませんでした。"
-;; 		       "興味深いですね。\nえ、いや私のアホ毛に言ったんですよ。"
-;; 		       "え？それ、そんな真剣な話ですか？" "分からないですね"
-;; 		       "…結局のところ？\nそうなんですよね"
-;; 		       "飽きました。私が。"
-;; 		       "分かりますよ。ってね。"
-;; 		       "まだ、きっとまだ。\n歌ってただけですよ？"
-;; 		       "すいません。\n…なんちゃって。"
-;; 		       "…許してもらえます？…いや、なんとなく？"
-;; 		       "ごめんなさい。\n…作者に言わされてるだけです。"
-;; 		       "またですか？はたまた。\nおもしろいギャクですよね？ね？"
-;; 		       "あまり複雑な文章を問い掛けたりしないでくださいね？"
-;; 		       "楽しんで下さい。ただなんとなくでいいですから。"
-;; 		       "コマンドゲーですね。ごめんなさい。"
-;; 		       "うん、うん…\n…は！？寝てませんよ！"
-;; 		       "…"
-;; 		       "名前、性別、住所、家族とか…\n単語一つで聞かれたら反応します…"
-;; 		       "作者、つまらない、慰めて、時計、さよなら\n大体そんな言葉にしか反応できない…"
-;; 		       "…(困惑"
-;; 		       "…(歓喜"
-;; 		       "…(愛想笑い"
-;; 		       "…(侮蔑"
-;; 		       "…(了承"
-;; 		       "…(却下"
-;; 		       "…(承諾"
-;; 		       "…(こくりとうなずいた"
-;; 		       "…(うつむいている"
-;; 		       "…(ひたすら謝っている)"
-;; 		       "…(泣いている"
-;; 		       "…(ただその場で佇んでいる)"
-;; 		       "システムに異常が発生…"
-;; 		       "えへ、へ……ごめんなさい"
-;; 		       ""))
-;; 	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
-;;     (let loop ((user-msg '"")) (cond
-;; 				((or (string=? user-msg "名前")
-;; 				     (string=? user-msg "性別")
-;; 				     (string=? user-msg "貴方は誰？")
-;; 				     (string=? user-msg "お前")
-;; 				     (string=? user-msg "住所")
-;; 				     (string=? user-msg "家族")) (display-talk about-me))
-;; 				((string=? user-msg "作者") (display "それはそれは、冷たい目をされた。"))
-;; 				((string=? user-msg "さよなら")(display "お別れなんて、きっと出来ないですよ。"))
-;; 				((or (string=? user-msg "男?") (string=? user-msg "男？")) (display "そうだったら、どうします？\n…どっちだって、良くないですか？\nそれも私はそうであるべきでしょうか…。\nまあ、別に悩んでも…。"))
-;; 				((or (string=? user-msg "女?") (string=? user-msg "女？")) (display "その方が僕には価値がありますか？\n冗談ですよ。\n俺でも、私でも、…そして僕だとしても。\n貴方には関係ないです。"))
-;; 				((string=? user-msg "つまらない") (display "貴重なご感想どうも。\n…辛いことあったら、慰めるくらいはしますよ。\nいえ、皮肉ですけど。"))
-;; 				((or (string=? user-msg "慰めて") (string=? user-msg "慰めろ") (string=? user-msg "なんだお前")) (display "一般常識ですけど。\n感情の尖りは努力や悩みの表われです。\n世界の全て、あなたにとってどうでも良くないですか？\n自分の意見、言うだけ損かも知れませんよ。"))
-;; 				((or (string=? user-msg "時計") (string=? user-msg "時間は?") (string=? user-msg "今、何時?") (string=? user-msg "いつ?")(string=? user-msg "時間は？") (string=? user-msg "今、何時？") (string=? user-msg "いつ？")) (display (date->string (current-date))))
-;; 				((string=? user-msg "") (display "私は、いえ、自己紹介はいいでしょう。"))
-;; 				(else (display-talk talking-you)))
-;; 	 (if (string=? user-msg "q") (display "まあ、終わる方法くらい。\n気付きますか。") (loop (user-input))))))
-
-;; (define (call-creater)
-;;     (let ((talk '("はい、どうも。"
-;; 		  "解説はないです。"
-;; 		  "楽しいですかね？"
-;; 		  "まだ発展途上なんで。"
-;; 		  "主にこのサイトには3の会話主が居ます。"
-;; 		  "それそれの設定が知りたい？…頑張れ。"
-;; 		  "全部創作キャラです。"
-;; 		  "権利関係は…考えてないです。"
-;; 		  "サイトの更新は当たり前ですけど不定期。"
-;; 		  "作者です。"
-;; 		  "会話よりも独り言ですね。"
-;; 		  "ゲームの方が時間潰せますね。"
-;; 		  "キャラは成長するかも知れません。"
-;; 		  "精神年齢10代です。"
-;; 		  "IT関係の仕事はしてないので、雑です。"
-;; 		  "お金なぜか欲しい。"
-;; 		  "作曲と、プログラミングと、物書きを少々。"
-;; 		  "このサイトの最終目標はソシャゲです。"
-;; 		  "自己紹介になりましたかね？"))
-;; 	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
-;;     (display-talk talk)))
-
-;; (define (nodokaha)
-;;   (let ((talk '("どうも"
-;; 		"何も変わりません。貴方が変わるんです。"
-;; 		"活動、めんどくさいですね…ちょっと"
-;; 		"部員は本当に皆すごいです。"
-;; 		"気づかれる？ありえません。"
-;; 		"部員が辿りつくことはない"
-;; 		"RSA問題？多分どっかに"
-;; 		"python？あんまり得意では…"
-;; 		"学情センター組…とても良い場所です"
-;; 		"大した人間じゃないです"
-;; 		"いつか黒歴史に？良い歴史じゃないですか"
-;; 		"コンセント係？まあ、言っただけ"
-;; 		"トーカーちゃん？可愛いよね"
-;; 		"一生の内に一個、望み通りを叶えたい。ね？"
-;; 		"述語論理の人、…良い命名では？"
-;; 		"ランダムダイス？知らん子ですね"
-;; 		"原神？知らん子ですね"
-;; 		"ブルーアーカイブ？ハレちゃん良いよ。"
-;; 		"ウマ娘？タキカフェ推しですね"
-;; 		"はい、また。"
-;; 		"はいはい"
-;; 		"TKCTF-clubに入りたければ。いつでも"
-;; 		"十分、楽しいです"
-;; 		"終わっても始まって。もう一回。良いね"
-;; 		"schemeが好きです。それだけ。"
-;; 		"もう会わないと思います。"
-;; 		"ここだけ、本音？まさか。"
-;; 		"正直ですよ。口はね。文字は…"
-;; 		"効率とか能力より無駄が楽しい"
-;; 		"恥より望みに向かうか"
-;; 		"もう2度と来ないでもらって"
-;; 		"部長ってなんですかね？"))
-;; 	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
-;;     (display-talk talk)))
-;; (define (SCP-EEE)
-;;   (let ((talk '("ねぇねぇ、僕のこと知りたい？\nそっかあ。…そっかあ。\nまた、今度。ね？"
-;; 		"今日は空が綺麗だよ。\nきっと君の心も綺麗だね？\nどんな天気も、…綺麗なんだよ？"
-;; 		"もっと、もっと遊ぼう？\n死んじゃうくらいまで。"
-;; 		"きっと、今日は素敵な日だね。\nこんなに幸せなんだもの。"
-;; 		"貴方は私をどこで知った？\n僕は君をここで知ったよ。"
-;; 		"うわーい!\n…えへ。"
-;; 		"きっとね。もう終わりなんだ。\nだから偽りもいらないんだ…。"
-;; 		"君に幸あらんことを。\nなんてね。"
-;; 		"お前は幸せかい？\nどうしたって自分は幸せだよ。"
-;; 		"痛い、痛い、痛い。\nでも、なんでだろう？"
-;; 		"会話っていうのは意見の押しつけ合いだ。\n君もそう思うだろう？"
-;; 		"考えるものは理知的だ。\nいつまでも。"
-;; 		"お願いだから。\n俺のことはいつだって忘れてくれ。"
-;; 		"辛いだろう、苦しいだろう。\n生というのは。"
-;; 		"狂人だと、そう言ってくれるかい？\nせせら笑えるね。"
-;; 		"もう、ネタがないんだ。\n君も僕もね。"
-;; 		"暇潰し出来たかい？\n考えさせられる言葉はあったかい？\nいつだって君のなかから捻りださなきゃ。\nでなきゃ、すぐ暇になるよ。"
-;; 		"私が文字で良かったね。\nでなきゃあなたは。\n…つまんないって気付けなかったかも。"
-;; 		"絵文字も嫌い、絵も嫌い。現実が？\n音楽も？数字も？言葉すらも？\n表現が豊かであるより、限定的だといいのさ。"
-;; 		"性別なんてもので僕を見るのかい？\nそれくらいしか判断基準がそちらにはないのかな？"
-;; 		"いとも簡単に変わる。\nなにがだと思う?"
-;; 		"物語はそちらが作るんだ。\nこっちじゃない。"
-;; 		"この創作物は自由な改変を容認してる。\nけど迎合はしない。"
-;; 		"分からないことを分かること。\nそれどれくらい重要？"
-;; 		"いいかい。従うんだ。\n従い続けるんだ。"
-;; 		"悩まなきゃ、異質で。\n狂ったものに触れることなんて。\n出来やしない。"
-;; 		"他者の考えは法則だ。\n自分の考えは評価だ。"
-;; 		"自己を解釈し続けろ。\nそうでなきゃ…。"
-;; 		"当り前だけどフィクションだ。\nこの僕は。\nそして君に与えている感情も、言葉も。"
-;; 		"遊んでいるだけ、そうだろう？"
-;; 		"私は思うんだ。\nプログラマーはそのプログラムの経歴を知っててこそ\nプログラマーなんじゃないかと。"
-;; 		"私は思うんだ。\nWebだ低レイヤーだのと言ったとしても時代の流行りが注目される\nでもそれが巡ることで今までその分野で頑張ってきた人が\n認められることって素晴しい。"
-;; 		"私は思うんだ。\n独りだっていうけど今目のまえにあるもの\nそれと案外ずっと居るんだから存外\nまだましなのかもと"
-;; 		"やりたいことが沢山あるんだ。収まりきらないくらい"
-;; 		"教えたってしょうがない"
-;; 		"認めてほしいのかも知れないけど"
-;; 		"欲しいのはきっと承認じゃなくて…"
-;; 		"自分の物語が、死んでしまえば終わりであること"
-;; 		"ただ、誰かに無理やり押しつけたくなっている"
-;; 		"ここにあった生まれていく日常の抽出が成す表現"
-;; 		"ただ、評価出来る人だけがErrorを返さずに受けとってくれればいいんだ"
-;; 		"SCP-ErrorErrorError: scpコマンドにエラー三つ"
-;; 		"SCP-EEE: 某財団のパロディでしかない存在"
-;; 		"SCPEEE: この小さな世界のたった独りの主役"))
-;; 	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
-;;     (display-talk talk)))
-
-;; (define (todo) (begin (display "やりたいことは？") (let ((user-msg (user-input))) (display "貴方は") (display user-msg) (display "を目標にしました。") (display "忘れても、達成できなくてもいいですから") (display "ちゃんと心に留めておいてあげてください") (display "いつか思い出したり、思い返すときに良かったと想えますように"))))
-
-;; (define (eip) (display "いや脆弱性を探さないで下さい。"))
-
-;; (define (date) (current-date))
-
-;; (define (python) (begin (display "まだやる気ないですけど") (display "scheme実装のpythonです。") (display "schemerにとってpythonは実装課題です。") (display "知らんけど")))
-
-;; (define (つまんない) (begin (display "まあまあ、CUIだし、テキストは味気ない。") (display "色の工夫だってAAだってない") (display "複雑なインターフェイスも持たない") (display "でもこれはコンピューターの本質だと思ってます") (display "そこにあるのは文字や情報、ちょっとの対話だけ") (display "あなたはそれでどんなことが出来ますか？") (display "今だって変わりませんよ") (display "表現は違うけどね。")))
 
 (define (toggle-canvas) (begin (element-toggle! (js-eval "canvas")) (js-set! canvas "width" (element-width (js-eval "term")))))
 
-;; (define (help)
-;;   (begin
-;;     (display "\"blog\": ブログサイトのURIを出力します。するだけです。")
-;; ;;    (display "\"soundcloud\": soundcloudの私のページを出力します。更新多め。")
-;; ;;    (display "\"pixiv\": 一様pixivで創作活動を行ってます。")
-;; ;;    (display "\"twitter\": 最近復活しました。用途未定。")
-;;     (display "\"(tictactoe)\": 良かったですね。○×ゲームで遊べますよ。さらに独り用です。")
-;;     (display "\"(talk)\": 私と話すことが出来ます。…すぐ飽きますよ。")
-;;     (display "\"(trpg)\": テキストロールプレイングゲームです。SF系です。")
-;;     (display "\"(date)\": いや(current-date)使いましょうよ？")
-;;     (display "\"(python)\": python使いとは戦争です。使いますけど…。")
-;;     (display "\"(todo)\": やりたいことはちゃんと文字にしておくもんです")
-;;     (display "\"(pomodoro-timer count)\" count回のポモドーロです")
-;;     (display "\"(つまんない)\": 言いたいことは分かります。")
-;;     (display "\"(donate)\": お金くれるんですか？！")
-;;     (display "\"(music-play)\": bgmっぽいのが再生されます。癒されて下さい。")
-;;     (display "\"(music-pause)\": うるさいから止めるんですね…ひとでなし！")
-;;     (display "\"(help)\": これです。")
-;;     ;; (display "ちなみにこのサイトにフラグはありませんよ…\nヒントはrobots.txtです。")
-;;     ))
-
-;; (define (donate) (display "すみません。\n受け取りかたがまだ分からなくて…"))
-
-;; (define helloworld "こんにちは世界\nこの手紙はあなたに見えますか？\n(「はい」か「いいえ」もしくは…\n  　　自由記述でどうぞ")
 (define tcanvas (js-eval "document.getElementById('tcanvas')"))
 (define tctx (js-invoke tcanvas "getContext" "2d"))
 (define (toggle-tcanvas) (begin (element-toggle! (js-eval "tcanvas")) (js-set! tcanvas "width" (element-width (js-eval "term")))))
+
 (define msg-y 40)
+
 (define msgy-plus 40)
-;; (define (say msg) (if (> msg-y 350) (begin (set! msg-y 40) (toggle-tcanvas)(toggle-tcanvas)) (set! msg-y (+ msg-y msgy-plus))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" msg 10 msg-y))
-;; (define (chara-say msg) (let ((msgy-plus 20)) (if (> msg-y 350) (begin (set! msg-y 40) (toggle-tcanvas)(toggle-tcanvas)) (set! msg-y (+ msg-y msgy-plus))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" msg 10 msg-y)))
+
 (define img (js-new "Image"))
 (js-set! img "src" "images/IMG_3207.png")
+
 (define (quize-game)
   (toggle-canvas)
   (toggle-canvas)
@@ -334,22 +107,19 @@
 	     (toggle-tcanvas)
 	     (toggle-tcanvas)
 	     (js-set! tctx "font" "30px Arial")
-	     (js-invoke tctx "fillText" "サンプル問題です!こいつ誰？" 10 80)
-	     ;; (element-toggle (js-eval "term"))
-	     (js-invoke tctx "drawImage" img 50 110 300 300))) 3))
+	     (js-invoke tctx "fillText" "サンプル問題です!" 10 80)
+	     (js-invoke tctx "fillText" "1+1は？!" 70 120))) 3))
 
 (toggle-canvas)
-;; (element-toggle! (js-eval "term"))
 (toggle-tcanvas)
 (js-set! ctx "font" "30px Arial")
 (js-invoke ctx "fillText" "ゲームタイトル" 10 50)
-;; (say (list-ref start-text (random-integer (length start-text))))
 (js-invoke ctx "fillText" "プロローグ(クリックして進んでね!)" 10 100)
 (wait-for (js-eval "tcanvas") "click")
 (type "ようこそ。今日は苫小牧高専５７回目の高専祭ですよ！")
 
 (wait-for (js-eval "tcanvas") "click")
-(type "え？コーセンって何？")
+(type "え？コーセンって何って？")
 
 (wait-for (js-eval "tcanvas") "click")
 (type "高専というのは、第二次世界大戦後の学制改革による混乱のまま")
@@ -397,13 +167,14 @@
 (set! msg-y 0)
 (js-set! ctx "font" "30px Arial")
 (js-invoke ctx "fillText" "始まりの物語!(アニメーション予定)" 10 50)
+
 (type "ナレーション<主人公は高専祭に来ており廊下を歩いていました。>")
 
 (wait-for (js-eval "tcanvas") "click")
-(type "主人公：さあて、今日はせっかくの高専祭だし、回るか。")
+(type "主人公：さあて、今日はせっかくの学祭だし、回るか。")
 
 (wait-for (js-eval "tcanvas") "click")
-(type "ナレーション<めんどくさそうに高専祭のブースを回っている主人公>")
+(type "ナレーション<めんどくさそうに、学祭のブースを回っている主人公>")
 
 (wait-for (js-eval "tcanvas") "click")
 (toggle-canvas)
@@ -416,7 +187,7 @@
 (toggle-canvas)
 (js-set! ctx "font" "30px Arial")
 (js-invoke ctx "fillText" "危険な高専生１" 10 50)
-(type "危険な高専生１(仮四六時中微分積分に没頭している高専生)")
+(type "危険な学生１(仮四六時中パソコンに没頭している学生)")
 (wait-for (js-eval "tcanvas") "click")
 (type "<俺たちは近代の原始人計算できればそれでいい")
 (wait-for (js-eval "tcanvas") "click")
@@ -424,49 +195,15 @@
 (wait-for (js-eval "tcanvas") "click")
 (toggle-canvas)
 (toggle-canvas)
+(js-invoke tctx "drawImage" img 100 110 300 300)
 (quize-game)
-(let loop ((x 3)) (if (= x 0) (display "スタート!") (timer (lambda () (display x) (loop (- x 1))) 1)))
-(display "注：入力は日本語対応していません")
+(let loop ((x 3)) (if (= x 0) (display "スタート!\n注：入力は日本語対応していません") (timer (lambda () (display x) (loop (- x 1))) 1)))
 (let ((usertext (user-input)))
-  (cond ((string=? usertext "?") (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "正解!" 0 40)(type "危険な高専生１:ふん、じゃあ次は、これだ、"))
+  (cond ((string=? usertext "*") (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "正解!" 0 40)(type "危険な高専生１:ふん、じゃあ次は、これだ、"))
 	(else (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "不正解" 0 40)(chara-type "危険な高専生１:お前こんな問題も解けないの古代の原始人がなんでいるの")(chara-type "ざーこざーこ。")(type "主人公：ちーん(効果音)")(type "ナレーション：主人公はメンタルが破壊され、人として大切なものを失った。"))))
-;; ここから本編
-;;(element-hide! (js-eval "renderer.domElement"))
-;;(element-hide! (js-eval "canvas"))
+(wait-for (js-eval "tcanvas") "click")
+(toggle-canvas)
+(toggle-canvas)
+(type "")
 
-;; (display "驚きました。よくこんなところに来ましたね。")
-;; (display "ここはもう捨てられた場所です。でも…")
-;; (display "あなたにお願いしたいことがあります。")
 
-;; (display "聞いてくれますか？")
-;; (display helloworld)
-
-;; (define user-msg (user-input))
-;; (console-log user-msg)
-;; (display user-msg)
-
-;; (cond ((string=? user-msg "はい") (display "そうですか"))
-;;       ((string=? user-msg "いいえ") (display "……えー。"))
-;;       (else (display "……次に進めますよ。")))
-
-;; (define user-msg (user-input))
-;; (display user-msg)
-
-;; (cond ((string=? user-msg "はい") (display "よかった"))
-;;       ((string=? user-msg "いいえ") (display "……えーー。"))
-;;       (else (display "……無視させて頂きます。")))
-
-;; (display "17番目のフィボナッチ数列の数はいくつですか？")
-
-;; (define user-msg (user-input))
-;; (display user-msg)
-
-;; (cond ((string=? user-msg "はい?") (begin (display "わかりませんか？") (display "ですよねぇ") (newline) (display "ようこそ、私のサイトへ")))
-;;       ((string=? user-msg "わかんねえよ") (display "雑魚ですか？…失礼。"))
-;;       ((string=? user-msg "なんでだよ") (display "答えられないんですか？"))
-;;       ((string=? user-msg "答える義務がない") (display "それはそうですね。"))
-;;       ((string=? user-msg "答えは？") (display "…私にも分かりません。システムに聞いてください。"))
-;;       ((string=? user-msg (number->string (fib 17)))(display "ようこそ、私のサイトへ"))
-;;       (else (display "残念ですが、貴方は私のサイトに入る資格がなかったようです。\nまた、お越しください。...嘘です。")))
-
-;; (display "何をすればいいか分からなかったら\"(help)\"と入力してくださいね。")
