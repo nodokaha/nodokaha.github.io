@@ -69,7 +69,7 @@
 	     (toggle-tcanvas)
 	     (js-set! tctx "font" "30px Arial")
 	     (js-invoke tctx "fillText" "サンプルテキストです" 10 80)
-	     (js-invoke tctx "fillText" "SANPURUTEKISUTODESU" 10 110))) 5))
+	     (js-invoke tctx "fillText" "SANPURUTEKISUTODESU" 10 110))) 3))
 ;; (define (alert-msg) (alert "hello"))
 ;; (add-handler! (js-eval "document.getElementById('show')") "animationend" alert-msg)
 ;; (define (dorakue)
@@ -373,12 +373,12 @@
   (timer (lambda ()
 	   (begin
 	     (js-invoke ctx "clearRect" 0 0 500 500)
-	     (js-invoke ctx "fillText" "クイズゲームへようこそ!" 10 50)	     
+	     (js-invoke ctx "fillText" "問題!" 10 50)	     
 	     (toggle-tcanvas)
 	     (toggle-tcanvas)
 	     (js-set! tctx "font" "30px Arial")
 	     (js-invoke tctx "fillText" "サンプル問題です" 10 80)
-	     (js-invoke tctx "drawImage" img 10 110))) 5))
+	     (js-invoke tctx "drawImage" img 10 110))) 3))
 
 (toggle-canvas)
 ;; (element-toggle! (js-eval "term"))
@@ -470,6 +470,9 @@
 (toggle-canvas)
 (toggle-canvas)
 (quize-game)
+(let ((usertext (user-input)))
+  (cond ((string=? usertext "scp-eee") (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "正解!" 0 40))
+	(else (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "不正解" 0 40))))
 ;; ここから本編
 ;;(element-hide! (js-eval "renderer.domElement"))
 ;;(element-hide! (js-eval "canvas"))

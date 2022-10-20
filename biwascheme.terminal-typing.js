@@ -160,7 +160,7 @@ jQuery(document).ready(function($, undefined) {
         BiwaScheme.Console.puts
     );
     BiwaScheme.Port.current_input = new BiwaScheme.Port.CustomInput(function(callback){
-        term.read('テキスト入力> ', callback);
+        term.read('あなたの回答> ', callback);
     });
     if (window.Prism) {
         // use symbols
