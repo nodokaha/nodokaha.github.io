@@ -46,19 +46,33 @@
 	     (js-set! tctx "font" "30px Arial")
 	     (js-invoke tctx "fillText" "サンプルテキストです" 10 80)
 	     (js-invoke tctx "fillText" "SANPURUTEKISUTODESU" 10 110)
-	     (typing "SANPURUTEKISUTODESU"))) 3))
+	     (set! typing-text (string->list "SANPURUTEKISUTODESU"))
+	     (typing))) 3))
 
-(define (typing msg)
-  (let ((msg-x 0)(strlist (string->list msg)))
-    ;; (wait-for (js-eval "document.body") "keypress")
-    (let ((keydown
-	   (lambda (ev)
+(define type-char 13)
+(define msg-x 10)
+(define typing-text (string->list "KONNNITIHA"))
+(define (keydown ev)
 	     (let ((code (js-ref ev  "keyCode")))
-	       (js-invoke tctx "clearRect" 0 140 100 230)
+	       (js-invoke tctx "clearRect" msg-x 140 (+ 50 msg-x) 230)
 	       (js-invoke tctx "fillText" (string (integer->char code)) msg-x 180)
-	       (js-invoke tctx "fillText" (string (car strlist)) msg-x 330)
+	       ;; (js-invoke tctx "fillText" (list->string typing-text) 10 330)
 	       ;; (wait-for (js-eval "document.body") "keydown")
-	       (if (string=? (string (integer->char code)) (string (car strlist))) (display "collect") (display "bad"))))))(add-handler! (js-eval "document.body") "keydown" keydown))  ))
+	       (set! type-char code)
+	       (if (eq? (integer->char code) (car typing-text))
+		   (begin (display "collect")(set! msg-x (+ msg-x 20))(set! typing-text (cdr typing-text)))
+		   (display "bad"))
+	       (display type-char)))
+;; (if (string=? (string (integer->char code)) (string (car strlist))) (display "collect") (display "bad"))
+(define (typing)
+  (add-handler! (js-eval "document.body") "keydown" keydown)
+  (display "start!"))
+;;   (let loop ((msg-x 0)(strlist (string->list msg))(type-char type-char))
+;;     ;; (wait-for (js-eval "document.body") "keypress")
+;;     ;; (wait-for (js-eval "tcanvas") "keypress")
+;;     (display type-char)
+;;     (if (eq? (integer->char type-char) (car strlist))
+;; 	(display "collect")  (timer (lambda () (display "bad") (loop 0 strlist type-char)) 0.1))))
   ;; (define (alert-msg) (alert "hello"))
 ;; (add-handler! (js-eval "document.getElementById('show')") "animationend" alert-msg)
 ;; (define (dorakue)
@@ -275,33 +289,67 @@
 	     (js-invoke ctx "fillText" "目の前に屈強な男(仮)が現れた。" 10 50)
 	     (type "屈強な男:ウェーイ")
 	     (type "毎日筋トレに励んでいる、脳まで筋肉な屈強な男が現れた。")
-	     (js-invoke tctx "drawImage" four-img 100 110 300 300)
+	     (js-invoke tctx "drawImage" kback 0 0 (element-width (js-eval "tcanvas")) (element-height (js-eval "tcanvas")))
+	     (js-invoke tctx "drawImage" four-img (/ (element-width (js-eval "tcanvas")) 3) (/ (element-height (js-eval "tcanvas")) 4) 300 300)
+	     (wait-for (js-eval "tcanvas") "click")
 	     (js-set! tctx "font" "20px Arial")
-	     (timer (lambda () (let loop
-		 ((msg '("「ミス！相手の腹筋がすごくてダメージをあたえられない!」"
-			 "「ミス！相手の上腕二頭筋がすごくて効果がない!」"
-			 "「ミス！相手の鍛え上げられた大胸筋によって弾かれた!」")))
-	       (toggle-tcanvas)
-	       (toggle-tcanvas)
-	       (set! msg-y 0)
-	       (js-set! tctx "font" "50px Arial")
-	       (say "1：こうげき")
-	       (say "2：まもる")
-	       (let ((usertext (user-input)))
-		 (cond ((string=? usertext "1") (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "ミス!" 0 40)(type (car msg)))
-		       (else (toggle-tcanvas)(toggle-tcanvas)(js-set! tctx "font" "30px Arial")(js-invoke tctx "fillText" "ゲームオーバー" 0 40)(type "「だめだ、筋肉によって押し潰された」")(return (gameover)))))
-	       (if (null? (cdr msg)) (begin  ()) (subloop (cdr msg))))) 1)
-	     ()
+	     (let loop
+				   ((msg '("「ミス！相手の腹筋がすごくてダメージをあたえられない!」"
+					   "「ミス！相手の上腕二頭筋がすごくて効果がない!」"
+					   "「ミス！相手の鍛え上げられた大胸筋によって弾かれた!」")))
+				 (toggle-tcanvas)
+				 (toggle-tcanvas)
+				 (set! msg-y 0)
+				 (js-set! tctx "font" "50px Arial")
+				 (say "1：こうげき")
+				 (say "2：まもる")
+				 (let ((usertext (user-input)))
+				   (cond
+				    ((string=? usertext "1")
+				     (toggle-tcanvas)
+				     (toggle-tcanvas)
+				     (js-set! tctx "font" "30px Arial")
+				     (js-invoke tctx "fillText" "ミス!" 0 40)
+				     (type (car msg)))
 
+				    (else
+				     (toggle-tcanvas)
+				     (toggle-tcanvas)
+				     (js-set! tctx "font" "30px Arial")
+				     (js-invoke tctx "fillText" "ゲームオーバー" 0 40)
+				     (type "「だめだ、筋肉によって押し潰された」")
+				     (return (gameover)))))
+				 (if (null? (cdr msg))
+				     (let subloop  ((msg '("開発者の声：ちょっとまずったな。敵を強くしすぎた。"
+							   "ちょっとずるだが"
+							   "仕方ない")))
+				       (if (null? (car msg))
+					   (begin
+					     (toggle-canvas)
+					     (toggle-canvas)
+					     (js-set! ctx "font" "30px Arial")
+					     (js-invoke ctx "fillText" (car msg) 0 40))
+					   (timer (lambda ()
+						    (toggle-canvas)
+						    (toggle-canvas)
+						    (js-set! ctx "font" "30px Arial")
+						    (js-invoke ctx "fillText" (car msg) 0 40)
+						    (subloop (cdr msg))) 2)))
+				     (loop (cdr msg))))
+	     (wait-for (js-eval "tcanvas") "click")
+	     (typing-game)
+	     (let loop () (if (null? typing-text) (type "hello world") (begin (wait-for (js-eval "tcanvas") "click") (loop))))
+	     (type "foobar")
+	     ;; (remove-handler! 
 
 
 
 
 	     
-	     ;; 	     (let loop
-	     ;; 	      ((msg '(11100011 10000001 10010011 11100011 10000010 10010011 11100011 10000001 10101010 11100110 10010110 10000111 11100111 10101011 10100000 11101000 10101010 10101101 11100011 10000010 10010011 11100011 10000001 10100111 11100011 10000010 10001011 11100110 10011010 10000111 11100011 10000001 10000010 11100011 10000010 10001011 11100011 10000001 10101110 11101111 10111100 10011111)))
+	       ;; 	     (let loop
+	       ;; 	      ((msg '(11100011 10000001 10010011 11100011 10000010 10010011 11100011 10000001 10101010 11100110 10010110 10000111 11100111 10101011 10100000 11101000 10101010 10101101 11100011 10000010 10010011 11100011 10000001 10100111 11100011 10000010 10001011 11100110 10011010 10000111 11100011 10000001 10000010 11100011 10000010 10001011 11100011 10000001 10101110 11101111 10111100 10011111)))
 
-	     ;;   (if (null? (car msg))  (begin (toggle-tcanvas) (toggle-canvas)) (timer (lambda ()  (display (list (car msg)))(toggle-tcanvas) (toggle-canvas) (loop (cdr msg))) 0.01)))
+	       ;; (if (null? (car msg))  (begin (toggle-tcanvas) (toggle-canvas)) (timer (lambda ()  (display (list (car msg)))(toggle-tcanvas) (toggle-canvas) (loop (cdr msg))) 0.01)))
 	     ;; (tictactoe)
 	     
 
