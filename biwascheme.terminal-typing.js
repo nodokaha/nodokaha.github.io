@@ -266,7 +266,7 @@ jQuery(document).ready(function($, undefined) {
             }
         },
         greetings: false,
-        height: 100,
+        height: 200,
         name: 'biwa',
         exit: false,
         prompt: prompt
