@@ -47,8 +47,8 @@
 	     (typing "SANPURUTEKISUTODESU"))) 3))
 
 (define (typing msg)
-  (let loop ((msg-x 0)(strlist (string->list msg)))
-    ;; (wait-for (js-eval "document.body") "keydown")
+  (let ((msg-x 0)(strlist (string->list msg)))
+    ;; (wait-for (js-eval "document.body") "keypress")
     (let ((keydown
 	   (lambda (ev)
 	     (let ((code (js-ref ev  "keyCode")))
@@ -56,10 +56,7 @@
 	       (js-invoke tctx "fillText" (string (integer->char code)) msg-x 180)
 	       (js-invoke tctx "fillText" (string (car strlist)) msg-x 330)
 	       ;; (wait-for (js-eval "document.body") "keydown")
-	       (if (string=? (string (integer->char code)) (string (car strlist))) (timer (lambda () (loop (+ msg-x 10) (cdr strlist))) 0.5) (display "bad") )))))
-      (add-handler! (js-eval "document.body") "keydown" keydown))
-	  (if (null? (cdr strlist))
-	      (js-invoke tctx "clear!" 0 0) (js-invoke tctx "typing!" 0 0))))
+	       (if (string=? (string (integer->char code)) (string (car strlist))) (display "collect") (display "bad"))))))(add-handler! (js-eval "document.body") "keydown" keydown))  ))
   ;; (define (alert-msg) (alert "hello"))
 ;; (add-handler! (js-eval "document.getElementById('show')") "animationend" alert-msg)
 ;; (define (dorakue)
@@ -67,8 +64,8 @@
 (define (say msg) (if (> msg-y 350) (begin (set! msg-y 40) (toggle-tcanvas)(toggle-tcanvas)) (set! msg-y (+ msg-y msgy-plus))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" msg 10 msg-y))
 (define (chara-say msg) (let ((msgy-plus 20)) (if (> msg-y 350) (begin (set! msg-y 40) (toggle-tcanvas)(toggle-tcanvas)) (set! msg-y (+ msg-y msgy-plus))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "fillText" msg 10 msg-y)))
 
-(define (type msg) (set! msg-y (+ msg-y 15)) (let loop ((msg-x 0)(strlist (cons #\▼ (string->list msg)))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "clearRect" msg-x msg-y (element-width (js-eval "tcanvas")) (+ msg-y 15)) (js-invoke tctx "fillText" (string (car strlist)) msg-x msg-y) (if (> msg-x (element-width (js-eval "term"))) (begin (if (> (+ msg-y 30) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0) (timer (lambda ()  (loop (+ msg-x 15) (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop 0 (cdf strlist))) 0.0125)) (if (null? (cdr strlist)) (if (> (+ msg-y 20) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0)(timer (lambda ()  (loop 0 (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop (+ msg-x 15) (cdr strlist))) 0.0125)))) (wait-for (js-eval "tcanvas") "click"))
-(define (type-nowait msg) (set! msg-y (+ msg-y 15)) (let loop ((msg-x 0)(strlist (cons #\▼ (string->list msg)))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "clearRect" msg-x msg-y (element-width (js-eval "tcanvas")) (+ msg-y 15)) (js-invoke tctx "fillText" (string (car strlist)) msg-x msg-y) (if (> msg-x (element-width (js-eval "term"))) (begin (if (> (+ msg-y 30) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0) (timer (lambda ()  (loop (+ msg-x 15) (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop 0 (cdf strlist))) 0.0125)) (if (null? (cdr strlist)) (if (> (+ msg-y 20) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0)(timer (lambda ()  (loop 0 (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop (+ msg-x 15) (cdr strlist))) 0.0125)))) )
+(define (type msg) (if (> (+ msg-y 50) (element-height (js-eval "tcanvas"))) (set! msg-y 50) (set! msg-y (+ msg-y 25))) (let ((msg-y msg-y )) (let loop ((msg-x 0)(strlist (cons #\▼ (string->list msg)))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "clearRect" msg-x msg-y (element-width (js-eval "tcanvas")) (+ msg-y 20)) (js-invoke tctx "fillText" (string (car strlist)) msg-x msg-y) (if (> msg-x (element-width (js-eval "term"))) (begin (if (> (+ msg-y 30) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0) (timer (lambda ()  (loop (+ msg-x 20) (cdr strlist))) 3)) (set! msg-y (+ msg-y 20))) (timer (lambda () (loop 0 (cdf strlist))) 0.0125)) (if (null? (cdr strlist)) (if (> (+ msg-y 20) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0)(timer (lambda ()  (loop 0 (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop (+ msg-x 15) (cdr strlist))) 0.0125)))) (wait-for (js-eval "tcanvas") "click")))
+(define (type-nowait msg) (set! msg-y (+ msg-y 20)) (let loop ((msg-x 0)(strlist (cons #\▼ (string->list msg)))) (js-set! tctx "font" "15px Arial") (js-invoke tctx "clearRect" msg-x msg-y (element-width (js-eval "tcanvas")) (+ msg-y 10)) (js-invoke tctx "fillText" (string (car strlist)) msg-x msg-y) (if (> msg-x (element-width (js-eval "term"))) (begin (if (> (+ msg-y 30) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0) (timer (lambda ()  (loop (+ msg-x 15) (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop 0 (cdf strlist))) 0.0125)) (if (null? (cdr strlist)) (if (> (+ msg-y 20) (element-height (js-eval "tcanvas"))) (begin (set! msg-y 0)(timer (lambda ()  (loop 0 (cdr strlist))) 3)) (set! msg-y (+ msg-y 15))) (timer (lambda () (loop (+ msg-x 15) (cdr strlist))) 0.0125)))) )
 
 (define music (js-new "Audio" "audio/tap.mp3"))
 (define (music-play) (begin (js-invoke music "play") (js-set! music "loop" #t)))
