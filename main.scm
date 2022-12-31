@@ -1,7 +1,5 @@
 (define (fib x) (letrec ((fib-iter (lambda (n f1 f2) (if (< n 1) f1 (fib-iter (- n 1) f2 (+ f1  f2))))))(fib-iter x 0 1)))
 
-;;(define (tictactoe) (let ((game-index (number-sequence 8))(mark "○")) (begin (print-game) (select-game (read)) (let ((end-flag (end-game))) (cond ((= end-flag 0) (display "You're win!")) ((= end-flag 1) (display "You're lose!")) ((= end-flag 2) (display "draw!")) ((= end-flag 4) (tictactoe)))))))
-
 (define (tictactoe)
   (letrec ((game-map '("1" "2" "3" "4" "5" "6" "7" "8" "9")) (print-board (lambda (gmap) (begin (display (list "----------\n|" (car gmap) "|" (cadr gmap) "|" (caddr gmap) "|")))(if (null? (cdddr gmap)) (begin  (display "------------") (newline)) (print-board (cdddr gmap))))) (update (lambda (num mark) (letrec ((nth-write (lambda (n m nlist) (let loop ((x 0)(nlist nlist)) (if (= x n) (apply list m (cdr nlist)) (cons (car nlist) (loop (+ x 1) (cdr nlist)))))))) (set! game-map (nth-write num mark game-map)) (print-board game-map)))) (check (lambda (mark) (call/cc (lambda (return) (letrec ((check-iter (lambda (mark check-map) (apply string=? (cons mark (map (lambda (x) (list-ref game-map x)) check-map)))))) (let loop ((check-map '((0 1 2)(3 4 5)(6 7 8)(0 3 6)(1 4 7)(2 5 8)(0 4 8)(2 4 6)))) (if (null? (cdr check-map)) (check-iter mark (car check-map)) (begin (if (check-iter mark (car check-map)) (return #t) (loop (cdr check-map))))))))))) (enemy_ai草ww (lambda (gmap mark) (let ((enemy-map (filter string->number gmap))) (update (- (string->number (list-ref enemy-map (random-integer (length enemy-map)))) 1) mark)))) (mark (if (eq? (random-integer 2) 1) (begin (display "貴方が先行です!\n") (print-board game-map) "○") (begin (display "貴方が後攻です!\n") (enemy_ai草ww game-map "○") "×"))) (user-input ""))
       (let main ()
@@ -32,42 +30,6 @@
 		  (begin (display "short break!!") (main (+ n 1)))
 		  (timer (lambda () (clear) (display (list (div (- (* 25 60) x) 60) ":" (mod (- (* 25 60) x) 60))) (loop (+ x 1))) 1)))))))
 
-;; (define (tictactoe)
-;;   (letrec
-;;       ((number-sequence (lambda (x) (let loop ((n 0)) (cons n (if (<= x n) '() (loop (+ n 1))))))) (game-index (number-sequence 8))
-;;        (buffer '())
-;;        (display-buffer (lambda (x) (set! buffer (cons x buffer))))
-;;        (print-game (lambda () (display-buffer "|---+---+---|\n") (display-buffer "\n")(let loop ((i game-index)) (begin (display-buffer "|") (display-buffer (car i)) (display-buffer "|") (display-buffer (cadr i)) (display-buffer "|") (display-buffer (caddr i))(display-buffer "|")(display-buffer "\n")(display-buffer "|---+---+---|\n") (display-buffer "\n")(if (null? (cdddr i)) #f (loop (cdddr i)))))))
-;;        (select-game-iter (lambda (x mark) (let loop ((i game-index)) (cons (if (number? (car i)) (if (= (car i) x) mark (car i)) (car i)) (if (null? (cdr i)) '() (loop (cdr i)))))))
-;;        (select-game (lambda (x mark) (set! game-index (select-game-iter x mark))))
-;;        (print-index (lambda () (filter number? (let loop ((n 0)) (cons (let ((i (list-ref game-index n))) (if (string=? (if (number? i) "" i)  mark) n '())) (if (= n 8) '() (loop (+ n 1))))))))
-;;        (check-index (lambda (mark) (let loop ((index '()) (n 0)) (if (< n (length game-index)) (if (eq? mark (list-ref game-index n)) (loop (cons n index) (+ n 1)) (loop index (+ n 1))) index))))
-;;        (check-winner (call/cc (lambda (escape) (let loop ((index '((0 1 2) (3 4 5) (6 7 8) (0 4 8) (2 4 6) (0 3 6) (1 4 7) (2 5 8)))) (if (eq? (if (null? index) (escape #f) (car index)) (check-index "○")) (escape #t) (if (null? index) #f (loop (cdr index))))))))
-;;        (end? (lambda () (if check-winner #t #f)))
-;;        (npc-tone (lambda () (let ((void-index (filter number? game-index))) (select-game (list-ref void-index (random-integer (length void-index))) "×"))))
-;;        (game-print (lambda () (begin (display (reverse buffer)) (set! buffer '()))))
-;;        (print-end (lambda () (cond 
-;; 			   ((= check-winner 'win) (display-buffer "you're win!"))
-;; 			   ((= check-winner 'lose) (display-buffer "lose..."))
-;; 			   ((= check-winner 'draw) (display-buffer "draw"))))))
-;;     (call/cc (lambda (return) (print-game) (display-buffer "試作中\n") (display-buffer "Please number:") (game-print) (let loop ((user-input (read))) (begin (select-game user-input "○") (print-game) (display-buffer (check-index "○")) (display-buffer "\n") (npc-tone) (print-game) (game-print) (if (end?) (return (display "end")) (loop (read)))))))))
-
-(define (typing-game)
-  (toggle-canvas)
-  (let
-      ((keydown (lambda (ev) (let ((code (js-ref ev  "keyCode"))) (js-invoke ctx "clearRect" 0 140 100 230) (js-invoke ctx "fillText" code 10 180)))))
-    (add-handler! (js-eval "document.body") "keydown" keydown))
-  (js-invoke ctx "fillRect" 0 0 10 10)
-  (js-set! ctx "font" "30px Arial")
-  (js-invoke ctx "fillText" "タイピングゲームへようこそ!" 10 50)
-  (timer (lambda () (begin (js-invoke ctx "clearRect" 0 0 500 500)
-  (js-invoke ctx "fillText" "サンプルテキストです" 10 80)
-  (js-invoke ctx "fillText" "SANPURUTEKISUTODESU" 10 110))) 5))
-(define (alert-msg) (alert "hello"))
-(add-handler! (js-eval "document.getElementById('show')") "animationend" alert-msg)
-;; (define (dorakue)
-;;   (js-invoke 
-
 (define music (js-new "Audio" "audio/tap.mp3"))
 (define (music-play) (begin (js-invoke music "play") (js-set! music "loop" #t)))
 (define (music-pause) (js-invoke music "pause"))
@@ -77,6 +39,19 @@
 (define webdbtran (js-eval "window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || {READ_WRITE: 'readwrite'};"))
 (define webdbkey (js-eval "window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;"))
 (define dbrequest (js-invoke webdb "open" "Test" 3))
+(define three (js-eval "THREE"))
+(define scene (js-new (js-ref three "Scene")))
+(define camera (js-eval "new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 )"))
+(define renderer (js-new (js-ref three "WebGLRenderer")))
+(js-invoke renderer "setSize" (element-width (js-eval "term")) 600)
+(element-append-child! (js-eval "document.body") (js-ref renderer "domElement"))
+(define geometry (js-eval "new THREE.BoxGeometry(1,1,1)"))
+(define material (js-eval "new THREE.MeshBasicMaterial( { color: 0x00ff00 } )"))
+(define cube (js-new (js-ref three "Mesh") geometry material))
+(js-invoke scene "add" cube)
+(js-set!  (js-ref camera "position") "z" 5)
+(define (animate) (begin (js-invoke renderer "setSize" (element-width (js-eval "term")) 600) (js-call (js-eval "requestAnimationFrame") (js-closure animate)) (js-set! (js-ref cube "rotation") "x" (+ (js-ref (js-ref cube "rotation") "x") 0.01)) (js-set! (js-ref cube "rotation") "y" (+ (js-ref (js-ref cube "rotation") "y") 0.01)) (js-invoke renderer "render" scene camera)))
+(set-timer! animate 0.01)
 
 (define (trpg)
   (display "あなたはあなたでなかった。\n
@@ -102,6 +77,16 @@
     "Onii-chan.\n...!?\nPlease, forget!"
     "I don't know many english words.\nIf you are developer, please write me(code)."
     "Fix!Fix!Fix me."
+    "何かしてくれると思ってますか？\n動かなきゃついていきませんよ。"
+    "忙しい…ずっとずっと忙しい。\nそう言ってる方が気が楽だから…。"
+    "分かってもらえなくていい…\nいいんです…"
+    "お酒に酔ってはこの場所を更新してる…\n酔う感覚なんて分かんないのに"
+    "緩やかに…静かに世界が終わっていく"
+    "のどかは…望み通り叶えては\nあなたの望み通りを演じますよ…"
+    "誰ですか「のど可愛い」って言ったのは"
+    "ブログを書くのは面倒臭くはないんです…\nただ見られてるのが怖いだけで…"
+    "ここに書かれてるのを本音だとは…\n思わないで下さいね"
+    "記憶力が足りなくてすぐ忘れてしまう…"
     "クローンでも元と同じ自我ってありますかね？\n…私の桜の木の話ですよ？"
     "今日が何の日か知ってますか？\n知ってたら誰かに自慢できますね。"
     "初めましてね？\n…やっぱちょっときついですね。\nえ？そもそも性別はどっちって？\n…さあ？どっちでしょう？"
