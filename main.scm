@@ -2,18 +2,22 @@
 
 (define (tictactoe)
   (letrec ((game-map '("1" "2" "3" "4" "5" "6" "7" "8" "9")) (print-board (lambda (gmap) (begin (display (list "----------\n|" (car gmap) "|" (cadr gmap) "|" (caddr gmap) "|")))(if (null? (cdddr gmap)) (begin  (display "------------") (newline)) (print-board (cdddr gmap))))) (update (lambda (num mark) (letrec ((nth-write (lambda (n m nlist) (let loop ((x 0)(nlist nlist)) (if (= x n) (apply list m (cdr nlist)) (cons (car nlist) (loop (+ x 1) (cdr nlist)))))))) (set! game-map (nth-write num mark game-map)) (print-board game-map)))) (check (lambda (mark) (call/cc (lambda (return) (letrec ((check-iter (lambda (mark check-map) (apply string=? (cons mark (map (lambda (x) (list-ref game-map x)) check-map)))))) (let loop ((check-map '((0 1 2)(3 4 5)(6 7 8)(0 3 6)(1 4 7)(2 5 8)(0 4 8)(2 4 6)))) (if (null? (cdr check-map)) (check-iter mark (car check-map)) (begin (if (check-iter mark (car check-map)) (return #t) (loop (cdr check-map))))))))))) (enemy_ai草ww (lambda (gmap mark) (let ((enemy-map (filter string->number gmap))) (update (- (string->number (list-ref enemy-map (random-integer (length enemy-map)))) 1) mark)))) (mark (if (eq? (random-integer 2) 1) (begin (display "貴方が先行です!\n") (print-board game-map) "○") (begin (display "貴方が後攻です!\n") (enemy_ai草ww game-map "○") "×"))) (user-input ""))
-      (let main ()
-      (if (null? (filter string->number game-map))
-	  (display "draw!\n")
-	  (begin
+    (let main ()
+      (call/cc (lambda (return)
+	(if (null? (filter string->number game-map))
+	    (cond ((check mark) (display "You win!\n"))
+		  ((check (if (string=? mark "○") "×" "○")) (display "You lose!\n"))
+		  (else (display "draw!\n")))
+	    (begin
 	    (let loop ()
 	    (set! user-input (read))
 	    (if (and (number? user-input) (positive? user-input) (< user-input 10) (not ((lambda (x) (or (car x) (cadr x))) (map (lambda (i) (string=? i (list-ref game-map (- user-input 1)))) '("○" "×")))))
 		(update (- user-input 1) mark)
 		(begin (display "please You can put 0~9 number: ") (loop))))
 	    (cond ((check mark) (display "You win!\n"))
-		  ((check (if (string=? "○" mark) "×" "○")) (display "You lose!\n"))
-		  (else (enemy_ai草ww game-map (if (string=? "○" mark) "×" "○"))(main))))))
+		  ((check (if (string=? mark "○") "×" "○")) (display "You lose!\n"))
+		  (else (enemy_ai草ww game-map (if (string=? "○" mark) "×" "○")) (if (check (if (string=? mark "○") "×" "○")) (return (display "You lose!\n")) #f) (main)))
+	    )))))
     (display "Thank You playing!\n")))
 
 (define (pomodoro-timer s)
