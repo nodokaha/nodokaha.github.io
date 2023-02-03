@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: nodokaha.github.io
+Token: 1c08f9fcf1d56c0fff9ee85d84ea7f3b4d58b691098a711b66a3a6f85cb25420
