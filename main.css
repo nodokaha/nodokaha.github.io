@@ -1,9 +1,9 @@
 body { font-size: 20px; background: white;
-       font-family: monospace,serif;
-       src: url(./unifont.ttf);
+       font-family: unifont;
+       src: url(./unifont.ttf) format("truetype");
      }
 
-#term { font-family: monospace,serif;
+#term { font-family: unifont;
         src: url(./unifont.ttf);
 }
 
