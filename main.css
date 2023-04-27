@@ -1,4 +1,9 @@
-body { font-size: 20px; background: white; font-family: monospace,serif;}
+body { font-size: 20px; background: white;
+       font-family: monospace,serif;
+       src: url(./unifont.ttf);
+     }
 
-#term { font-family: monospace,serif; }
+#term { font-family: monospace,serif;
+        src: url(./unifont.ttf);
+}
 
