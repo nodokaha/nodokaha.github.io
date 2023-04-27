@@ -1,9 +1,9 @@
 body { font-size: 20px; background: white;
-       font-family: unifont;
-       src: url(./unifont.ttf) format("truetype");
+       font-family: Courier, Consolas, 'Courier New';
+       /* src: url(./unifont.ttf) format("truetype"); */
      }
 
-#term { font-family: unifont;
-        src: url(./unifont.ttf);
+#term { font-family: Courier, Consolas, 'Courier New';
+        /* src: url(./unifont.ttf); */
 }
 
