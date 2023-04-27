@@ -57,7 +57,7 @@
 (define (help) (display "\"(factor)\": 答えの数字だけを受け付けて素因数分解します。それ以外はerrorを返します。\n\"(tictactoe)\": ○×ゲームです。"))
 (display "71456335213936339667583931974144970765327963434711239325932911324065698399442011")
 (display "1085267300152893114288803146806622529202080626206924102794738916250870161499231")
-(display "https://nodokaha.github.io/images/yui.png")
+(display "https://nodokaha.github.io/images/yui.jpg")
 (display "https://nodokaha.github.io/chall.c")
 (display "https://nodokaha.github.io/chall")
 (display "CTFという競技は、いわゆるホワイトハッカー達が凌ぎを削りあっているセキュリティ大会です!")
