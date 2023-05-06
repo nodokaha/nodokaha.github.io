@@ -429,3 +429,4 @@
 
 (display (list-ref start-text (random-integer (length start-text))))
 (display "何をすればいいか分からなかったら\"(help)\"と入力してくださいね。")
+(define (stay) (display "言うてまだ見てますけどね"))
