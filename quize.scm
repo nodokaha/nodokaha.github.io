@@ -1,4 +1,5 @@
 (define term (js-eval "document.getElementById('term')"))
+(set-style! term "backgroundColor" "transparent")
 (js-invoke (getelem term) "LoadingOverlay" "show")
 (display "71456335213936339667583931974144970765327963434711239325932911324065698399442011")
 (sleep 0.5)
@@ -131,3 +132,4 @@
 		  "RSA暗号って知ってますか？"))
 	(display-talk (lambda (x) (display (list-ref x (random-integer (length x)))))))
     (display-talk talk)))
+
