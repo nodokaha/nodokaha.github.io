@@ -1,17 +1,14 @@
 function unbalanced_parentheses(text_code) {
-    var tokens = (new BiwaScheme.Parser(text_code)).tokens;
-    var parentheses = 0;
-    var brakets = 0;
-    for(var i=0; i<tokens.length; ++i) {
-        switch(tokens[i]) {
-            case "[": ++brakets; break;
-            case "]": --brakets; break;
-            case "(": ++parentheses; break;
-            case "#(": ++parentheses; break;
-            case ")": --parentheses; break;
+    try {
+        (new BiwaScheme.Parser(text_code)).getObject(text_code);
+    } catch(e) {
+        if (e instanceof BiwaScheme.Parser.Unterminated) {
+            return true;
+        } else {
+            return false;
         }
     }
-    return parentheses != 0 || brakets != 0;
+    return false;
 }
 // -----------------------------------------------------------------------------
 // S-Expression Tokenizer taken from LIPS interpreter
@@ -141,7 +138,7 @@ function indent(code, level, offset) {
 //--------------------------------------------------------------------------
 jQuery(document).ready(function($, undefined) {
     $.terminal.syntax("scheme");
-    var prompt = 'SRRRS> ';
+    var prompt = 'user> ';
     //NOTE: $ is jQuery in this scope
     var trace = false;
     var bscheme = new BiwaScheme.Interpreter(function(e, state) {
@@ -149,8 +146,8 @@ jQuery(document).ready(function($, undefined) {
        term.error(e.message);
     });
 
-    bscheme.evaluate('(load "main.scm")', function(result) {
-    	console.log(result);
+    bscheme.evaluate('(load "main.scm")', function(result){
+	console.log(result);
     });
 
     BiwaScheme.Console.puts = function(string) {
@@ -266,13 +263,13 @@ jQuery(document).ready(function($, undefined) {
             }
         },
         greetings: false,
-        height: 300,
+        height: 250,
         name: 'biwa',
         exit: false,
         prompt: prompt
     });
     // we don't want formatting on version number
-    term.echo('こんにちは ユーザー！ここは仮想研究所です。\nこれはBiwaSchemeによって成り立っています。versionは' + BiwaScheme.Version, {
+    term.echo('BiwaScheme Interpreter version ' + BiwaScheme.Version, {
         formatters: false
     });
     // run trace mode

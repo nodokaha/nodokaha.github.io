@@ -1,7 +1,7 @@
 /*
  * BiwaScheme 0.7.5 - R6RS/R7RS Scheme in JavaScript
  *
- * Copyright (c) 2007-2022 Yutaka HARA (http://www.biwascheme.org/)
+ * Copyright (c) 2007-2023 Yutaka HARA (http://www.biwascheme.org/)
  * Licensed under the MIT license.
  */ /*!
  * jQuery JavaScript Library v3.6.0
@@ -11211,8 +11211,6 @@ var BiwaScheme = (function () {
     length: function () {
       return 0;
     },
-    // Moved to main.js to avoid circular dependency
-    //to_set: function() { return new BiwaSet(); },
   };
 
   //
@@ -11236,873 +11234,20 @@ var BiwaScheme = (function () {
   const suppress_deprecation_warning = false;
 
   // Actual values are set by rollup (see rollup.config.js)
-  const VERSION$1 = "0.7.5";
-  const GitCommit = "6cb6a0cc9da5f2a40d4afe10d70713d73d44f3bd";
+  const VERSION = "0.7.5";
+  const GitCommit = "7a92b7c3cd5abbb1212309bef72874414996e4e7";
 
-  //     Underscore.js 1.13.1
-  //     https://underscorejs.org
-  //     (c) 2009-2021 Jeremy Ashkenas, Julian Gonggrijp, and DocumentCloud and Investigative Reporters & Editors
-  //     Underscore may be freely distributed under the MIT license.
+  // utility functions to replace underscore equivalents
 
-  // Current version.
-  var VERSION = "1.13.1";
-
-  // Establish the root object, `window` (`self`) in the browser, `global`
-  // on the server, or `this` in some virtual machines. We use `self`
-  // instead of `window` for `WebWorker` support.
-  var root =
-    (typeof self == "object" && self.self === self && self) ||
-    (typeof global == "object" && global.global === global && global) ||
-    Function("return this")() ||
-    {};
-
-  // Save bytes in the minified (but not gzipped) version:
-  var ArrayProto = Array.prototype,
-    ObjProto = Object.prototype;
-  var SymbolProto = typeof Symbol !== "undefined" ? Symbol.prototype : null;
-
-  // Create quick reference variables for speed access to core prototypes.
-  var push = ArrayProto.push,
-    slice = ArrayProto.slice,
-    toString = ObjProto.toString,
-    hasOwnProperty = ObjProto.hasOwnProperty;
-
-  // Modern feature detection.
-  var supportsArrayBuffer = typeof ArrayBuffer !== "undefined",
-    supportsDataView = typeof DataView !== "undefined";
-
-  // All **ECMAScript 5+** native function implementations that we hope to use
-  // are declared here.
-  var nativeIsArray = Array.isArray,
-    nativeKeys = Object.keys,
-    nativeCreate = Object.create,
-    nativeIsView = supportsArrayBuffer && ArrayBuffer.isView;
-
-  // Create references to these builtin functions because we override them.
-  var _isNaN = isNaN,
-    _isFinite = isFinite;
-
-  // Keys in IE < 9 that won't be iterated by `for key in ...` and thus missed.
-  var hasEnumBug = !{ toString: null }.propertyIsEnumerable("toString");
-  var nonEnumerableProps = [
-    "valueOf",
-    "isPrototypeOf",
-    "toString",
-    "propertyIsEnumerable",
-    "hasOwnProperty",
-    "toLocaleString",
-  ];
-
-  // The largest integer that can be represented exactly.
-  var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
-
-  // Some functions take a variable number of arguments, or a few expected
-  // arguments at the beginning and then a variable number of values to operate
-  // on. This helper accumulates all remaining arguments past the function’s
-  // argument length (or an explicit `startIndex`), into an array that becomes
-  // the last argument. Similar to ES6’s "rest parameter".
-  function restArguments(func, startIndex) {
-    startIndex = startIndex == null ? func.length - 1 : +startIndex;
-    return function () {
-      var length = Math.max(arguments.length - startIndex, 0),
-        rest = Array(length),
-        index = 0;
-      for (; index < length; index++) {
-        rest[index] = arguments[index + startIndex];
-      }
-      switch (startIndex) {
-        case 0:
-          return func.call(this, rest);
-        case 1:
-          return func.call(this, arguments[0], rest);
-        case 2:
-          return func.call(this, arguments[0], arguments[1], rest);
-      }
-      var args = Array(startIndex + 1);
-      for (index = 0; index < startIndex; index++) {
-        args[index] = arguments[index];
-      }
-      args[startIndex] = rest;
-      return func.apply(this, args);
-    };
+  // https://underscorejs.org/docs/modules/uniqueId.html
+  var idCounter = 0;
+  function uniqueId(prefix) {
+    var id = ++idCounter + "";
+    return prefix ? prefix + id : id;
   }
 
-  // Is a given variable an object?
-  function isObject(obj) {
-    var type = typeof obj;
-    return type === "function" || (type === "object" && !!obj);
-  }
-
-  // Is a given value equal to null?
-  function isNull(obj) {
-    return obj === null;
-  }
-
-  // Is a given variable undefined?
-  function isUndefined(obj) {
-    return obj === void 0;
-  }
-
-  // Is a given value a boolean?
-  function isBoolean$1(obj) {
-    return (
-      obj === true || obj === false || toString.call(obj) === "[object Boolean]"
-    );
-  }
-
-  // Is a given value a DOM element?
-  function isElement(obj) {
-    return !!(obj && obj.nodeType === 1);
-  }
-
-  // Internal function for creating a `toString`-based type tester.
-  function tagTester(name) {
-    var tag = "[object " + name + "]";
-    return function (obj) {
-      return toString.call(obj) === tag;
-    };
-  }
-
-  var isString$1 = tagTester("String");
-
-  var isNumber$1 = tagTester("Number");
-
-  var isDate = tagTester("Date");
-
-  var isRegExp = tagTester("RegExp");
-
-  var isError = tagTester("Error");
-
-  var isSymbol$1 = tagTester("Symbol");
-
-  var isArrayBuffer = tagTester("ArrayBuffer");
-
-  var isFunction$1 = tagTester("Function");
-
-  // Optimize `isFunction` if appropriate. Work around some `typeof` bugs in old
-  // v8, IE 11 (#1621), Safari 8 (#1929), and PhantomJS (#2236).
-  var nodelist = root.document && root.document.childNodes;
-  if (
-    typeof /./ != "function" &&
-    typeof Int8Array != "object" &&
-    typeof nodelist != "function"
-  ) {
-    isFunction$1 = function (obj) {
-      return typeof obj == "function" || false;
-    };
-  }
-
-  var isFunction$1$1 = isFunction$1;
-
-  var hasObjectTag = tagTester("Object");
-
-  // In IE 10 - Edge 13, `DataView` has string tag `'[object Object]'`.
-  // In IE 11, the most common among them, this problem also applies to
-  // `Map`, `WeakMap` and `Set`.
-  var hasStringTagBug =
-      supportsDataView && hasObjectTag(new DataView(new ArrayBuffer(8))),
-    isIE11 = typeof Map !== "undefined" && hasObjectTag(new Map());
-
-  var isDataView = tagTester("DataView");
-
-  // In IE 10 - Edge 13, we need a different heuristic
-  // to determine whether an object is a `DataView`.
-  function ie10IsDataView(obj) {
-    return (
-      obj != null && isFunction$1$1(obj.getInt8) && isArrayBuffer(obj.buffer)
-    );
-  }
-
-  var isDataView$1 = hasStringTagBug ? ie10IsDataView : isDataView;
-
-  // Is a given value an array?
-  // Delegates to ECMA5's native `Array.isArray`.
-  var isArray = nativeIsArray || tagTester("Array");
-
-  // Internal function to check whether `key` is an own property name of `obj`.
-  function has$1(obj, key) {
-    return obj != null && hasOwnProperty.call(obj, key);
-  }
-
-  var isArguments = tagTester("Arguments");
-
-  // Define a fallback version of the method in browsers (ahem, IE < 9), where
-  // there isn't any inspectable "Arguments" type.
-  (function () {
-    if (!isArguments(arguments)) {
-      isArguments = function (obj) {
-        return has$1(obj, "callee");
-      };
-    }
-  })();
-
-  var isArguments$1 = isArguments;
-
-  // Is a given object a finite number?
-  function isFinite$1(obj) {
-    return !isSymbol$1(obj) && _isFinite(obj) && !isNaN(parseFloat(obj));
-  }
-
-  // Is the given value `NaN`?
-  function isNaN$1(obj) {
-    return isNumber$1(obj) && _isNaN(obj);
-  }
-
-  // Predicate-generating function. Often useful outside of Underscore.
-  function constant(value) {
-    return function () {
-      return value;
-    };
-  }
-
-  // Common internal logic for `isArrayLike` and `isBufferLike`.
-  function createSizePropertyCheck(getSizeProperty) {
-    return function (collection) {
-      var sizeProperty = getSizeProperty(collection);
-      return (
-        typeof sizeProperty == "number" &&
-        sizeProperty >= 0 &&
-        sizeProperty <= MAX_ARRAY_INDEX
-      );
-    };
-  }
-
-  // Internal helper to generate a function to obtain property `key` from `obj`.
-  function shallowProperty(key) {
-    return function (obj) {
-      return obj == null ? void 0 : obj[key];
-    };
-  }
-
-  // Internal helper to obtain the `byteLength` property of an object.
-  var getByteLength = shallowProperty("byteLength");
-
-  // Internal helper to determine whether we should spend extensive checks against
-  // `ArrayBuffer` et al.
-  var isBufferLike = createSizePropertyCheck(getByteLength);
-
-  // Is a given value a typed array?
-  var typedArrayPattern = /\[object ((I|Ui)nt(8|16|32)|Float(32|64)|Uint8Clamped|Big(I|Ui)nt64)Array\]/;
-  function isTypedArray(obj) {
-    // `ArrayBuffer.isView` is the most future-proof, so use it when available.
-    // Otherwise, fall back on the above regular expression.
-    return nativeIsView
-      ? nativeIsView(obj) && !isDataView$1(obj)
-      : isBufferLike(obj) && typedArrayPattern.test(toString.call(obj));
-  }
-
-  var isTypedArray$1 = supportsArrayBuffer ? isTypedArray : constant(false);
-
-  // Internal helper to obtain the `length` property of an object.
-  var getLength = shallowProperty("length");
-
-  // Internal helper to create a simple lookup structure.
-  // `collectNonEnumProps` used to depend on `_.contains`, but this led to
-  // circular imports. `emulatedSet` is a one-off solution that only works for
-  // arrays of strings.
-  function emulatedSet(keys) {
-    var hash = {};
-    for (var l = keys.length, i = 0; i < l; ++i) hash[keys[i]] = true;
-    return {
-      contains: function (key) {
-        return hash[key];
-      },
-      push: function (key) {
-        hash[key] = true;
-        return keys.push(key);
-      },
-    };
-  }
-
-  // Internal helper. Checks `keys` for the presence of keys in IE < 9 that won't
-  // be iterated by `for key in ...` and thus missed. Extends `keys` in place if
-  // needed.
-  function collectNonEnumProps(obj, keys) {
-    keys = emulatedSet(keys);
-    var nonEnumIdx = nonEnumerableProps.length;
-    var constructor = obj.constructor;
-    var proto =
-      (isFunction$1$1(constructor) && constructor.prototype) || ObjProto;
-
-    // Constructor is a special case.
-    var prop = "constructor";
-    if (has$1(obj, prop) && !keys.contains(prop)) keys.push(prop);
-
-    while (nonEnumIdx--) {
-      prop = nonEnumerableProps[nonEnumIdx];
-      if (prop in obj && obj[prop] !== proto[prop] && !keys.contains(prop)) {
-        keys.push(prop);
-      }
-    }
-  }
-
-  // Retrieve the names of an object's own properties.
-  // Delegates to **ECMAScript 5**'s native `Object.keys`.
-  function keys(obj) {
-    if (!isObject(obj)) return [];
-    if (nativeKeys) return nativeKeys(obj);
-    var keys = [];
-    for (var key in obj) if (has$1(obj, key)) keys.push(key);
-    // Ahem, IE < 9.
-    if (hasEnumBug) collectNonEnumProps(obj, keys);
-    return keys;
-  }
-
-  // Is a given array, string, or object empty?
-  // An "empty" object has no enumerable own-properties.
-  function isEmpty(obj) {
-    if (obj == null) return true;
-    // Skip the more expensive `toString`-based type checks if `obj` has no
-    // `.length`.
-    var length = getLength(obj);
-    if (
-      typeof length == "number" &&
-      (isArray(obj) || isString$1(obj) || isArguments$1(obj))
-    )
-      return length === 0;
-    return getLength(keys(obj)) === 0;
-  }
-
-  // Returns whether an object has a given set of `key:value` pairs.
-  function isMatch(object, attrs) {
-    var _keys = keys(attrs),
-      length = _keys.length;
-    if (object == null) return !length;
-    var obj = Object(object);
-    for (var i = 0; i < length; i++) {
-      var key = _keys[i];
-      if (attrs[key] !== obj[key] || !(key in obj)) return false;
-    }
-    return true;
-  }
-
-  // If Underscore is called as a function, it returns a wrapped object that can
-  // be used OO-style. This wrapper holds altered versions of all functions added
-  // through `_.mixin`. Wrapped objects may be chained.
-  function _$1(obj) {
-    if (obj instanceof _$1) return obj;
-    if (!(this instanceof _$1)) return new _$1(obj);
-    this._wrapped = obj;
-  }
-
-  _$1.VERSION = VERSION;
-
-  // Extracts the result from a wrapped and chained object.
-  _$1.prototype.value = function () {
-    return this._wrapped;
-  };
-
-  // Provide unwrapping proxies for some methods used in engine operations
-  // such as arithmetic and JSON stringification.
-  _$1.prototype.valueOf = _$1.prototype.toJSON = _$1.prototype.value;
-
-  _$1.prototype.toString = function () {
-    return String(this._wrapped);
-  };
-
-  // Internal function to wrap or shallow-copy an ArrayBuffer,
-  // typed array or DataView to a new view, reusing the buffer.
-  function toBufferView(bufferSource) {
-    return new Uint8Array(
-      bufferSource.buffer || bufferSource,
-      bufferSource.byteOffset || 0,
-      getByteLength(bufferSource)
-    );
-  }
-
-  // We use this string twice, so give it a name for minification.
-  var tagDataView = "[object DataView]";
-
-  // Internal recursive comparison function for `_.isEqual`.
-  function eq$1(a, b, aStack, bStack) {
-    // Identical objects are equal. `0 === -0`, but they aren't identical.
-    // See the [Harmony `egal` proposal](https://wiki.ecmascript.org/doku.php?id=harmony:egal).
-    if (a === b) return a !== 0 || 1 / a === 1 / b;
-    // `null` or `undefined` only equal to itself (strict comparison).
-    if (a == null || b == null) return false;
-    // `NaN`s are equivalent, but non-reflexive.
-    if (a !== a) return b !== b;
-    // Exhaust primitive checks
-    var type = typeof a;
-    if (type !== "function" && type !== "object" && typeof b != "object")
-      return false;
-    return deepEq(a, b, aStack, bStack);
-  }
-
-  // Internal recursive comparison function for `_.isEqual`.
-  function deepEq(a, b, aStack, bStack) {
-    // Unwrap any wrapped objects.
-    if (a instanceof _$1) a = a._wrapped;
-    if (b instanceof _$1) b = b._wrapped;
-    // Compare `[[Class]]` names.
-    var className = toString.call(a);
-    if (className !== toString.call(b)) return false;
-    // Work around a bug in IE 10 - Edge 13.
-    if (hasStringTagBug && className == "[object Object]" && isDataView$1(a)) {
-      if (!isDataView$1(b)) return false;
-      className = tagDataView;
-    }
-    switch (className) {
-      // These types are compared by value.
-      case "[object RegExp]":
-      // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
-      case "[object String]":
-        // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
-        // equivalent to `new String("5")`.
-        return "" + a === "" + b;
-      case "[object Number]":
-        // `NaN`s are equivalent, but non-reflexive.
-        // Object(NaN) is equivalent to NaN.
-        if (+a !== +a) return +b !== +b;
-        // An `egal` comparison is performed for other numeric values.
-        return +a === 0 ? 1 / +a === 1 / b : +a === +b;
-      case "[object Date]":
-      case "[object Boolean]":
-        // Coerce dates and booleans to numeric primitive values. Dates are compared by their
-        // millisecond representations. Note that invalid dates with millisecond representations
-        // of `NaN` are not equivalent.
-        return +a === +b;
-      case "[object Symbol]":
-        return SymbolProto.valueOf.call(a) === SymbolProto.valueOf.call(b);
-      case "[object ArrayBuffer]":
-      case tagDataView:
-        // Coerce to typed array so we can fall through.
-        return deepEq(toBufferView(a), toBufferView(b), aStack, bStack);
-    }
-
-    var areArrays = className === "[object Array]";
-    if (!areArrays && isTypedArray$1(a)) {
-      var byteLength = getByteLength(a);
-      if (byteLength !== getByteLength(b)) return false;
-      if (a.buffer === b.buffer && a.byteOffset === b.byteOffset) return true;
-      areArrays = true;
-    }
-    if (!areArrays) {
-      if (typeof a != "object" || typeof b != "object") return false;
-
-      // Objects with different constructors are not equivalent, but `Object`s or `Array`s
-      // from different frames are.
-      var aCtor = a.constructor,
-        bCtor = b.constructor;
-      if (
-        aCtor !== bCtor &&
-        !(
-          isFunction$1$1(aCtor) &&
-          aCtor instanceof aCtor &&
-          isFunction$1$1(bCtor) &&
-          bCtor instanceof bCtor
-        ) &&
-        "constructor" in a &&
-        "constructor" in b
-      ) {
-        return false;
-      }
-    }
-    // Assume equality for cyclic structures. The algorithm for detecting cyclic
-    // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
-
-    // Initializing stack of traversed objects.
-    // It's done here since we only need them for objects and arrays comparison.
-    aStack = aStack || [];
-    bStack = bStack || [];
-    var length = aStack.length;
-    while (length--) {
-      // Linear search. Performance is inversely proportional to the number of
-      // unique nested structures.
-      if (aStack[length] === a) return bStack[length] === b;
-    }
-
-    // Add the first object to the stack of traversed objects.
-    aStack.push(a);
-    bStack.push(b);
-
-    // Recursively compare objects and arrays.
-    if (areArrays) {
-      // Compare array lengths to determine if a deep comparison is necessary.
-      length = a.length;
-      if (length !== b.length) return false;
-      // Deep compare the contents, ignoring non-numeric properties.
-      while (length--) {
-        if (!eq$1(a[length], b[length], aStack, bStack)) return false;
-      }
-    } else {
-      // Deep compare objects.
-      var _keys = keys(a),
-        key;
-      length = _keys.length;
-      // Ensure that both objects contain the same number of properties before comparing deep equality.
-      if (keys(b).length !== length) return false;
-      while (length--) {
-        // Deep compare each member
-        key = _keys[length];
-        if (!(has$1(b, key) && eq$1(a[key], b[key], aStack, bStack)))
-          return false;
-      }
-    }
-    // Remove the first object from the stack of traversed objects.
-    aStack.pop();
-    bStack.pop();
-    return true;
-  }
-
-  // Perform a deep comparison to check if two objects are equal.
-  function isEqual(a, b) {
-    return eq$1(a, b);
-  }
-
-  // Retrieve all the enumerable property names of an object.
-  function allKeys(obj) {
-    if (!isObject(obj)) return [];
-    var keys = [];
-    for (var key in obj) keys.push(key);
-    // Ahem, IE < 9.
-    if (hasEnumBug) collectNonEnumProps(obj, keys);
-    return keys;
-  }
-
-  // Since the regular `Object.prototype.toString` type tests don't work for
-  // some types in IE 11, we use a fingerprinting heuristic instead, based
-  // on the methods. It's not great, but it's the best we got.
-  // The fingerprint method lists are defined below.
-  function ie11fingerprint(methods) {
-    var length = getLength(methods);
-    return function (obj) {
-      if (obj == null) return false;
-      // `Map`, `WeakMap` and `Set` have no enumerable keys.
-      var keys = allKeys(obj);
-      if (getLength(keys)) return false;
-      for (var i = 0; i < length; i++) {
-        if (!isFunction$1$1(obj[methods[i]])) return false;
-      }
-      // If we are testing against `WeakMap`, we need to ensure that
-      // `obj` doesn't have a `forEach` method in order to distinguish
-      // it from a regular `Map`.
-      return methods !== weakMapMethods || !isFunction$1$1(obj[forEachName]);
-    };
-  }
-
-  // In the interest of compact minification, we write
-  // each string in the fingerprints only once.
-  var forEachName = "forEach",
-    hasName = "has",
-    commonInit = ["clear", "delete"],
-    mapTail = ["get", hasName, "set"];
-
-  // `Map`, `WeakMap` and `Set` each have slightly different
-  // combinations of the above sublists.
-  var mapMethods = commonInit.concat(forEachName, mapTail),
-    weakMapMethods = commonInit.concat(mapTail),
-    setMethods = ["add"].concat(commonInit, forEachName, hasName);
-
-  var isMap = isIE11 ? ie11fingerprint(mapMethods) : tagTester("Map");
-
-  var isWeakMap = isIE11
-    ? ie11fingerprint(weakMapMethods)
-    : tagTester("WeakMap");
-
-  var isSet = isIE11 ? ie11fingerprint(setMethods) : tagTester("Set");
-
-  var isWeakSet = tagTester("WeakSet");
-
-  // Retrieve the values of an object's properties.
-  function values(obj) {
-    var _keys = keys(obj);
-    var length = _keys.length;
-    var values = Array(length);
-    for (var i = 0; i < length; i++) {
-      values[i] = obj[_keys[i]];
-    }
-    return values;
-  }
-
-  // Convert an object into a list of `[key, value]` pairs.
-  // The opposite of `_.object` with one argument.
-  function pairs(obj) {
-    var _keys = keys(obj);
-    var length = _keys.length;
-    var pairs = Array(length);
-    for (var i = 0; i < length; i++) {
-      pairs[i] = [_keys[i], obj[_keys[i]]];
-    }
-    return pairs;
-  }
-
-  // Invert the keys and values of an object. The values must be serializable.
-  function invert(obj) {
-    var result = {};
-    var _keys = keys(obj);
-    for (var i = 0, length = _keys.length; i < length; i++) {
-      result[obj[_keys[i]]] = _keys[i];
-    }
-    return result;
-  }
-
-  // Return a sorted list of the function names available on the object.
-  function functions(obj) {
-    var names = [];
-    for (var key in obj) {
-      if (isFunction$1$1(obj[key])) names.push(key);
-    }
-    return names.sort();
-  }
-
-  // An internal function for creating assigner functions.
-  function createAssigner(keysFunc, defaults) {
-    return function (obj) {
-      var length = arguments.length;
-      if (defaults) obj = Object(obj);
-      if (length < 2 || obj == null) return obj;
-      for (var index = 1; index < length; index++) {
-        var source = arguments[index],
-          keys = keysFunc(source),
-          l = keys.length;
-        for (var i = 0; i < l; i++) {
-          var key = keys[i];
-          if (!defaults || obj[key] === void 0) obj[key] = source[key];
-        }
-      }
-      return obj;
-    };
-  }
-
-  // Extend a given object with all the properties in passed-in object(s).
-  var extend = createAssigner(allKeys);
-
-  // Assigns a given object with all the own properties in the passed-in
-  // object(s).
-  // (https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
-  var extendOwn = createAssigner(keys);
-
-  // Fill in a given object with default properties.
-  var defaults = createAssigner(allKeys, true);
-
-  // Create a naked function reference for surrogate-prototype-swapping.
-  function ctor() {
-    return function () {};
-  }
-
-  // An internal function for creating a new object that inherits from another.
-  function baseCreate(prototype) {
-    if (!isObject(prototype)) return {};
-    if (nativeCreate) return nativeCreate(prototype);
-    var Ctor = ctor();
-    Ctor.prototype = prototype;
-    var result = new Ctor();
-    Ctor.prototype = null;
-    return result;
-  }
-
-  // Creates an object that inherits from the given prototype object.
-  // If additional properties are provided then they will be added to the
-  // created object.
-  function create(prototype, props) {
-    var result = baseCreate(prototype);
-    if (props) extendOwn(result, props);
-    return result;
-  }
-
-  // Create a (shallow-cloned) duplicate of an object.
-  function clone(obj) {
-    if (!isObject(obj)) return obj;
-    return isArray(obj) ? obj.slice() : extend({}, obj);
-  }
-
-  // Invokes `interceptor` with the `obj` and then returns `obj`.
-  // The primary purpose of this method is to "tap into" a method chain, in
-  // order to perform operations on intermediate results within the chain.
-  function tap(obj, interceptor) {
-    interceptor(obj);
-    return obj;
-  }
-
-  // Normalize a (deep) property `path` to array.
-  // Like `_.iteratee`, this function can be customized.
-  function toPath$1(path) {
-    return isArray(path) ? path : [path];
-  }
-  _$1.toPath = toPath$1;
-
-  // Internal wrapper for `_.toPath` to enable minification.
-  // Similar to `cb` for `_.iteratee`.
-  function toPath(path) {
-    return _$1.toPath(path);
-  }
-
-  // Internal function to obtain a nested property in `obj` along `path`.
-  function deepGet(obj, path) {
-    var length = path.length;
-    for (var i = 0; i < length; i++) {
-      if (obj == null) return void 0;
-      obj = obj[path[i]];
-    }
-    return length ? obj : void 0;
-  }
-
-  // Get the value of the (deep) property on `path` from `object`.
-  // If any property in `path` does not exist or if the value is
-  // `undefined`, return `defaultValue` instead.
-  // The `path` is normalized through `_.toPath`.
-  function get(object, path, defaultValue) {
-    var value = deepGet(object, toPath(path));
-    return isUndefined(value) ? defaultValue : value;
-  }
-
-  // Shortcut function for checking if an object has a given property directly on
-  // itself (in other words, not on a prototype). Unlike the internal `has`
-  // function, this public version can also traverse nested properties.
-  function has(obj, path) {
-    path = toPath(path);
-    var length = path.length;
-    for (var i = 0; i < length; i++) {
-      var key = path[i];
-      if (!has$1(obj, key)) return false;
-      obj = obj[key];
-    }
-    return !!length;
-  }
-
-  // Keep the identity function around for default iteratees.
-  function identity(value) {
-    return value;
-  }
-
-  // Returns a predicate for checking whether an object has a given set of
-  // `key:value` pairs.
-  function matcher(attrs) {
-    attrs = extendOwn({}, attrs);
-    return function (obj) {
-      return isMatch(obj, attrs);
-    };
-  }
-
-  // Creates a function that, when passed an object, will traverse that object’s
-  // properties down the given `path`, specified as an array of keys or indices.
-  function property(path) {
-    path = toPath(path);
-    return function (obj) {
-      return deepGet(obj, path);
-    };
-  }
-
-  // Internal function that returns an efficient (for current engines) version
-  // of the passed-in callback, to be repeatedly applied in other Underscore
-  // functions.
-  function optimizeCb(func, context, argCount) {
-    if (context === void 0) return func;
-    switch (argCount == null ? 3 : argCount) {
-      case 1:
-        return function (value) {
-          return func.call(context, value);
-        };
-      // The 2-argument case is omitted because we’re not using it.
-      case 3:
-        return function (value, index, collection) {
-          return func.call(context, value, index, collection);
-        };
-      case 4:
-        return function (accumulator, value, index, collection) {
-          return func.call(context, accumulator, value, index, collection);
-        };
-    }
-    return function () {
-      return func.apply(context, arguments);
-    };
-  }
-
-  // An internal function to generate callbacks that can be applied to each
-  // element in a collection, returning the desired result — either `_.identity`,
-  // an arbitrary callback, a property matcher, or a property accessor.
-  function baseIteratee(value, context, argCount) {
-    if (value == null) return identity;
-    if (isFunction$1$1(value)) return optimizeCb(value, context, argCount);
-    if (isObject(value) && !isArray(value)) return matcher(value);
-    return property(value);
-  }
-
-  // External wrapper for our callback generator. Users may customize
-  // `_.iteratee` if they want additional predicate/iteratee shorthand styles.
-  // This abstraction hides the internal-only `argCount` argument.
-  function iteratee(value, context) {
-    return baseIteratee(value, context, Infinity);
-  }
-  _$1.iteratee = iteratee;
-
-  // The function we call internally to generate a callback. It invokes
-  // `_.iteratee` if overridden, otherwise `baseIteratee`.
-  function cb(value, context, argCount) {
-    if (_$1.iteratee !== iteratee) return _$1.iteratee(value, context);
-    return baseIteratee(value, context, argCount);
-  }
-
-  // Returns the results of applying the `iteratee` to each element of `obj`.
-  // In contrast to `_.map` it returns an object.
-  function mapObject(obj, iteratee, context) {
-    iteratee = cb(iteratee, context);
-    var _keys = keys(obj),
-      length = _keys.length,
-      results = {};
-    for (var index = 0; index < length; index++) {
-      var currentKey = _keys[index];
-      results[currentKey] = iteratee(obj[currentKey], currentKey, obj);
-    }
-    return results;
-  }
-
-  // Predicate-generating function. Often useful outside of Underscore.
-  function noop() {}
-
-  // Generates a function for a given object that returns a given property.
-  function propertyOf(obj) {
-    if (obj == null) return noop;
-    return function (path) {
-      return get(obj, path);
-    };
-  }
-
-  // Run a function **n** times.
-  function times(n, iteratee, context) {
-    var accum = Array(Math.max(0, n));
-    iteratee = optimizeCb(iteratee, context, 1);
-    for (var i = 0; i < n; i++) accum[i] = iteratee(i);
-    return accum;
-  }
-
-  // Return a random integer between `min` and `max` (inclusive).
-  function random(min, max) {
-    if (max == null) {
-      max = min;
-      min = 0;
-    }
-    return min + Math.floor(Math.random() * (max - min + 1));
-  }
-
-  // A (possibly faster) way to get the current timestamp as an integer.
-  var now =
-    Date.now ||
-    function () {
-      return new Date().getTime();
-    };
-
-  // Internal helper to generate functions for escaping and unescaping strings
-  // to/from HTML interpolation.
-  function createEscaper(map) {
-    var escaper = function (match) {
-      return map[match];
-    };
-    // Regexes for identifying a key that needs to be escaped.
-    var source = "(?:" + keys(map).join("|") + ")";
-    var testRegexp = RegExp(source);
-    var replaceRegexp = RegExp(source, "g");
-    return function (string) {
-      string = string == null ? "" : "" + string;
-      return testRegexp.test(string)
-        ? string.replace(replaceRegexp, escaper)
-        : string;
-    };
-  }
-
-  // Internal list of HTML entities for escaping.
-  var escapeMap = {
+  // https://underscorejs.org/docs/modules/escape.html
+  const escapeMap = {
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
@@ -12111,1268 +11256,12 @@ var BiwaScheme = (function () {
     "`": "&#x60;",
   };
 
-  // Function for escaping strings to HTML interpolation.
-  var _escape = createEscaper(escapeMap);
-
-  // Internal list of HTML entities for unescaping.
-  var unescapeMap = invert(escapeMap);
-
-  // Function for unescaping strings from HTML interpolation.
-  var _unescape = createEscaper(unescapeMap);
-
-  // By default, Underscore uses ERB-style template delimiters. Change the
-  // following template settings to use alternative delimiters.
-  var templateSettings = (_$1.templateSettings = {
-    evaluate: /<%([\s\S]+?)%>/g,
-    interpolate: /<%=([\s\S]+?)%>/g,
-    escape: /<%-([\s\S]+?)%>/g,
-  });
-
-  // When customizing `_.templateSettings`, if you don't want to define an
-  // interpolation, evaluation or escaping regex, we need one that is
-  // guaranteed not to match.
-  var noMatch = /(.)^/;
-
-  // Certain characters need to be escaped so that they can be put into a
-  // string literal.
-  var escapes = {
-    "'": "'",
-    "\\": "\\",
-    "\r": "r",
-    "\n": "n",
-    "\u2028": "u2028",
-    "\u2029": "u2029",
-  };
-
-  var escapeRegExp = /\\|'|\r|\n|\u2028|\u2029/g;
-
-  function escapeChar(match) {
-    return "\\" + escapes[match];
-  }
-
-  // In order to prevent third-party code injection through
-  // `_.templateSettings.variable`, we test it against the following regular
-  // expression. It is intentionally a bit more liberal than just matching valid
-  // identifiers, but still prevents possible loopholes through defaults or
-  // destructuring assignment.
-  var bareIdentifier = /^\s*(\w|\$)+\s*$/;
-
-  // JavaScript micro-templating, similar to John Resig's implementation.
-  // Underscore templating handles arbitrary delimiters, preserves whitespace,
-  // and correctly escapes quotes within interpolated code.
-  // NB: `oldSettings` only exists for backwards compatibility.
-  function template(text, settings, oldSettings) {
-    if (!settings && oldSettings) settings = oldSettings;
-    settings = defaults({}, settings, _$1.templateSettings);
-
-    // Combine delimiters into one regular expression via alternation.
-    var matcher = RegExp(
-      [
-        (settings.escape || noMatch).source,
-        (settings.interpolate || noMatch).source,
-        (settings.evaluate || noMatch).source,
-      ].join("|") + "|$",
-      "g"
-    );
-
-    // Compile the template source, escaping string literals appropriately.
-    var index = 0;
-    var source = "__p+='";
-    text.replace(matcher, function (
-      match,
-      escape,
-      interpolate,
-      evaluate,
-      offset
-    ) {
-      source += text.slice(index, offset).replace(escapeRegExp, escapeChar);
-      index = offset + match.length;
-
-      if (escape) {
-        source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
-      } else if (interpolate) {
-        source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
-      } else if (evaluate) {
-        source += "';\n" + evaluate + "\n__p+='";
-      }
-
-      // Adobe VMs need the match returned to produce the correct offset.
-      return match;
-    });
-    source += "';\n";
-
-    var argument = settings.variable;
-    if (argument) {
-      // Insure against third-party code injection. (CVE-2021-23358)
-      if (!bareIdentifier.test(argument))
-        throw new Error("variable is not a bare identifier: " + argument);
-    } else {
-      // If a variable is not specified, place data values in local scope.
-      source = "with(obj||{}){\n" + source + "}\n";
-      argument = "obj";
-    }
-
-    source =
-      "var __t,__p='',__j=Array.prototype.join," +
-      "print=function(){__p+=__j.call(arguments,'');};\n" +
-      source +
-      "return __p;\n";
-
-    var render;
-    try {
-      render = new Function(argument, "_", source);
-    } catch (e) {
-      e.source = source;
-      throw e;
-    }
-
-    var template = function (data) {
-      return render.call(this, data, _$1);
-    };
-
-    // Provide the compiled source as a convenience for precompilation.
-    template.source = "function(" + argument + "){\n" + source + "}";
-
-    return template;
-  }
-
-  // Traverses the children of `obj` along `path`. If a child is a function, it
-  // is invoked with its parent as context. Returns the value of the final
-  // child, or `fallback` if any child is undefined.
-  function result(obj, path, fallback) {
-    path = toPath(path);
-    var length = path.length;
-    if (!length) {
-      return isFunction$1$1(fallback) ? fallback.call(obj) : fallback;
-    }
-    for (var i = 0; i < length; i++) {
-      var prop = obj == null ? void 0 : obj[path[i]];
-      if (prop === void 0) {
-        prop = fallback;
-        i = length; // Ensure we don't continue iterating.
-      }
-      obj = isFunction$1$1(prop) ? prop.call(obj) : prop;
-    }
-    return obj;
-  }
-
-  // Generate a unique integer id (unique within the entire client session).
-  // Useful for temporary DOM ids.
-  var idCounter = 0;
-  function uniqueId(prefix) {
-    var id = ++idCounter + "";
-    return prefix ? prefix + id : id;
-  }
-
-  // Start chaining a wrapped Underscore object.
-  function chain(obj) {
-    var instance = _$1(obj);
-    instance._chain = true;
-    return instance;
-  }
-
-  // Internal function to execute `sourceFunc` bound to `context` with optional
-  // `args`. Determines whether to execute a function as a constructor or as a
-  // normal function.
-  function executeBound(sourceFunc, boundFunc, context, callingContext, args) {
-    if (!(callingContext instanceof boundFunc))
-      return sourceFunc.apply(context, args);
-    var self = baseCreate(sourceFunc.prototype);
-    var result = sourceFunc.apply(self, args);
-    if (isObject(result)) return result;
-    return self;
-  }
-
-  // Partially apply a function by creating a version that has had some of its
-  // arguments pre-filled, without changing its dynamic `this` context. `_` acts
-  // as a placeholder by default, allowing any combination of arguments to be
-  // pre-filled. Set `_.partial.placeholder` for a custom placeholder argument.
-  var partial = restArguments(function (func, boundArgs) {
-    var placeholder = partial.placeholder;
-    var bound = function () {
-      var position = 0,
-        length = boundArgs.length;
-      var args = Array(length);
-      for (var i = 0; i < length; i++) {
-        args[i] =
-          boundArgs[i] === placeholder ? arguments[position++] : boundArgs[i];
-      }
-      while (position < arguments.length) args.push(arguments[position++]);
-      return executeBound(func, bound, this, this, args);
-    };
-    return bound;
-  });
-
-  partial.placeholder = _$1;
-
-  // Create a function bound to a given object (assigning `this`, and arguments,
-  // optionally).
-  var bind = restArguments(function (func, context, args) {
-    if (!isFunction$1$1(func))
-      throw new TypeError("Bind must be called on a function");
-    var bound = restArguments(function (callArgs) {
-      return executeBound(func, bound, context, this, args.concat(callArgs));
-    });
-    return bound;
-  });
-
-  // Internal helper for collection methods to determine whether a collection
-  // should be iterated as an array or as an object.
-  // Related: https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
-  // Avoids a very nasty iOS 8 JIT bug on ARM-64. #2094
-  var isArrayLike = createSizePropertyCheck(getLength);
-
-  // Internal implementation of a recursive `flatten` function.
-  function flatten$1(input, depth, strict, output) {
-    output = output || [];
-    if (!depth && depth !== 0) {
-      depth = Infinity;
-    } else if (depth <= 0) {
-      return output.concat(input);
-    }
-    var idx = output.length;
-    for (var i = 0, length = getLength(input); i < length; i++) {
-      var value = input[i];
-      if (isArrayLike(value) && (isArray(value) || isArguments$1(value))) {
-        // Flatten current level of array or arguments object.
-        if (depth > 1) {
-          flatten$1(value, depth - 1, strict, output);
-          idx = output.length;
-        } else {
-          var j = 0,
-            len = value.length;
-          while (j < len) output[idx++] = value[j++];
-        }
-      } else if (!strict) {
-        output[idx++] = value;
-      }
-    }
-    return output;
-  }
-
-  // Bind a number of an object's methods to that object. Remaining arguments
-  // are the method names to be bound. Useful for ensuring that all callbacks
-  // defined on an object belong to it.
-  var bindAll = restArguments(function (obj, keys) {
-    keys = flatten$1(keys, false, false);
-    var index = keys.length;
-    if (index < 1) throw new Error("bindAll must be passed function names");
-    while (index--) {
-      var key = keys[index];
-      obj[key] = bind(obj[key], obj);
-    }
-    return obj;
-  });
-
-  // Memoize an expensive function by storing its results.
-  function memoize$1(func, hasher) {
-    var memoize = function (key) {
-      var cache = memoize.cache;
-      var address = "" + (hasher ? hasher.apply(this, arguments) : key);
-      if (!has$1(cache, address)) cache[address] = func.apply(this, arguments);
-      return cache[address];
-    };
-    memoize.cache = {};
-    return memoize;
-  }
-
-  // Delays a function for the given number of milliseconds, and then calls
-  // it with the arguments supplied.
-  var delay = restArguments(function (func, wait, args) {
-    return setTimeout(function () {
-      return func.apply(null, args);
-    }, wait);
-  });
-
-  // Defers a function, scheduling it to run after the current call stack has
-  // cleared.
-  var defer = partial(delay, _$1, 1);
-
-  // Returns a function, that, when invoked, will only be triggered at most once
-  // during a given window of time. Normally, the throttled function will run
-  // as much as it can, without ever going more than once per `wait` duration;
-  // but if you'd like to disable the execution on the leading edge, pass
-  // `{leading: false}`. To disable execution on the trailing edge, ditto.
-  function throttle(func, wait, options) {
-    var timeout, context, args, result;
-    var previous = 0;
-    if (!options) options = {};
-
-    var later = function () {
-      previous = options.leading === false ? 0 : now();
-      timeout = null;
-      result = func.apply(context, args);
-      if (!timeout) context = args = null;
-    };
-
-    var throttled = function () {
-      var _now = now();
-      if (!previous && options.leading === false) previous = _now;
-      var remaining = wait - (_now - previous);
-      context = this;
-      args = arguments;
-      if (remaining <= 0 || remaining > wait) {
-        if (timeout) {
-          clearTimeout(timeout);
-          timeout = null;
-        }
-        previous = _now;
-        result = func.apply(context, args);
-        if (!timeout) context = args = null;
-      } else if (!timeout && options.trailing !== false) {
-        timeout = setTimeout(later, remaining);
-      }
-      return result;
-    };
-
-    throttled.cancel = function () {
-      clearTimeout(timeout);
-      previous = 0;
-      timeout = context = args = null;
-    };
-
-    return throttled;
-  }
-
-  // When a sequence of calls of the returned function ends, the argument
-  // function is triggered. The end of a sequence is defined by the `wait`
-  // parameter. If `immediate` is passed, the argument function will be
-  // triggered at the beginning of the sequence instead of at the end.
-  function debounce(func, wait, immediate) {
-    var timeout, previous, args, result, context;
-
-    var later = function () {
-      var passed = now() - previous;
-      if (wait > passed) {
-        timeout = setTimeout(later, wait - passed);
-      } else {
-        timeout = null;
-        if (!immediate) result = func.apply(context, args);
-        // This check is needed because `func` can recursively invoke `debounced`.
-        if (!timeout) args = context = null;
-      }
-    };
-
-    var debounced = restArguments(function (_args) {
-      context = this;
-      args = _args;
-      previous = now();
-      if (!timeout) {
-        timeout = setTimeout(later, wait);
-        if (immediate) result = func.apply(context, args);
-      }
-      return result;
-    });
-
-    debounced.cancel = function () {
-      clearTimeout(timeout);
-      timeout = args = context = null;
-    };
-
-    return debounced;
-  }
-
-  // Returns the first function passed as an argument to the second,
-  // allowing you to adjust arguments, run code before and after, and
-  // conditionally execute the original function.
-  function wrap(func, wrapper) {
-    return partial(wrapper, func);
-  }
-
-  // Returns a negated version of the passed-in predicate.
-  function negate(predicate) {
-    return function () {
-      return !predicate.apply(this, arguments);
-    };
-  }
-
-  // Returns a function that is the composition of a list of functions, each
-  // consuming the return value of the function that follows.
-  function compose() {
-    var args = arguments;
-    var start = args.length - 1;
-    return function () {
-      var i = start;
-      var result = args[start].apply(this, arguments);
-      while (i--) result = args[i].call(this, result);
-      return result;
-    };
-  }
-
-  // Returns a function that will only be executed on and after the Nth call.
-  function after(times, func) {
-    return function () {
-      if (--times < 1) {
-        return func.apply(this, arguments);
-      }
-    };
-  }
-
-  // Returns a function that will only be executed up to (but not including) the
-  // Nth call.
-  function before(times, func) {
-    var memo;
-    return function () {
-      if (--times > 0) {
-        memo = func.apply(this, arguments);
-      }
-      if (times <= 1) func = null;
-      return memo;
-    };
-  }
-
-  // Returns a function that will be executed at most one time, no matter how
-  // often you call it. Useful for lazy initialization.
-  var once = partial(before, 2);
-
-  // Returns the first key on an object that passes a truth test.
-  function findKey(obj, predicate, context) {
-    predicate = cb(predicate, context);
-    var _keys = keys(obj),
-      key;
-    for (var i = 0, length = _keys.length; i < length; i++) {
-      key = _keys[i];
-      if (predicate(obj[key], key, obj)) return key;
-    }
-  }
-
-  // Internal function to generate `_.findIndex` and `_.findLastIndex`.
-  function createPredicateIndexFinder(dir) {
-    return function (array, predicate, context) {
-      predicate = cb(predicate, context);
-      var length = getLength(array);
-      var index = dir > 0 ? 0 : length - 1;
-      for (; index >= 0 && index < length; index += dir) {
-        if (predicate(array[index], index, array)) return index;
-      }
-      return -1;
-    };
-  }
-
-  // Returns the first index on an array-like that passes a truth test.
-  var findIndex = createPredicateIndexFinder(1);
-
-  // Returns the last index on an array-like that passes a truth test.
-  var findLastIndex = createPredicateIndexFinder(-1);
-
-  // Use a comparator function to figure out the smallest index at which
-  // an object should be inserted so as to maintain order. Uses binary search.
-  function sortedIndex(array, obj, iteratee, context) {
-    iteratee = cb(iteratee, context, 1);
-    var value = iteratee(obj);
-    var low = 0,
-      high = getLength(array);
-    while (low < high) {
-      var mid = Math.floor((low + high) / 2);
-      if (iteratee(array[mid]) < value) low = mid + 1;
-      else high = mid;
-    }
-    return low;
-  }
-
-  // Internal function to generate the `_.indexOf` and `_.lastIndexOf` functions.
-  function createIndexFinder(dir, predicateFind, sortedIndex) {
-    return function (array, item, idx) {
-      var i = 0,
-        length = getLength(array);
-      if (typeof idx == "number") {
-        if (dir > 0) {
-          i = idx >= 0 ? idx : Math.max(idx + length, i);
-        } else {
-          length = idx >= 0 ? Math.min(idx + 1, length) : idx + length + 1;
-        }
-      } else if (sortedIndex && idx && length) {
-        idx = sortedIndex(array, item);
-        return array[idx] === item ? idx : -1;
-      }
-      if (item !== item) {
-        idx = predicateFind(slice.call(array, i, length), isNaN$1);
-        return idx >= 0 ? idx + i : -1;
-      }
-      for (
-        idx = dir > 0 ? i : length - 1;
-        idx >= 0 && idx < length;
-        idx += dir
-      ) {
-        if (array[idx] === item) return idx;
-      }
-      return -1;
-    };
-  }
-
-  // Return the position of the first occurrence of an item in an array,
-  // or -1 if the item is not included in the array.
-  // If the array is large and already in sort order, pass `true`
-  // for **isSorted** to use binary search.
-  var indexOf = createIndexFinder(1, findIndex, sortedIndex);
-
-  // Return the position of the last occurrence of an item in an array,
-  // or -1 if the item is not included in the array.
-  var lastIndexOf = createIndexFinder(-1, findLastIndex);
-
-  // Return the first value which passes a truth test.
-  function find(obj, predicate, context) {
-    var keyFinder = isArrayLike(obj) ? findIndex : findKey;
-    var key = keyFinder(obj, predicate, context);
-    if (key !== void 0 && key !== -1) return obj[key];
-  }
-
-  // Convenience version of a common use case of `_.find`: getting the first
-  // object containing specific `key:value` pairs.
-  function findWhere(obj, attrs) {
-    return find(obj, matcher(attrs));
-  }
-
-  // The cornerstone for collection functions, an `each`
-  // implementation, aka `forEach`.
-  // Handles raw objects in addition to array-likes. Treats all
-  // sparse array-likes as if they were dense.
-  function each(obj, iteratee, context) {
-    iteratee = optimizeCb(iteratee, context);
-    var i, length;
-    if (isArrayLike(obj)) {
-      for (i = 0, length = obj.length; i < length; i++) {
-        iteratee(obj[i], i, obj);
-      }
-    } else {
-      var _keys = keys(obj);
-      for (i = 0, length = _keys.length; i < length; i++) {
-        iteratee(obj[_keys[i]], _keys[i], obj);
-      }
-    }
-    return obj;
-  }
-
-  // Return the results of applying the iteratee to each element.
-  function map(obj, iteratee, context) {
-    iteratee = cb(iteratee, context);
-    var _keys = !isArrayLike(obj) && keys(obj),
-      length = (_keys || obj).length,
-      results = Array(length);
-    for (var index = 0; index < length; index++) {
-      var currentKey = _keys ? _keys[index] : index;
-      results[index] = iteratee(obj[currentKey], currentKey, obj);
-    }
-    return results;
-  }
-
-  // Internal helper to create a reducing function, iterating left or right.
-  function createReduce(dir) {
-    // Wrap code that reassigns argument variables in a separate function than
-    // the one that accesses `arguments.length` to avoid a perf hit. (#1991)
-    var reducer = function (obj, iteratee, memo, initial) {
-      var _keys = !isArrayLike(obj) && keys(obj),
-        length = (_keys || obj).length,
-        index = dir > 0 ? 0 : length - 1;
-      if (!initial) {
-        memo = obj[_keys ? _keys[index] : index];
-        index += dir;
-      }
-      for (; index >= 0 && index < length; index += dir) {
-        var currentKey = _keys ? _keys[index] : index;
-        memo = iteratee(memo, obj[currentKey], currentKey, obj);
-      }
-      return memo;
-    };
-
-    return function (obj, iteratee, memo, context) {
-      var initial = arguments.length >= 3;
-      return reducer(obj, optimizeCb(iteratee, context, 4), memo, initial);
-    };
-  }
-
-  // **Reduce** builds up a single result from a list of values, aka `inject`,
-  // or `foldl`.
-  var reduce = createReduce(1);
-
-  // The right-associative version of reduce, also known as `foldr`.
-  var reduceRight = createReduce(-1);
-
-  // Return all the elements that pass a truth test.
-  function filter(obj, predicate, context) {
-    var results = [];
-    predicate = cb(predicate, context);
-    each(obj, function (value, index, list) {
-      if (predicate(value, index, list)) results.push(value);
-    });
-    return results;
-  }
-
-  // Return all the elements for which a truth test fails.
-  function reject(obj, predicate, context) {
-    return filter(obj, negate(cb(predicate)), context);
-  }
-
-  // Determine whether all of the elements pass a truth test.
-  function every(obj, predicate, context) {
-    predicate = cb(predicate, context);
-    var _keys = !isArrayLike(obj) && keys(obj),
-      length = (_keys || obj).length;
-    for (var index = 0; index < length; index++) {
-      var currentKey = _keys ? _keys[index] : index;
-      if (!predicate(obj[currentKey], currentKey, obj)) return false;
-    }
-    return true;
-  }
-
-  // Determine if at least one element in the object passes a truth test.
-  function some(obj, predicate, context) {
-    predicate = cb(predicate, context);
-    var _keys = !isArrayLike(obj) && keys(obj),
-      length = (_keys || obj).length;
-    for (var index = 0; index < length; index++) {
-      var currentKey = _keys ? _keys[index] : index;
-      if (predicate(obj[currentKey], currentKey, obj)) return true;
-    }
-    return false;
-  }
-
-  // Determine if the array or object contains a given item (using `===`).
-  function contains(obj, item, fromIndex, guard) {
-    if (!isArrayLike(obj)) obj = values(obj);
-    if (typeof fromIndex != "number" || guard) fromIndex = 0;
-    return indexOf(obj, item, fromIndex) >= 0;
-  }
-
-  // Invoke a method (with arguments) on every item in a collection.
-  var invoke = restArguments(function (obj, path, args) {
-    var contextPath, func;
-    if (isFunction$1$1(path)) {
-      func = path;
-    } else {
-      path = toPath(path);
-      contextPath = path.slice(0, -1);
-      path = path[path.length - 1];
-    }
-    return map(obj, function (context) {
-      var method = func;
-      if (!method) {
-        if (contextPath && contextPath.length) {
-          context = deepGet(context, contextPath);
-        }
-        if (context == null) return void 0;
-        method = context[path];
-      }
-      return method == null ? method : method.apply(context, args);
-    });
-  });
-
-  // Convenience version of a common use case of `_.map`: fetching a property.
-  function pluck(obj, key) {
-    return map(obj, property(key));
-  }
-
-  // Convenience version of a common use case of `_.filter`: selecting only
-  // objects containing specific `key:value` pairs.
-  function where(obj, attrs) {
-    return filter(obj, matcher(attrs));
-  }
-
-  // Return the maximum element (or element-based computation).
-  function max(obj, iteratee, context) {
-    var result = -Infinity,
-      lastComputed = -Infinity,
-      value,
-      computed;
-    if (
-      iteratee == null ||
-      (typeof iteratee == "number" && typeof obj[0] != "object" && obj != null)
-    ) {
-      obj = isArrayLike(obj) ? obj : values(obj);
-      for (var i = 0, length = obj.length; i < length; i++) {
-        value = obj[i];
-        if (value != null && value > result) {
-          result = value;
-        }
-      }
-    } else {
-      iteratee = cb(iteratee, context);
-      each(obj, function (v, index, list) {
-        computed = iteratee(v, index, list);
-        if (
-          computed > lastComputed ||
-          (computed === -Infinity && result === -Infinity)
-        ) {
-          result = v;
-          lastComputed = computed;
-        }
-      });
-    }
-    return result;
-  }
-
-  // Return the minimum element (or element-based computation).
-  function min(obj, iteratee, context) {
-    var result = Infinity,
-      lastComputed = Infinity,
-      value,
-      computed;
-    if (
-      iteratee == null ||
-      (typeof iteratee == "number" && typeof obj[0] != "object" && obj != null)
-    ) {
-      obj = isArrayLike(obj) ? obj : values(obj);
-      for (var i = 0, length = obj.length; i < length; i++) {
-        value = obj[i];
-        if (value != null && value < result) {
-          result = value;
-        }
-      }
-    } else {
-      iteratee = cb(iteratee, context);
-      each(obj, function (v, index, list) {
-        computed = iteratee(v, index, list);
-        if (
-          computed < lastComputed ||
-          (computed === Infinity && result === Infinity)
-        ) {
-          result = v;
-          lastComputed = computed;
-        }
-      });
-    }
-    return result;
-  }
-
-  // Sample **n** random values from a collection using the modern version of the
-  // [Fisher-Yates shuffle](https://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
-  // If **n** is not specified, returns a single random element.
-  // The internal `guard` argument allows it to work with `_.map`.
-  function sample(obj, n, guard) {
-    if (n == null || guard) {
-      if (!isArrayLike(obj)) obj = values(obj);
-      return obj[random(obj.length - 1)];
-    }
-    var sample = isArrayLike(obj) ? clone(obj) : values(obj);
-    var length = getLength(sample);
-    n = Math.max(Math.min(n, length), 0);
-    var last = length - 1;
-    for (var index = 0; index < n; index++) {
-      var rand = random(index, last);
-      var temp = sample[index];
-      sample[index] = sample[rand];
-      sample[rand] = temp;
-    }
-    return sample.slice(0, n);
-  }
-
-  // Shuffle a collection.
-  function shuffle(obj) {
-    return sample(obj, Infinity);
-  }
-
-  // Sort the object's values by a criterion produced by an iteratee.
-  function sortBy(obj, iteratee, context) {
-    var index = 0;
-    iteratee = cb(iteratee, context);
-    return pluck(
-      map(obj, function (value, key, list) {
-        return {
-          value: value,
-          index: index++,
-          criteria: iteratee(value, key, list),
-        };
-      }).sort(function (left, right) {
-        var a = left.criteria;
-        var b = right.criteria;
-        if (a !== b) {
-          if (a > b || a === void 0) return 1;
-          if (a < b || b === void 0) return -1;
-        }
-        return left.index - right.index;
-      }),
-      "value"
+  function escape(string) {
+    return Object.entries(escapeMap).reduce(
+      (string, [target, sub]) => string.replaceAll(target, sub),
+      string
     );
   }
-
-  // An internal function used for aggregate "group by" operations.
-  function group(behavior, partition) {
-    return function (obj, iteratee, context) {
-      var result = partition ? [[], []] : {};
-      iteratee = cb(iteratee, context);
-      each(obj, function (value, index) {
-        var key = iteratee(value, index, obj);
-        behavior(result, value, key);
-      });
-      return result;
-    };
-  }
-
-  // Groups the object's values by a criterion. Pass either a string attribute
-  // to group by, or a function that returns the criterion.
-  var groupBy = group(function (result, value, key) {
-    if (has$1(result, key)) result[key].push(value);
-    else result[key] = [value];
-  });
-
-  // Indexes the object's values by a criterion, similar to `_.groupBy`, but for
-  // when you know that your index values will be unique.
-  var indexBy = group(function (result, value, key) {
-    result[key] = value;
-  });
-
-  // Counts instances of an object that group by a certain criterion. Pass
-  // either a string attribute to count by, or a function that returns the
-  // criterion.
-  var countBy = group(function (result, value, key) {
-    if (has$1(result, key)) result[key]++;
-    else result[key] = 1;
-  });
-
-  // Split a collection into two arrays: one whose elements all pass the given
-  // truth test, and one whose elements all do not pass the truth test.
-  var partition = group(function (result, value, pass) {
-    result[pass ? 0 : 1].push(value);
-  }, true);
-
-  // Safely create a real, live array from anything iterable.
-  var reStrSymbol = /[^\ud800-\udfff]|[\ud800-\udbff][\udc00-\udfff]|[\ud800-\udfff]/g;
-  function toArray(obj) {
-    if (!obj) return [];
-    if (isArray(obj)) return slice.call(obj);
-    if (isString$1(obj)) {
-      // Keep surrogate pair characters together.
-      return obj.match(reStrSymbol);
-    }
-    if (isArrayLike(obj)) return map(obj, identity);
-    return values(obj);
-  }
-
-  // Return the number of elements in a collection.
-  function size(obj) {
-    if (obj == null) return 0;
-    return isArrayLike(obj) ? obj.length : keys(obj).length;
-  }
-
-  // Internal `_.pick` helper function to determine whether `key` is an enumerable
-  // property name of `obj`.
-  function keyInObj(value, key, obj) {
-    return key in obj;
-  }
-
-  // Return a copy of the object only containing the allowed properties.
-  var pick = restArguments(function (obj, keys) {
-    var result = {},
-      iteratee = keys[0];
-    if (obj == null) return result;
-    if (isFunction$1$1(iteratee)) {
-      if (keys.length > 1) iteratee = optimizeCb(iteratee, keys[1]);
-      keys = allKeys(obj);
-    } else {
-      iteratee = keyInObj;
-      keys = flatten$1(keys, false, false);
-      obj = Object(obj);
-    }
-    for (var i = 0, length = keys.length; i < length; i++) {
-      var key = keys[i];
-      var value = obj[key];
-      if (iteratee(value, key, obj)) result[key] = value;
-    }
-    return result;
-  });
-
-  // Return a copy of the object without the disallowed properties.
-  var omit = restArguments(function (obj, keys) {
-    var iteratee = keys[0],
-      context;
-    if (isFunction$1$1(iteratee)) {
-      iteratee = negate(iteratee);
-      if (keys.length > 1) context = keys[1];
-    } else {
-      keys = map(flatten$1(keys, false, false), String);
-      iteratee = function (value, key) {
-        return !contains(keys, key);
-      };
-    }
-    return pick(obj, iteratee, context);
-  });
-
-  // Returns everything but the last entry of the array. Especially useful on
-  // the arguments object. Passing **n** will return all the values in
-  // the array, excluding the last N.
-  function initial(array, n, guard) {
-    return slice.call(
-      array,
-      0,
-      Math.max(0, array.length - (n == null || guard ? 1 : n))
-    );
-  }
-
-  // Get the first element of an array. Passing **n** will return the first N
-  // values in the array. The **guard** check allows it to work with `_.map`.
-  function first(array, n, guard) {
-    if (array == null || array.length < 1)
-      return n == null || guard ? void 0 : [];
-    if (n == null || guard) return array[0];
-    return initial(array, array.length - n);
-  }
-
-  // Returns everything but the first entry of the `array`. Especially useful on
-  // the `arguments` object. Passing an **n** will return the rest N values in the
-  // `array`.
-  function rest(array, n, guard) {
-    return slice.call(array, n == null || guard ? 1 : n);
-  }
-
-  // Get the last element of an array. Passing **n** will return the last N
-  // values in the array.
-  function last(array, n, guard) {
-    if (array == null || array.length < 1)
-      return n == null || guard ? void 0 : [];
-    if (n == null || guard) return array[array.length - 1];
-    return rest(array, Math.max(0, array.length - n));
-  }
-
-  // Trim out all falsy values from an array.
-  function compact(array) {
-    return filter(array, Boolean);
-  }
-
-  // Flatten out an array, either recursively (by default), or up to `depth`.
-  // Passing `true` or `false` as `depth` means `1` or `Infinity`, respectively.
-  function flatten(array, depth) {
-    return flatten$1(array, depth, false);
-  }
-
-  // Take the difference between one array and a number of other arrays.
-  // Only the elements present in just the first array will remain.
-  var difference = restArguments(function (array, rest) {
-    rest = flatten$1(rest, true, true);
-    return filter(array, function (value) {
-      return !contains(rest, value);
-    });
-  });
-
-  // Return a version of the array that does not contain the specified value(s).
-  var without = restArguments(function (array, otherArrays) {
-    return difference(array, otherArrays);
-  });
-
-  // Produce a duplicate-free version of the array. If the array has already
-  // been sorted, you have the option of using a faster algorithm.
-  // The faster algorithm will not work with an iteratee if the iteratee
-  // is not a one-to-one function, so providing an iteratee will disable
-  // the faster algorithm.
-  function uniq(array, isSorted, iteratee, context) {
-    if (!isBoolean$1(isSorted)) {
-      context = iteratee;
-      iteratee = isSorted;
-      isSorted = false;
-    }
-    if (iteratee != null) iteratee = cb(iteratee, context);
-    var result = [];
-    var seen = [];
-    for (var i = 0, length = getLength(array); i < length; i++) {
-      var value = array[i],
-        computed = iteratee ? iteratee(value, i, array) : value;
-      if (isSorted && !iteratee) {
-        if (!i || seen !== computed) result.push(value);
-        seen = computed;
-      } else if (iteratee) {
-        if (!contains(seen, computed)) {
-          seen.push(computed);
-          result.push(value);
-        }
-      } else if (!contains(result, value)) {
-        result.push(value);
-      }
-    }
-    return result;
-  }
-
-  // Produce an array that contains the union: each distinct element from all of
-  // the passed-in arrays.
-  var union = restArguments(function (arrays) {
-    return uniq(flatten$1(arrays, true, true));
-  });
-
-  // Produce an array that contains every item shared between all the
-  // passed-in arrays.
-  function intersection(array) {
-    var result = [];
-    var argsLength = arguments.length;
-    for (var i = 0, length = getLength(array); i < length; i++) {
-      var item = array[i];
-      if (contains(result, item)) continue;
-      var j;
-      for (j = 1; j < argsLength; j++) {
-        if (!contains(arguments[j], item)) break;
-      }
-      if (j === argsLength) result.push(item);
-    }
-    return result;
-  }
-
-  // Complement of zip. Unzip accepts an array of arrays and groups
-  // each array's elements on shared indices.
-  function unzip(array) {
-    var length = (array && max(array, getLength).length) || 0;
-    var result = Array(length);
-
-    for (var index = 0; index < length; index++) {
-      result[index] = pluck(array, index);
-    }
-    return result;
-  }
-
-  // Zip together multiple lists into a single array -- elements that share
-  // an index go together.
-  var zip = restArguments(unzip);
-
-  // Converts lists into objects. Pass either a single array of `[key, value]`
-  // pairs, or two parallel arrays of the same length -- one of keys, and one of
-  // the corresponding values. Passing by pairs is the reverse of `_.pairs`.
-  function object(list, values) {
-    var result = {};
-    for (var i = 0, length = getLength(list); i < length; i++) {
-      if (values) {
-        result[list[i]] = values[i];
-      } else {
-        result[list[i][0]] = list[i][1];
-      }
-    }
-    return result;
-  }
-
-  // Generate an integer Array containing an arithmetic progression. A port of
-  // the native Python `range()` function. See
-  // [the Python documentation](https://docs.python.org/library/functions.html#range).
-  function range(start, stop, step) {
-    if (stop == null) {
-      stop = start || 0;
-      start = 0;
-    }
-    if (!step) {
-      step = stop < start ? -1 : 1;
-    }
-
-    var length = Math.max(Math.ceil((stop - start) / step), 0);
-    var range = Array(length);
-
-    for (var idx = 0; idx < length; idx++, start += step) {
-      range[idx] = start;
-    }
-
-    return range;
-  }
-
-  // Chunk a single array into multiple arrays, each containing `count` or fewer
-  // items.
-  function chunk(array, count) {
-    if (count == null || count < 1) return [];
-    var result = [];
-    var i = 0,
-      length = array.length;
-    while (i < length) {
-      result.push(slice.call(array, i, (i += count)));
-    }
-    return result;
-  }
-
-  // Helper function to continue chaining intermediate results.
-  function chainResult(instance, obj) {
-    return instance._chain ? _$1(obj).chain() : obj;
-  }
-
-  // Add your own custom functions to the Underscore object.
-  function mixin(obj) {
-    each(functions(obj), function (name) {
-      var func = (_$1[name] = obj[name]);
-      _$1.prototype[name] = function () {
-        var args = [this._wrapped];
-        push.apply(args, arguments);
-        return chainResult(this, func.apply(_$1, args));
-      };
-    });
-    return _$1;
-  }
-
-  // Add all mutator `Array` functions to the wrapper.
-  each(
-    ["pop", "push", "reverse", "shift", "sort", "splice", "unshift"],
-    function (name) {
-      var method = ArrayProto[name];
-      _$1.prototype[name] = function () {
-        var obj = this._wrapped;
-        if (obj != null) {
-          method.apply(obj, arguments);
-          if ((name === "shift" || name === "splice") && obj.length === 0) {
-            delete obj[0];
-          }
-        }
-        return chainResult(this, obj);
-      };
-    }
-  );
-
-  // Add all accessor `Array` functions to the wrapper.
-  each(["concat", "join", "slice"], function (name) {
-    var method = ArrayProto[name];
-    _$1.prototype[name] = function () {
-      var obj = this._wrapped;
-      if (obj != null) obj = method.apply(obj, arguments);
-      return chainResult(this, obj);
-    };
-  });
-
-  // Named Exports
-
-  var allExports = {
-    __proto__: null,
-    VERSION: VERSION,
-    restArguments: restArguments,
-    isObject: isObject,
-    isNull: isNull,
-    isUndefined: isUndefined,
-    isBoolean: isBoolean$1,
-    isElement: isElement,
-    isString: isString$1,
-    isNumber: isNumber$1,
-    isDate: isDate,
-    isRegExp: isRegExp,
-    isError: isError,
-    isSymbol: isSymbol$1,
-    isArrayBuffer: isArrayBuffer,
-    isDataView: isDataView$1,
-    isArray: isArray,
-    isFunction: isFunction$1$1,
-    isArguments: isArguments$1,
-    isFinite: isFinite$1,
-    isNaN: isNaN$1,
-    isTypedArray: isTypedArray$1,
-    isEmpty: isEmpty,
-    isMatch: isMatch,
-    isEqual: isEqual,
-    isMap: isMap,
-    isWeakMap: isWeakMap,
-    isSet: isSet,
-    isWeakSet: isWeakSet,
-    keys: keys,
-    allKeys: allKeys,
-    values: values,
-    pairs: pairs,
-    invert: invert,
-    functions: functions,
-    methods: functions,
-    extend: extend,
-    extendOwn: extendOwn,
-    assign: extendOwn,
-    defaults: defaults,
-    create: create,
-    clone: clone,
-    tap: tap,
-    get: get,
-    has: has,
-    mapObject: mapObject,
-    identity: identity,
-    constant: constant,
-    noop: noop,
-    toPath: toPath$1,
-    property: property,
-    propertyOf: propertyOf,
-    matcher: matcher,
-    matches: matcher,
-    times: times,
-    random: random,
-    now: now,
-    escape: _escape,
-    unescape: _unescape,
-    templateSettings: templateSettings,
-    template: template,
-    result: result,
-    uniqueId: uniqueId,
-    chain: chain,
-    iteratee: iteratee,
-    partial: partial,
-    bind: bind,
-    bindAll: bindAll,
-    memoize: memoize$1,
-    delay: delay,
-    defer: defer,
-    throttle: throttle,
-    debounce: debounce,
-    wrap: wrap,
-    negate: negate,
-    compose: compose,
-    after: after,
-    before: before,
-    once: once,
-    findKey: findKey,
-    findIndex: findIndex,
-    findLastIndex: findLastIndex,
-    sortedIndex: sortedIndex,
-    indexOf: indexOf,
-    lastIndexOf: lastIndexOf,
-    find: find,
-    detect: find,
-    findWhere: findWhere,
-    each: each,
-    forEach: each,
-    map: map,
-    collect: map,
-    reduce: reduce,
-    foldl: reduce,
-    inject: reduce,
-    reduceRight: reduceRight,
-    foldr: reduceRight,
-    filter: filter,
-    select: filter,
-    reject: reject,
-    every: every,
-    all: every,
-    some: some,
-    any: some,
-    contains: contains,
-    includes: contains,
-    include: contains,
-    invoke: invoke,
-    pluck: pluck,
-    where: where,
-    max: max,
-    min: min,
-    shuffle: shuffle,
-    sample: sample,
-    sortBy: sortBy,
-    groupBy: groupBy,
-    indexBy: indexBy,
-    countBy: countBy,
-    partition: partition,
-    toArray: toArray,
-    size: size,
-    pick: pick,
-    omit: omit,
-    first: first,
-    head: first,
-    take: first,
-    initial: initial,
-    last: last,
-    rest: rest,
-    tail: rest,
-    drop: rest,
-    compact: compact,
-    flatten: flatten,
-    without: without,
-    uniq: uniq,
-    unique: uniq,
-    union: union,
-    intersection: intersection,
-    difference: difference,
-    unzip: unzip,
-    transpose: unzip,
-    zip: zip,
-    object: object,
-    range: range,
-    chunk: chunk,
-    mixin: mixin,
-    default: _$1,
-  };
-
-  // Default Export
-
-  // Add all of the Underscore functions to the wrapper object.
-  var _ = mixin(allExports);
-  // Legacy Node.js API.
-  _._ = _;
 
   //
   // Scheme symbols
@@ -13785,20 +11674,20 @@ var BiwaScheme = (function () {
       return this._get(["cdr", "car"], err);
     }
     cdar(err) {
-      return this._get(["cdr", "car"], err);
+      return this._get(["car", "cdr"], err);
     }
     cddr(err) {
       return this._get(["cdr", "cdr"], err);
     }
-    _get(props, err) {
+    _get(props, err = "unexpected") {
       let x = this;
-      props.forEach((p) => {
+      for (const p of props) {
         if (x.hasOwnProperty(p)) {
-          return x[p];
-        } else if (err) {
+          x = x[p];
+        } else {
           throw err;
         }
-      });
+      }
       return x;
     }
 
@@ -13827,14 +11716,6 @@ var BiwaScheme = (function () {
         ary.push(o.car);
       }
       return ary;
-    }
-
-    to_set() {
-      var set = new BiwaSet();
-      for (var o = this; o instanceof Pair; o = o.cdr) {
-        set.add(o.car);
-      }
-      return set;
     }
 
     length() {
@@ -14671,7 +12552,7 @@ var BiwaScheme = (function () {
               body = x.cdr.cdr;
             if (vars instanceof Pair) {
               // (lambda (...) ...)
-              ret = this.find_sets(body, v.set_minus(vars.to_set()));
+              ret = this.find_sets(body, v.set_minus(to_set(vars)));
             } else {
               // (lambda args ...)
               ret = this.find_sets(body, v.set_minus(new BiwaSet(vars)));
@@ -14741,7 +12622,7 @@ var BiwaScheme = (function () {
               body = x.cdr.cdr;
             if (vars instanceof Pair) {
               // (lambda (...) ...)
-              ret = this.find_free(body, b.set_union(vars.to_set()), f);
+              ret = this.find_free(body, b.set_union(to_set(vars)), f);
             } else {
               // (lambda args ...)
               ret = this.find_free(body, b.set_cons(vars), f);
@@ -15079,14 +12960,14 @@ var BiwaScheme = (function () {
 
       var dotpos = this.find_dot_pos(vars);
       var proper = this.dotted2proper(vars);
-      var free = this.find_free(cbody, proper.to_set(), f); //free variables
-      var sets = this.find_sets(cbody, proper.to_set()); //local variables
+      var free = this.find_free(cbody, to_set(proper), f); //free variables
+      var sets = this.find_sets(cbody, to_set(proper)); //local variables
 
       var do_body = this.compile(
         cbody,
-        [proper.to_set(), free],
+        [to_set(proper), free],
         sets.set_union(s.set_intersect(free)),
-        f.set_union(proper.to_set()),
+        f.set_union(to_set(proper)),
         ["return"]
       );
       var do_close = [
@@ -15279,6 +13160,19 @@ var BiwaScheme = (function () {
     return new Pair(Sym("letrec*"), new Pair(bindings, exprs));
   };
 
+  // Convert a list to BiwaSet
+  function to_set(ls) {
+    if (ls === nil) {
+      return new BiwaSet();
+    } else {
+      var set = new BiwaSet();
+      for (var o = ls; o instanceof Pair; o = o.cdr) {
+        set.add(o.car);
+      }
+      return set;
+    }
+  }
+
   //
   // assertions - type checks
   //
@@ -15357,15 +13251,11 @@ var BiwaScheme = (function () {
     create_copy(mutable) {
       var copy = new Hashtable(this.hash_proc, this.equiv_proc, mutable);
       // clone the pairs to copy
-      Object.keys(this.pairs_of).forEach(
-        bind(function (hashed) {
-          var pairs = this.pairs_of[hashed];
-          var cloned = pairs.map(function (pair) {
-            return [...pair];
-          });
-          copy.pairs_of[hashed] = cloned;
-        }, this)
-      );
+      Object.keys(this.pairs_of).forEach((hashed) => {
+        let pairs = this.pairs_of[hashed];
+        let cloned = pairs.map((pair) => [...pair]);
+        copy.pairs_of[hashed] = cloned;
+      });
 
       return copy;
     }
@@ -15392,7 +13282,7 @@ var BiwaScheme = (function () {
 
     _apply_pair(func) {
       var a = [];
-      values(this.pairs_of).forEach(function (pairs) {
+      Object.values(this.pairs_of).forEach(function (pairs) {
         pairs.forEach(function (pair) {
           a.push(func(pair));
         });
@@ -15448,263 +13338,735 @@ var BiwaScheme = (function () {
   };
 
   //
-  // Parser
-  // copied from jsScheme - should be rewrriten (support #0=, etc)
+  // number.js
   //
+
+  //
+  // Complex
+  //
+  class Complex {
+    constructor(real, imag) {
+      this.real = real;
+      this.imag = imag;
+    }
+
+    magnitude() {
+      return Math.sqrt(this.real * this.real + this.imag * this.imag);
+    }
+
+    angle() {
+      return Math.atan2(this.imag, this.real);
+    }
+
+    isReal() {
+      return this.imag == 0;
+    }
+
+    isRational() {
+      return this.imag == 0 && isRational(this.real);
+    }
+
+    isInteger() {
+      return this.imag == 0 && isInteger(this.real);
+    }
+
+    toString(radix) {
+      if (this.real === 0 && this.imag === 0) return "0";
+      var img = "";
+      if (this.imag !== 0) {
+        if (this.imag > 0 && this.real !== 0) {
+          img += "+";
+        }
+        switch (this.imag) {
+          case 1:
+            break;
+          case -1:
+            img += "-";
+            break;
+          default:
+            img += this.imag.toString(radix);
+        }
+        img += "i";
+      }
+      var real = "";
+      if (this.real !== 0) {
+        real += this.real.toString(radix);
+      }
+      return real + img;
+    }
+  }
+
+  Complex.from_polar = function (r, theta) {
+    var real = r * Math.cos(theta);
+    var imag = r * Math.sin(theta);
+    return new Complex(real, imag);
+  };
+
+  Complex.assure = function (num) {
+    if (num instanceof Complex) return num;
+    else return new Complex(num, 0);
+  };
+
+  //
+  // Rational (unfinished)
+  //
+  class Rational$1 {
+    constructor(numerator, denominator) {
+      this.numerator = numerator;
+      this.denominator = denominator;
+    }
+
+    isInteger() {
+      // FIXME
+    }
+  }
+
+  //
+  // Predicates
+  //
+  const isNumber = function (x) {
+    return (
+      x instanceof Complex || x instanceof Rational$1 || typeof x == "number"
+    );
+  };
+  const isComplex = isNumber;
+
+  const isReal = function (x) {
+    if (x instanceof Complex || x instanceof Rational$1) {
+      return x.isReal();
+    } else {
+      return typeof x == "number";
+    }
+  };
+
+  const isRational = function (x) {
+    if (x instanceof Complex) {
+      return x.isRational();
+    } else if (x instanceof Rational$1) {
+      return true;
+    } else {
+      return typeof x == "number";
+    }
+  };
+
+  const isInteger = function (x) {
+    if (x instanceof Complex || x instanceof Rational$1) {
+      return x.isInteger();
+    } else {
+      return typeof x == "number" && x % 1 == 0;
+    }
+  };
+
+  // Raised when input is not terminated
+  class Unterminated extends BiwaError {}
+
+  // Allowed digits in each base
+  const DIGITS = {
+    2: /^[01]+/,
+    8: /^[0-7]+/,
+    10: /^[0-9]+/,
+    16: /^[0-9a-fA-F]+/,
+  };
+
+  // Matching parenthesis/bracket for lists
+  const PAREN = {
+    "(": ")",
+    "{": "}",
+    "[": "]",
+  };
+
+  // Named characters like `#\newline`
+  const NAMED_CHARS = {
+    alarm: "\x07",
+    backspace: "\x08",
+    delete: "\x7F",
+    escape: "\x1B",
+    newline: "\n",
+    null: "\x00",
+    return: "\x0D",
+    space: " ",
+    tab: "\t",
+  };
+  const NAMED_CHARS_REXP = new RegExp(
+    "^(" + Object.keys(NAMED_CHARS).join("|") + ")\\b"
+  );
+
+  // Escape sequences like `\n`, `\t`
+  const ESCAPE_SEQUENCES = {
+    a: "\x07",
+    b: "\x08",
+    t: "\t",
+    n: "\n",
+    r: "\x0D",
+  };
+
   class Parser {
     constructor(txt) {
-      this.tokens = this.tokenize(txt);
+      // Scheme source text
+      this.txt = txt;
+      // Current position
       this.i = 0;
-      this.sexpCommentMarker = new Object();
+      // Case fold flag. Changed by `#!(no-)fold-case` directives in Scheme source text
+      this.foldCase = false;
+      // For datum labels (`#1=`)
+      this.labelledData = [];
     }
 
     // Inject scheme program into current position
     insert(txt) {
-      this.tokens.splice(this.i, 0, ...this.tokenize(txt));
+      const orig = this.txt;
+      this.txt = orig.slice(0, this.i) + txt + orig.slice(this.i);
     }
 
     // Returns string representation of `this` for debugging
     inspect() {
-      return [
-        "#<Parser:",
-        this.i,
-        "/",
-        this.tokens.length,
-        " ",
-        inspect(this.tokens),
-        ">",
-      ].join("");
+      return `#<Parser (${this.i}/${this.txt.length})>`;
     }
 
-    // Split a string into array of tokens
-    tokenize(txt) {
-      var tokens = new Array(),
-        oldTxt = null;
-      var in_srfi_30_comment = 0;
-
-      while (txt != "" && oldTxt != txt) {
-        oldTxt = txt;
-        txt = txt.replace(
-          /^\s*(;[^\r\n]*(\r|\n|$)|#;|#\||#\\[^\w]|#?(\(|\[|{)|\)|\]|}|\'|`|,@|,|\+inf\.0|-inf\.0|\+nan\.0|\"(\\(.|$)|[^\"\\])*(\"|$)|\|(\\(.|$)|[^\|\\])*(\||$)|[^\s()\[\]{}]+)/,
-          function ($0, $1) {
-            var t = $1;
-
-            if (t == "#|") {
-              in_srfi_30_comment++;
-              return "";
-            } else if (in_srfi_30_comment > 0) {
-              if (/(.*\|#)/.test(t)) {
-                in_srfi_30_comment--;
-                if (in_srfi_30_comment < 0) {
-                  throw new BiwaError(
-                    "Found an extra comment terminator: `|#'"
-                  );
-                }
-                // Push back the rest substring to input stream.
-                return t.substring(RegExp.$1.length, t.length);
-              } else {
-                return "";
-              }
-            } else {
-              if (t.charAt(0) != ";") tokens[tokens.length] = t;
-              return "";
-            }
-          }
-        );
-      }
-      return tokens;
-    }
-
-    // Read a Scheme object. Skip sexp comment if any
+    // Read a Scheme value and returns it.
+    // Returns `Parser.EOS` if there is no more.
+    // Throws `Parser.Unterminated` if the source text ends with an unterminated
+    // list, etc.
     getObject() {
-      var r = this.getObject0();
+      this._skipAtmosphere();
+      let ret;
+      if (this.done()) {
+        ret = Parser.EOS;
+      } else {
+        switch (this.txt[this.i]) {
+          case "#":
+            this.i++;
+            ret = this._parseSharp();
+            break;
+          case "(":
+          case "[":
+          case "{":
+            ret = this._parseList();
+            break;
+          case '"':
+            ret = this._parseString();
+            break;
+          case "|":
+            ret = this._parseEnclosedSymbol();
+            break;
 
-      if (r != this.sexpCommentMarker) return r;
+          // Aliases
+          case "'":
+            this.i++;
+            ret = this._parseQuote("quote");
+            break;
+          case "`":
+            this.i++;
+            ret = this._parseQuote("quasiquote");
+            break;
+          case ",":
+            this.i++;
+            if (this.txt[this.i] == "@") {
+              this.i++;
+              ret = this._parseQuote("unquote-splicing");
+            } else {
+              ret = this._parseQuote("unquote");
+            }
+            break;
 
-      r = this.getObject();
-      if (r == Parser.EOS)
-        throw new BiwaError(
-          "Readable object not found after S exression comment"
-        );
-
-      r = this.getObject();
-      return r;
-    }
-
-    // Read a Scheme list
-    getList(close) {
-      var list = nil,
-        prev = list;
-      while (this.i < this.tokens.length) {
-        this.eatObjectsInSexpComment(
-          "Input stream terminated unexpectedly(in list)"
-        );
-
-        if (
-          this.tokens[this.i] == ")" ||
-          this.tokens[this.i] == "]" ||
-          this.tokens[this.i] == "}"
-        ) {
-          this.i++;
-          break;
-        }
-
-        if (this.tokens[this.i] == ".") {
-          this.i++;
-          var o = this.getObject();
-          if (o != Parser.EOS && list != nil) {
-            prev.cdr = o;
-          }
-        } else {
-          var cur = new Pair(this.getObject(), nil);
-          if (list == nil) list = cur;
-          else prev.cdr = cur;
-          prev = cur;
+          default:
+            ret = this._parseDecimalNumberOrIdentifier();
+            break;
         }
       }
-      return list;
+      //console.log("getObject", inspect(ret))
+      return ret;
     }
 
-    // Read a Scheme vector
-    getVector(close) {
-      var arr = new Array();
-      while (this.i < this.tokens.length) {
-        this.eatObjectsInSexpComment(
-          "Input stream terminated unexpectedly(in vector)"
-        );
+    _getObjectOrThrowUnterminated(msg) {
+      const v = this.getObject();
+      if (v === Parser.EOS) throw new Unterminated(msg);
+      return v;
+    }
 
-        if (
-          this.tokens[this.i] == ")" ||
-          this.tokens[this.i] == "]" ||
-          this.tokens[this.i] == "}"
-        ) {
-          this.i++;
+    // Skip whitespaces
+    _skipWhitespace() {
+      while (this.i < this.txt.length) {
+        switch (this.txt[i]) {
+          case " ":
+          case "\t":
+          case "\n":
+            i++;
+            break;
+          default:
+            return;
+        }
+      }
+    }
+
+    // Skip whitespace, comment and directive
+    // Note: calling this method may change parser state (`this.foldCase`).
+    _skipAtmosphere() {
+      while (this.i < this.txt.length) {
+        switch (this.txt[this.i]) {
+          // Whitespace
+          case " ":
+          case "\t":
+          case "\n":
+            this.i++;
+            break;
+
+          // Line comment
+          case ";":
+            const m = this.match(/^;[^\n]*(\n|$)/);
+            this.i += m[0].length;
+            break;
+
+          // Sexp/multiline comment and directives
+          case "#":
+            if (this.txt[this.i + 1] == ";") {
+              this.i += "#;".length;
+              this._skipAtmosphere();
+              // Drop the value after the `#;` and continue
+              this._getObjectOrThrowUnterminated("missing argument for `#;`");
+            } else if (this.txt[this.i + 1] == "|") {
+              this.i += "#|".length;
+              this._skipBlockComment();
+            } else if (this.match(/^#!fold-case/)) {
+              this.i += "#!fold-case".length;
+              this.foldCase = true;
+            } else if (this.match(/^#!no-fold-case/)) {
+              this.i += "#!no-fold-case".length;
+              this.foldCase = false;
+            } else {
+              return;
+            }
+            break;
+
+          default:
+            return;
+        }
+      }
+    }
+
+    // Skip block comment (`#|...|#`)
+    // `#|` must be consumed beforehand
+    _skipBlockComment() {
+      let level = 1;
+      while (this.i < this.txt.length) {
+        const mEnd = this.match(/\|#/);
+        if (mEnd === null) {
           break;
         }
-        arr[arr.length] = this.getObject();
+        // Check nested comment
+        const mBegin = /#\|/.exec(this.txt.slice(this.i, mEnd.index));
+        if (mBegin) {
+          level++;
+          this.i += mBegin.index + "#|".length;
+          continue;
+        } else {
+          this.i += mEnd.index + "|#".length;
+          level--;
+          if (level == 0) {
+            // Found matching `|#` for all `#|`s.
+            return;
+          }
+        }
+      }
+      throw new Unterminated(
+        "unterminated block comment (`|#` not found)",
+        this.rest()
+      );
+    }
+
+    // Parse quote, backquote, unquote, unquote-splicing
+    _parseQuote(name) {
+      this._skipAtmosphere();
+      const v = this._getObjectOrThrowUnterminated(`unterminated ${name}`);
+      return List(Sym(name), v);
+    }
+
+    // Parse stuffs starting with `#` (except those parsed with _skipAtmosphere)
+    _parseSharp() {
+      switch (this.txt[this.i]) {
+        case "t":
+          if (this.match(/^true/)) {
+            this.i += "true".length;
+          } else {
+            this.i++;
+          }
+          return true;
+        case "f":
+          if (this.match(/^false/)) {
+            this.i += "false".length;
+          } else {
+            this.i++;
+          }
+          return false;
+        case "\\":
+          this.i++;
+          return this._parseChar();
+        case "(":
+          this.i++;
+          return this._parseVector();
+        case "u":
+          if (this.match(/^u8\(/)) {
+            throw new BiwaError(
+              "bytevectors are not supported yet",
+              this.rest(-1)
+            );
+          } else {
+            break;
+          }
+        case "e":
+        case "i":
+        case "b":
+        case "o":
+        case "d":
+        case "x":
+          this.i--; // Unget `#`
+          return this._parsePrefixedNumber();
+        default:
+          if (this.match(/^\d/)) {
+            return this._parseDatumLabel();
+          } else {
+            break;
+          }
+      }
+      throw new BiwaError("unknown #-syntax", this.rest(-1));
+    }
+
+    // Parse a character literal after `#\`
+    _parseChar() {
+      let m = this.match(NAMED_CHARS_REXP);
+      if (m) {
+        this.i += m[0].length;
+        return Char.get(NAMED_CHARS[m[1]]);
+      }
+      m = this.match(/^x([a-zA-Z0-9]+)/);
+      if (m) {
+        this.i += m[0].length;
+        return Char.get(String.fromCharCode(parseInt(m[1], 16)));
+      }
+      if (this.done()) {
+        throw new Unterminated("got EOS on char literal", this.rest(-2));
+      } else {
+        const c = this.txt[this.i];
+        this.i++;
+        return Char.get(c);
+      }
+    }
+
+    // Parse a vector expression after `#(`
+    _parseVector() {
+      const begin = this.i;
+      const arr = [];
+      loop: while (this.i < this.txt.length) {
+        this._skipAtmosphere();
+        switch (this.txt[this.i]) {
+          case ")":
+            this.i++;
+            break loop;
+          case "]":
+          case "}":
+            throw new BiwaError("extra close paren", this.rest());
+          default:
+            arr.push(this.getObject());
+            break;
+        }
       }
       return arr;
     }
 
-    // Skip contents of sexp comment
-    eatObjectsInSexpComment(err_msg) {
-      while (this.tokens[this.i] == "#;") {
+    // Parse a number prefixed with `#i`, `#b`, etc.
+    _parsePrefixedNumber() {
+      let base = 10; // Decimal is the default
+      if (this.match(/^#[iIeE]/)) this.i += 2; // Exactness is not supported.
+      if (this.match(/^#[bB]/)) {
+        base = 2;
+        this.i += 2;
+      } else if (this.match(/^#[oO]/)) {
+        base = 8;
+        this.i += 2;
+      } else if (this.match(/^#[dD]/)) {
+        base = 10;
+        this.i += 2;
+      } else if (this.match(/^#[xX]/)) {
+        base = 16;
+        this.i += 2;
+      }
+      if (this.match(/^#[iIeE]/)) this.i += 2; // Exactness is not supported.
+
+      return this._parseComplexNumber(base);
+    }
+
+    // Parse a (possibly) complex number
+    _parseComplexNumber(base) {
+      const a = this._parseRealNumber(base);
+      const c = this.txt[this.i];
+      if (c == "@") {
         this.i++;
-        if (this.getObject() == Parser.EOS || this.i >= this.tokens.length)
-          throw new BiwaError(err_msg);
+        return this._parsePolarComplexNumber(a, base);
+      } else if (c == "+" || c == "-") {
+        this.i--; // Unget the sign
+        return this._parseOrthoComplexNumber(a, base);
+      } else {
+        // Was not a complex number.
+        return a;
       }
     }
 
-    // Read a Scheme object
-    // Returns `sexpCommentMarker` if `#;` is found
-    getObject0() {
-      if (this.i >= this.tokens.length) return Parser.EOS;
+    // Parse a complex number of the form `a@b`
+    _parsePolarComplexNumber(a, base) {
+      const b = this._parseRealNumber(base);
+      return Complex.from_polar(a, b);
+    }
 
-      var t = this.tokens[this.i++];
-      // if( t == ')' ) return null;
-
-      if (t == "#;") return this.sexpCommentMarker;
-
-      var s =
-        t == "'"
-          ? "quote"
-          : t == "`"
-          ? "quasiquote"
-          : t == ","
-          ? "unquote"
-          : t == ",@"
-          ? "unquote-splicing"
-          : false;
-
-      if (
-        s ||
-        t == "(" ||
-        t == "#(" ||
-        t == "[" ||
-        t == "#[" ||
-        t == "{" ||
-        t == "#{"
-      ) {
-        return s
-          ? new Pair(Sym(s), new Pair(this.getObject(), nil))
-          : t == "(" || t == "[" || t == "{"
-          ? this.getList(t)
-          : this.getVector(t);
+    // Parse a complex number of the form `a+bi`
+    _parseOrthoComplexNumber(a, base) {
+      const b = this._parseRealNumber(base);
+      if (this.match(/^[iI]/)) {
+        this.i++;
+        return new Complex(a, b);
       } else {
-        switch (t) {
-          case "+inf.0":
-            return Infinity;
-          case "-inf.0":
-            return -Infinity;
-          case "+nan.0":
-            return NaN;
-        }
+        throw new BiwaError(
+          "invalid complex number format (missing `i`)",
+          this.rest()
+        );
+      }
+    }
 
-        var n;
-        if (/^#x[0-9a-z]+$/i.test(t)) {
-          // #x... Hex
-          n = new Number("0x" + t.substring(2, t.length));
-        } else if (/^#d[0-9\.]+$/i.test(t)) {
-          // #d... Decimal
-          n = new Number(t.substring(2, t.length));
-        } else if (/^#o[0-9\.]+$/i.test(t)) {
-          // #o... Octal
-          n = new Number(parseInt("0" + t.substring(2, t.length), 8));
-        } else if (/^#b[0-9\.]+$/i.test(t)) {
-          // #b... Binary
-          n = new Number(parseInt(t.substring(2, t.length), 2));
-        } else {
-          n = new Number(t); // use constructor as parser
-        }
+    // Parse a real number in base 2, 8, or 16
+    // If `maybeSymbol` is true, returns a consumed string intead of throwing error
+    // when it is not a number.
+    _parseRealNumber(base, maybeSymbol = false) {
+      if (maybeSymbol && base != 10)
+        throw new Bug("base must be 10 if maybeSymbol");
+      let asSym = "";
 
-        if (!isNaN(n)) {
-          return n.valueOf();
-        } else if (t == "#f" || t == "#F") {
-          return false;
-        } else if (t == "#t" || t == "#T") {
-          return true;
-        } else if (t.toLowerCase() == "#\\newline") {
-          return Char.get("\n");
-        } else if (t.toLowerCase() == "#\\space") {
-          return Char.get(" ");
-        } else if (t.toLowerCase() == "#\\tab") {
-          return Char.get("\t");
-        } else if (/^#\\.$/.test(t)) {
-          return Char.get(t.charAt(2));
-        } else if (/^#\\x[a-zA-Z0-9]+$/.test(t)) {
-          var scalar = parseInt(t.slice(3), 16);
-          // R6RS 11.11 (surrogate codepoints)
-          if (scalar >= 0xd800 && scalar <= 0xdfff) {
-            throw new BiwaError("Character in Unicode excluded range.");
-          }
-          // ECMA-262 4.3.16 -- Basically, strings are sequences of 16-bit
-          // unsigned integers, so anything greater than 0xFFFF won't fit.
-          // NOTE: This violates R6RS which requires the full Unicode range!
-          else if (scalar > 0xffff) {
-            throw new BiwaError("Character literal out of range.");
-          } else {
-            return Char.get(String.fromCharCode(scalar));
-          }
-        } else if (/^\"(\\(.|$)|[^\"\\])*\"?$/.test(t)) {
-          // String literal
-          return t
-            .replace(/(\r?\n|\\n)/g, "\n")
-            .replace(/^\"|\\(.|$)|\"$/g, function ($0, $1) {
-              return $1 ? $1 : "";
-            });
-        } else if (/^\|[^\|]*\|/.test(t)) {
-          // Symbol literal with vertical bars (eg. `|a b|`)
-          const s = t.replace(/^\|/, "").replace(/\|$/, "");
-          return Sym(s);
+      // Check if it is inf or nan
+      const m = this.match(/^(\+|-)(inf.0|nan.0)/);
+      if (m) {
+        this.i += "+inf.0".length;
+        return (m[2] == "inf.0" ? Infinity : NaN) * (m[1] == "+" ? 1 : -1);
+      }
+
+      let sign = 1;
+      if (this.match(/^\+/)) {
+        this.i++;
+        asSym += "+";
+      } else if (this.match(/^\-/)) {
+        this.i++;
+        asSym += "-";
+        sign = -1;
+      }
+
+      let a = null;
+      const mm = this.match(DIGITS[base]);
+      if (mm) {
+        this.i += mm[0].length;
+        asSym += mm[0];
+        a = parseInt(mm[0], base) * sign;
+      } else if (base == 10 && this.txt[this.i] == ".");
+      else if (maybeSymbol);
+      else {
+        throw new BiwaError("invalid char in number literal", this.rest());
+      }
+
+      // Parse rational
+      if (this.txt[this.i] == "/") {
+        this.i++;
+        const mmm = this.match(DIGITS[base]);
+        if (mmm) {
+          this.i += mmm[0].length;
+          const b = parseInt(mmm[0], base);
+          return new Rational(a, b);
+        } else if (maybeSymbol) {
+          asSym += "/";
         } else {
-          return Sym(t);
+          throw new BiwaError(
+            "invalid char in rational number literal",
+            this.rest()
+          );
         }
       }
+
+      // Was not a rational. Check if it is a decimal
+      if (base == 10) {
+        // Try matching form the beginning
+        this.i -= asSym.length;
+        const mmm = this.match(/^[+-]?(\d+\.\d*|\.?\d+)([eE][+-]?\d+)?/);
+        if (mmm) {
+          this.i += mmm[0].length;
+          return parseFloat(mmm[0]);
+        } else {
+          // Was not a decimal either. Put back the cursor
+          this.i += asSym.length;
+        }
+      }
+
+      if (maybeSymbol) {
+        return asSym;
+      } else {
+        throw new BiwaError(
+          `invalid chars in number literal (${asSym})`,
+          this.rest()
+        );
+      }
+    }
+
+    // Parse a datum label definition (`#0=`) or reference (`#0#`).
+    _parseDatumLabel() {
+      const m = this.match(/^(\d+)(=|#)/);
+      if (m) {
+        this.i += m[0].length;
+        const id = parseInt(m[1]);
+        if (m[2] == "=") {
+          const v = this._getObjectOrThrowUnterminated(
+            "got EOS for labelled datum"
+          );
+          this.labelledData[id] = v;
+          return v;
+        } else {
+          if (this.labelledData.hasOwnProperty(id)) {
+            return this.labelledData[id];
+          } else {
+            throw new BiwaError("undefined datum reference", this.rest(-1));
+          }
+        }
+      } else {
+        throw new BiwaError("unknown #-syntax", this.rest(-1));
+      }
+    }
+
+    // Parse a list (`(...)`)
+    // BiwaScheme allows `[]`, `{}` for list too
+    _parseList() {
+      const begin = this.i;
+      const openParen = this.txt[this.i];
+      this.i++;
+      const closeParen = PAREN[openParen];
+      let dotSeen = false;
+      let list = nil,
+        prev = list;
+      while (this.i < this.txt.length) {
+        this._skipAtmosphere();
+        const c = this.txt[this.i];
+        if (c == closeParen) {
+          this.i++;
+          return list;
+        } else if (c == ")" || c == "]" || c == "}") {
+          throw new BiwaError("extra close paren", this.rest());
+        } else if (c == "." && this.match(/^\.[\s]/)) {
+          if (list === nil) {
+            throw new BiwaError("no list element before `.`", this.from(begin));
+          }
+          dotSeen = true;
+          this.i++;
+          const v = this.getObject();
+          if (v === Parser.EOS) {
+            throw new Unterminated(
+              "found EOS after `.` in list",
+              this.from(begin)
+            );
+          }
+          prev.cdr = v;
+        } else if (dotSeen) {
+          throw new BiwaError(
+            "more than one element after `.`",
+            this.from(begin)
+          );
+        } else {
+          const vv = this.getObject();
+          if (vv === Parser.EOS) {
+            this.i = begin;
+            throw new Unterminated("found EOS in list", this.rest());
+          }
+          const cur = new Pair(vv, nil);
+          if (list === nil) list = cur;
+          else prev.cdr = cur;
+          prev = cur;
+        }
+      }
+      this.i = begin;
+      throw new Unterminated("found EOS in list", this.rest());
+    }
+
+    // Parse a string literal (`"..."`)
+    _parseString() {
+      const m = this.match(/^"((\\"|[^"])*)"/);
+      if (m) {
+        this.i += m[0].length;
+        const s = m[1].replaceAll(/\\\s*\n\s*/g, "");
+        return this._replaceEscapedChars(s);
+      } else {
+        throw new Unterminated("invalid string literal", this.rest());
+      }
+    }
+
+    // Parse a symbol enclosed with `|`
+    _parseEnclosedSymbol() {
+      const m = this.match(/^\|((\\\||[^\|])*)\|/);
+      if (m) {
+        this.i += m[0].length;
+        return Sym(this._replaceEscapedChars(m[1]));
+      } else {
+        throw new Unterminated("invalid symbol literal", this.rest());
+      }
+    }
+
+    // Replace `\n`, `\t`, `\x1234`, etc. in `s`
+    _replaceEscapedChars(s) {
+      return s
+        .replaceAll(/\\x([0-9a-f]+);/gi, (_, n) =>
+          String.fromCharCode(parseInt(n, 16))
+        )
+        .replaceAll(/\\(.)/g, (_, c) => ESCAPE_SEQUENCES[c] || c);
+    }
+
+    // Parse a number or an identifier.
+    _parseDecimalNumberOrIdentifier() {
+      const c = this.txt[this.i];
+      if (c == "#") throw new Bug("#-syntax must be parsed beforehand");
+      if (c === undefined) throw new Bug("EOS must be handled beforehand");
+
+      let v = this._parseRealNumber(10, true);
+      if (isString(v)) {
+        // Read the rest of this identifier
+        const m = this.match(/^[^\s)}\]]+/);
+        if (m) {
+          this.i += m[0].length;
+          v += m[0];
+        }
+        if (this.foldCase) {
+          v = v.toLowerCase();
+        }
+        return Sym(v);
+      } else {
+        return v;
+      }
+    }
+
+    // Returns rest of the source text
+    rest(di = 0) {
+      return this.txt.slice(this.i + di);
+    }
+
+    // Returns the source text beginning from `pos`
+    from(pos) {
+      return this.txt.slice(pos);
+    }
+
+    // Execute regexp match from the current position.
+    // Returns `null` if no match
+    match(rexp, di = 0) {
+      return rexp.exec(this.rest(di));
+    }
+
+    // Returns if whole text is seen
+    done() {
+      return this.i >= this.txt.length;
     }
   }
 
-  // indicates end of source file
+  // Indicates end of source file
   Parser.EOS = new Object();
+  Parser.EOS.toString = () => "#<BiwaScheme.Parser.EOS>";
 
   // Parser the text and return an array of exprs
   Parser.parse = (txt) => {
@@ -15717,6 +14079,8 @@ var BiwaScheme = (function () {
     }
     return ret;
   };
+
+  Parser.Unterminated = Unterminated;
 
   ///
   /// Interpreter
@@ -16017,7 +14381,7 @@ var BiwaScheme = (function () {
             break;
           case "tco_hinted_apply": // just like a regular apply, except we need to trace the # of TCO calls so we can generate a stacktrace
             this.tco_counter[this.tco_counter.length - 1]++;
-            x = ["apply"].concat(rest(x));
+            x = ["apply"].concat(x.slice(1));
             break;
           case "apply": //extended: n_args as second argument
             var func = a; //, n_args = x[1];
@@ -16128,15 +14492,11 @@ var BiwaScheme = (function () {
                     ["constant", result.proc, ["apply", result.args.length]],
                   ],
                 ];
-                var push_args = reduce(
-                  result.args,
-                  function (opc, arg) {
-                    // (foo 1 2) => first push 2, then 1
-                    //   [constant 2 ... [constant 1 ... ]
-                    return ["constant", arg, ["argument", opc]];
-                  },
-                  call_proc
-                );
+                var push_args = result.args.reduce(function (opc, arg) {
+                  // (foo 1 2) => first push 2, then 1
+                  //   [constant 2 ... [constant 1 ... ]
+                  return ["constant", arg, ["argument", opc]];
+                }, call_proc);
                 x = ["frame", push_args, call_after];
               } else {
                 // the JavaScript function returned a normal value
@@ -16227,6 +14587,23 @@ var BiwaScheme = (function () {
       // finished executing all forms
       this.after_evaluate(ret);
       return ret;
+    }
+
+    // Execute compiled vmcode
+    evaluate_vmcode(vmcode) {
+      this.call_stack = [];
+      this.is_top = true;
+      this.file_stack = [];
+      try {
+        const ret = this._execute(undef, vmcode.il, 0, [], 0);
+        if (!(ret instanceof Pause)) {
+          this.after_evaluate(ret);
+        }
+        return ret;
+      } catch (e) {
+        e.message = e.message + " [" + this.call_stack.join(", ") + "]";
+        return this.on_error(e);
+      }
     }
 
     // Invoke a scheme closure
@@ -16345,126 +14722,6 @@ var BiwaScheme = (function () {
         acc,
       ];
     }, x);
-  };
-
-  //
-  // number.js
-  //
-
-  //
-  // Complex
-  //
-  class Complex {
-    constructor(real, imag) {
-      this.real = real;
-      this.imag = imag;
-    }
-
-    magnitude() {
-      return Math.sqrt(this.real * this.real + this.imag * this.imag);
-    }
-
-    angle() {
-      return Math.atan2(this.imag, this.real);
-    }
-
-    isReal() {
-      return this.imag == 0;
-    }
-
-    isRational() {
-      return this.imag == 0 && isRational(this.real);
-    }
-
-    isInteger() {
-      return this.imag == 0 && isInteger(this.real);
-    }
-
-    toString(radix) {
-      if (this.real === 0 && this.imag === 0) return "0";
-      var img = "";
-      if (this.imag !== 0) {
-        if (this.imag > 0 && this.real !== 0) {
-          img += "+";
-        }
-        switch (this.imag) {
-          case 1:
-            break;
-          case -1:
-            img += "-";
-            break;
-          default:
-            img += this.imag.toString(radix);
-        }
-        img += "i";
-      }
-      var real = "";
-      if (this.real !== 0) {
-        real += this.real.toString(radix);
-      }
-      return real + img;
-    }
-  }
-
-  Complex.from_polar = function (r, theta) {
-    var real = r * Math.cos(theta);
-    var imag = r * Math.sin(theta);
-    return new Complex(real, imag);
-  };
-
-  Complex.assure = function (num) {
-    if (num instanceof Complex) return num;
-    else return new Complex(num, 0);
-  };
-
-  //
-  // Rational (unfinished)
-  //
-  class Rational {
-    constructor(numerator, denominator) {
-      this.numerator = numerator;
-      this.denominator = denominator;
-    }
-
-    isInteger() {
-      // FIXME
-    }
-  }
-
-  //
-  // Predicates
-  //
-  const isNumber = function (x) {
-    return (
-      x instanceof Complex || x instanceof Rational || typeof x == "number"
-    );
-  };
-  const isComplex = isNumber;
-
-  const isReal = function (x) {
-    if (x instanceof Complex || x instanceof Rational) {
-      return x.isReal();
-    } else {
-      return typeof x == "number";
-    }
-  };
-
-  const isRational = function (x) {
-    if (x instanceof Complex) {
-      return x.isRational();
-    } else if (x instanceof Rational) {
-      return true;
-    } else {
-      return typeof x == "number";
-    }
-  };
-
-  const isInteger = function (x) {
-    if (x instanceof Complex || x instanceof Rational) {
-      return x.isInteger();
-    } else {
-      return typeof x == "number" && x % 1 == 0;
-    }
   };
 
   //
@@ -16641,6 +14898,10 @@ var BiwaScheme = (function () {
   const assert_list = make_simple_assert("list", isList);
   const assert_vector = make_simple_assert("vector", isVector);
   const assert_hashtable = make_simple_assert("hashtable", isHashtable);
+  const assert_mutable_hashtable = make_simple_assert(
+    "mutable hashtable",
+    isMutableHashtable
+  );
   const assert_promise = make_simple_assert("promise", isPromise);
 
   const assert_function = make_simple_assert("JavaScript function", isFunction);
@@ -16842,7 +15103,7 @@ var BiwaScheme = (function () {
     // members - Array of symbols.
     //           Symbols may be duplicate (I think you shouldn't, though :-p).
     constructor(members) {
-      this.members = uniq(members);
+      this.members = [...new Set(members)];
     }
 
     // Returns an EnumSet.
@@ -16857,11 +15118,11 @@ var BiwaScheme = (function () {
     indexer() {
       // ar[0] - a symbol
       // Returns an integer or #f.
-      return bind(function (ar) {
+      return (ar) => {
         assert_symbol(ar[0], "(enum-set indexer)");
-        var idx = indexOf(this.members, ar[0]);
+        var idx = this.members.indexOf(ar[0]);
         return idx === -1 ? false : idx;
-      }, this);
+      };
     }
 
     // Retuns a function which creates an enum_set from a list of
@@ -16869,7 +15130,7 @@ var BiwaScheme = (function () {
     constructor_() {
       // ar[0] - a list of symbol
       // Returns a enum_set.
-      return bind(function (ar) {
+      return (ar) => {
         assert_list(ar[0], "(enum-set constructor)");
         var symbols = ar[0].to_array();
         symbols.forEach(function (arg) {
@@ -16877,7 +15138,7 @@ var BiwaScheme = (function () {
         });
 
         return new Enumeration.EnumSet(this, symbols);
-      }, this);
+      };
     }
   };
 
@@ -16899,9 +15160,7 @@ var BiwaScheme = (function () {
     //   - order by universe
     constructor(enum_type, symbols) {
       this.enum_type = enum_type;
-      this.symbols = enum_type.members.filter(function (sym) {
-        return contains(symbols, sym);
-      });
+      this.symbols = enum_type.members.filter((sym) => symbols.includes(sym));
     }
 
     // Returns a list of symbols.
@@ -16912,7 +15171,7 @@ var BiwaScheme = (function () {
     // Returns true if the enum_set includes the symbol.
     // 'symbol' is allowed to be a symbol which is not included in the universe.
     is_member(symbol) {
-      return contains(this.symbols, symbol);
+      return this.symbols.includes(symbol);
     }
 
     // Returns true if:
@@ -16922,11 +15181,7 @@ var BiwaScheme = (function () {
     // The enum_set and 'other' may belong to different enum_type.
     is_subset(other) {
       // Check elements
-      if (
-        some(this.symbols, function (sym) {
-          return !contains(other.symbols, sym);
-        })
-      ) {
+      if (this.symbols.some((sym) => !other.symbols.includes(sym))) {
         return false;
       }
 
@@ -16934,9 +15189,9 @@ var BiwaScheme = (function () {
       if (this.enum_type === other.enum_type) {
         return true;
       } else {
-        return every(this.enum_type.members, function (sym) {
-          return contains(other.enum_type.members, sym);
-        });
+        return this.enum_type.members.every((sym) =>
+          other.enum_type.members.includes(sym)
+        );
       }
     }
 
@@ -16955,9 +15210,7 @@ var BiwaScheme = (function () {
     // The enum_set and 'other' *must* belong to the same enum_type.
     union(other) {
       var syms = this.enum_type.members.filter(
-        bind(function (sym) {
-          return contains(this.symbols, sym) || contains(other.symbols, sym);
-        }, this)
+        (sym) => this.symbols.includes(sym) || other.symbols.includes(sym)
       );
       return new Enumeration.EnumSet(this.enum_type, syms);
     }
@@ -16966,9 +15219,7 @@ var BiwaScheme = (function () {
     // - the symbols included both in the enum_set or the enum_set 'other'.
     // The enum_set and 'other' *must* belong to the same enum_type.
     intersection(other) {
-      var syms = this.symbols.filter(function (sym) {
-        return contains(other.symbols, sym);
-      });
+      var syms = this.symbols.filter((sym) => other.symbols.includes(sym));
       return new Enumeration.EnumSet(this.enum_type, syms);
     }
 
@@ -16976,9 +15227,7 @@ var BiwaScheme = (function () {
     // - the symbols included in the enum_set and not in the enum_set 'other'.
     // The enum_set and 'other' *must* belong to the same enum_type.
     difference(other) {
-      var syms = this.symbols.filter(function (sym) {
-        return !contains(other.symbols, sym);
-      });
+      var syms = this.symbols.filter((sym) => !other.symbols.includes(sym));
       return new Enumeration.EnumSet(this.enum_type, syms);
     }
 
@@ -16986,9 +15235,7 @@ var BiwaScheme = (function () {
     // - the symbols included in the universe but not in the enum_set.
     complement() {
       var syms = this.enum_type.members.filter(
-        bind(function (sym) {
-          return !contains(this.symbols, sym);
-        }, this)
+        (sym) => !this.symbols.includes(sym)
       );
       return new Enumeration.EnumSet(this.enum_type, syms);
     }
@@ -16997,9 +15244,9 @@ var BiwaScheme = (function () {
     // - the symbols included in the enum_set and the universe of the enum_set 'other'.
     // The enum_set and 'other' may belong to different enum_type.
     projection(other) {
-      var syms = this.symbols.filter(function (sym) {
-        return contains(other.enum_type.members, sym);
-      });
+      var syms = this.symbols.filter((sym) =>
+        other.enum_type.members.includes(sym)
+      );
       return new Enumeration.EnumSet(other.enum_type, syms);
     }
 
@@ -17238,7 +15485,7 @@ var BiwaScheme = (function () {
       var arg_for_protocol = this.parent_cd
         ? this._make_n([], this.rtd)
         : this._make_p();
-      arg_for_protocol = bind(arg_for_protocol, this);
+      arg_for_protocol = arg_for_protocol.bind(this);
 
       return new Call(this.protocol, [arg_for_protocol], function (ar) {
         var ctor = ar[0];
@@ -17327,7 +15574,7 @@ var BiwaScheme = (function () {
 
   define_libfunc("html-escape", 1, 1, function (ar) {
     assert_string(ar[0]);
-    return _escape(ar[0]);
+    return escape(ar[0]);
   });
   const inspect_objs = function (objs) {
     return objs.map(inspect).join(", ");
@@ -17529,7 +15776,7 @@ var BiwaScheme = (function () {
     assert_procedure(ar[0]);
     assert_vector(ar[1]);
 
-    return sort_with_comp(clone(ar[1]), ar[0], intp);
+    return sort_with_comp([...ar[1]], ar[0], intp);
   });
   define_libfunc("vector-sort/comp!", 1, 2, function (ar, intp) {
     assert_procedure(ar[0]);
@@ -18753,12 +17000,12 @@ var BiwaScheme = (function () {
 
   define_libfunc("numerator", 1, 1, function (ar) {
     assert_number(ar[0]);
-    if (ar[0] instanceof Rational) return ar[0].numerator;
+    if (ar[0] instanceof Rational$1) return ar[0].numerator;
     else throw new Bug("todo");
   });
   define_libfunc("denominator", 1, 1, function (ar) {
     assert_number(ar[0]);
-    if (ar[0] instanceof Rational) return ar[0].denominator;
+    if (ar[0] instanceof Rational$1) return ar[0].denominator;
     else throw new Bug("todo");
   });
   define_libfunc("floor", 1, 1, function (ar) {
@@ -19297,9 +17544,11 @@ var BiwaScheme = (function () {
       c = ar[1].value;
     }
     var out = "";
-    times(ar[0], function () {
-      out += c;
-    });
+    Array(ar[0])
+      .fill()
+      .map(() => {
+        out += c;
+      });
     return out;
   });
   define_libfunc("string", 0, null, function (ar) {
@@ -19579,9 +17828,13 @@ var BiwaScheme = (function () {
     } else if (f instanceof Pair) {
       var car = f.car;
       if (car instanceof Pair && car.car === Sym("unquote-splicing")) {
-        if (lv == 1)
-          return List(Sym("append"), f.car.cdr.car, expand_qq(f.cdr, lv));
-        else
+        if (lv == 1) {
+          if (f.cdr === nil) {
+            return f.car.cdr.car;
+          } else {
+            return List(Sym("append"), f.car.cdr.car, expand_qq(f.cdr, lv));
+          }
+        } else
           return List(
             Sym("cons"),
             List(
@@ -19625,11 +17878,11 @@ var BiwaScheme = (function () {
               ),
               expand_qq(f[i].cdr, lv)
             );
-            last(vecs).push(item);
+            vecs[vecs.length - 1].push(item);
           }
         } else {
           // Expand other things as the same as if they are in a list quasiquote
-          last(vecs).push(expand_qq(f[i], lv));
+          vecs[vecs.length - 1].push(expand_qq(f[i], lv));
         }
       }
 
@@ -20700,7 +18953,17 @@ var BiwaScheme = (function () {
     return function (args) {
       var obj = args[0];
 
-      return obj instanceof Record && obj.rtd === rtd;
+      if (!(obj instanceof Record)) {
+        return false;
+      } else if (obj.rtd === rtd) {
+        // Fast path
+        return true;
+      } else {
+        for (let _rtd = obj.rtd; _rtd; _rtd = _rtd.parent_rtd) {
+          if (_rtd == rtd) return true;
+        }
+        return false;
+      }
     };
   });
 
@@ -21778,7 +20041,7 @@ var BiwaScheme = (function () {
 
       // Check arg is included in the universe
       assert(
-        contains(enum_type.members, arg),
+        enum_type.members.includes(arg),
         arg.name +
           " is not included in the universe: " +
           to_write$1(enum_type.members),
@@ -21798,7 +20061,7 @@ var BiwaScheme = (function () {
       symbols.forEach(function (arg) {
         assert_symbol(arg, constructor_name);
         assert(
-          contains(enum_type.members, arg),
+          enum_type.members.includes(arg),
           arg.name +
             " is not included in the universe: " +
             to_write$1(enum_type.members),
@@ -22519,11 +20782,6 @@ var BiwaScheme = (function () {
   // - srfi-98 (get-environment-variable)
   //
 
-  // Avoid circular dependency
-  nil.to_set = function () {
-    return new BiwaSet();
-  };
-
   var BiwaScheme$1 = {
     TopEnv,
     CoreEnv,
@@ -22531,8 +20789,8 @@ var BiwaScheme = (function () {
     undef,
     max_trace_size,
     suppress_deprecation_warning,
-    Version: VERSION$1,
-    VERSION: VERSION$1,
+    Version: VERSION,
+    VERSION,
     GitCommit,
     eq,
     eqv,
@@ -22569,7 +20827,7 @@ var BiwaScheme = (function () {
     Hashtable,
     Interpreter,
     Complex,
-    Rational,
+    Rational: Rational$1,
     isNumber,
     isComplex,
     isReal,
@@ -22605,6 +20863,26 @@ var BiwaScheme = (function () {
     parse_integer,
     is_valid_float_notation,
     parse_float,
+
+    assert_number,
+    assert_integer,
+    assert_real,
+    assert_between,
+    assert_string,
+    assert_char,
+    assert_symbol,
+    assert_port,
+    assert_pair,
+    assert_list,
+    assert_vector,
+    assert_hashtable,
+    assert_mutable_hashtable,
+    assert_promise,
+    assert_function,
+    assert_closure,
+    assert_procedure,
+    assert_date,
+    assert,
   };
 
   Console.puts = function (str, no_newline) {
@@ -22635,9 +20913,7 @@ var BiwaScheme = (function () {
     const out = document.querySelector("#bs-console");
     if (!out) return;
     const span = document.createElement("span");
-    span.innerHTML = _escape(str)
-      .replace(/\n/g, "<br>")
-      .replace(/ /g, "&nbsp;");
+    span.innerHTML = escape(str).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;");
     out.appendChild(span);
   });
 
@@ -22939,7 +21215,7 @@ var BiwaScheme = (function () {
     if ($$1(selector).prop("value")) {
       return $$1(selector).val();
     } else {
-      return _escape($$1(selector).html());
+      return escape($$1(selector).html());
     }
   };
   define_libfunc("element-content", 1, 1, function (ar) {
@@ -23220,18 +21496,16 @@ var BiwaScheme = (function () {
         pad2 = "";
       var level = level || 0;
       var nested = nested || false;
-      times(
-        level,
-        function () {
+      Array(level)
+        .fill()
+        .map(() => {
           pad1 += DUMP_PAD;
-        }.bind(this)
-      );
-      times(
-        level + 1,
-        function () {
+        });
+      Array(level + 1)
+        .fill()
+        .map(() => {
           pad2 += DUMP_PAD;
-        }.bind(this)
-      );
+        });
 
       s += pad1 + '[<span class="dump_opecode">' + obj[0] + "</span>";
       var i = 1;
@@ -23357,7 +21631,7 @@ var BiwaScheme = (function () {
       else {
         var s = to_write$1(obj);
         if (s == "[object Object]") s = this.dump_object(obj);
-        return _escape(s);
+        return escape(s);
       }
     }
 
@@ -23405,7 +21679,7 @@ var BiwaScheme = (function () {
           "</td></tr>";
         s += "</table>";
       } else {
-        s = _escape(inspect(obj)) + "<br>\n";
+        s = escape(inspect(obj)) + "<br>\n";
       }
       var dumpitem = $("<div/>", { class: "dump" + this.n_dumps });
       dumpitem.html(s);
