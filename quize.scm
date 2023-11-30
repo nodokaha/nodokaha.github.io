@@ -1,11 +1,10 @@
 (define term (js-eval "document.getElementById('term')"))
 (js-invoke (getelem term) "LoadingOverlay" "show" (js-obj "image" "" "progress" #t))
-;; (set-style! term "font" "18px / 20px Courier New")
+(set-style! term "font" "18px / 20px Courier New")
 (sleep 0.5)
 (js-invoke (getelem term) "LoadingOverlay" "progress" 10)
-;; (if (not (string=? (get-style term "font") "18px / 20px Courier New"))
-;;     (set-style! term "font" "18px / 20px monospace"))
-;; (
+(if (not (string=? (get-style term "font") "18px / 20px Courier New"))
+    (set-style! term "font" "18px / 20px monospace"))
 (sleep 0.5)
 (js-invoke (getelem term) "LoadingOverlay" "progress" 20)
 (set-style! term "backgroundColor" "transparent")
@@ -71,7 +70,8 @@
 ;(define (bigint x) (let ((bigint-iter (js-eval "BigInt"))) (js-call bigint-iter x)))
 (define (factor-brute-1 N) (if (string? N) (do ((x 2 (+ x 1))) ((= (modulo N x) 0) x)) (display "文字列でお願いします。")))
 ;(define (modulo-expt a b c) (if (= b -1) (if (prime? a) (let ((modulo-inverse (lambda (x y) (do ((n 0 (+ n 1))) ((= (modulo (number->string (* n x)) y) 1) n))))) (modulo-inverse a c)) (display "Not calc modulo-inverse")) (modulo (expt a b) c)))
-(define (help) (display "どうも、初めまして。\nあなたが何者か知りませんが、このサイトに訪れたということは\n何かしらの縁があったということです。\n是非とも我々高専の裏組織サークルであるTKCTF-clubに入部下さい…。\nですが、あなたの実力を知らない以上\n容易に高専の裏情報を教える訳にはいけません。\nこのサイトにはいくつかのフラグという情報が隠されています。\nフラグはTKCTF{ほにゃらら}という形になっていますので\n是非とも高専の裏情報を取得する準備運動と思って挑戦してみてください。\n\"(factor-brute-1 'N')\": Nを総当たりで素因数分解します。一回だけの操作です。\n\"(tictactoe)\": ○×ゲームです。"))
+(define (modulo-expt a b c) (if (= b -1) (if (prime? (number->string a)) (let ((modulo-inverse (lambda (x y) (do ((n 0 (+ n 1))) ((= (modulo (number->string (* n x)) y) 1) n))))) (modulo-inverse a c)) (display "Not calc modulo-inverse")) (modulo (number->string (expt a b)) c)))
+(define (help) (display "どうも、初めまして。\nあなたが何者か知りませんが、このサイトに訪れたということは\n何かしらの縁があったということです。\n是非とも我々高専の裏組織サークルであるTKCTF-clubに入部下さい…。\nですが、あなたの実力を知らない以上\n容易に高専の裏情報を教える訳にはいけません。\nこのサイトにはいくつかのフラグという情報が隠されています。\nフラグはTKCTF{ほにゃらら}という形になっていますので\n是非とも高専の裏情報を取得する準備運動と思って挑戦してみてください。\n\"(factor-brute-1 \"N\")\": Nを総当たりで素因数分解します。一回だけの操作です。\n\"(tictactoe)\": ○×ゲームです。"))
 (define (talk)
     (let ((talk '("はい、どうも。"
 		  "ヒントとか欲しいですかね？"
