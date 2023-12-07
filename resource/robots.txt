@@ -1,0 +1,3 @@
+Disallow robots.txt
+Disallow test.txt
+Disallow flag.txt
