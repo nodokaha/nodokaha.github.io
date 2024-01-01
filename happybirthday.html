@@ -6,12 +6,22 @@
     <title>Happy Birthday!</title>
   </head>
   <body>
-    <div id="particles-js"></div>
-    <div class="count-particles">
+    <div id="particles-js" hidden></div>
+    <div class="count-particles" id="count-particles" hidden>
       <span class="js-count-particles"> Happy Birthday!! </span>
     </div>
-    <audio autoplay src=audio/happybirthday.mp3></audio>
+    <button onClick="audioplay()">祝われる</button>
+    <audio id="audio" autoplay src=audio/happybirthday.mp3></audio>
     <script src="particles.js"></script>
     <script src="setting.js"></script>
+    <script>
+      function audioplay() {
+	  const audio = document.getElementById('audio');
+	  audio.load();
+	  document.getElementById('particles-js').hidden = false;
+	  document.getElementById('count-particles').hidden = false;
+	  audio.play();
+      }
+    </script>
   </body>
 </html>
