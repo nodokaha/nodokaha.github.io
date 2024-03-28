@@ -8,10 +8,9 @@
     <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
     <style>
 	html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
 	.w3-sidebar {
@@ -27,35 +26,11 @@
     <!-- Navbar -->
     <div class="w3-top">
       <div class="w3-bar w3-theme w3-top w3-left-align w3-large">
-	<a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1" href="javascript:void(0)" onclick="w3_open()"><i class="fa fa-bars"></i></a>
-	<image src="5C81231B-81BE-493E-A71F-57EE9051E444.png" style="max-height: 100; max-width: 100px;" class="w3-bar-item w3-button w3-theme-l1"></a>
-<a href="./setup.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">TKCTF-club?</a>
-<a href="./setup.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">作品達</a>
-<a href="./setup.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Blog</a>
-<a href="./setup.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">News</a>
-<a href="./seccon-beginner.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">大会記録</a>
-<a href="./setup.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Contact</a>
+	<a href="#"><image src="5C81231B-81BE-493E-A71F-57EE9051E444.png" style="max-height: 100; max-width: 100px;" class="w3-bar-item w3-button w3-theme-l1"></a>
 </div>
 </div>
 
 <br></br>
-
-<!-- Sidebar -->
-<nav class="w3-sidebar w3-bar-block w3-collapse w3-large w3-theme-l5 w3-animate-left" id="mySidebar">
-  <a href="javascript:void(0)" onclick="w3_close()" class="w3-right w3-xlarge w3-padding-large w3-hover-black w3-hide-large" title="Close Menu">
-    <i class="fa fa-remove"></i>
-  </a>
-  <h4 class="w3-bar-item"><b>Menu</b></h4>
-  <a class="w3-bar-item w3-button w3-hover-black" href="./setup.html">TKCTF-club?</a>
-  <a class="w3-bar-item w3-button w3-hover-black" href="./setup.html">作品達</a>
-  <a class="w3-bar-item w3-button w3-hover-black" href="./setup.html">Blog</a>
-  <a class="w3-bar-item w3-button w3-hover-black" href="./setup.html">News</a>
-  <a class="w3-bar-item w3-button w3-hover-black" href="./seccon-beginner.html">大会記録</a>
-  <a class="w3-bar-item w3-button w3-hover-black" href="#工事中">Contact</a>
-</nav>
-
-<!-- Overlay effect when opening sidebar on small screens -->
-<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
 
 <!-- Main -->
 <div class="w3-main" style="margin-left:250px">
@@ -65,74 +40,33 @@
       <h1 class="w3-text-teal">CTFとは？</h1>
       <p>そもそも皆さんはCTFというものを知っていますが？</p>
       <p>もしかしたら、RTA界隈などやチート(違法ですよ!(違法のやつは))界隈に居たら聞いたことがあるかも知れません。</p>
-      <p>基本的にCTFとはCapture The Flagと呼ばれる旗取りゲームなのですが、この旗の取り方には様々な方法があります。</p>
-      <p>我々のサークルが活動している、CTFという競技においてその様々な方法とは</p>
-      <li><h2>forensic</h2></li>
-      <li><h2>Crypto</h2></li>
-      <li><h2>pwn</h2></li>
-      <li><h2>reversing</h2></li>
-      <li><h2>misc</h2></li>
-      <p>となっています。</p>
-      
+      <p>基本的にCTFとはCapture The Flagと呼ばれる旗取りゲームです。</p>
+      <p>キャプチャー・ザ・フラッグとの頭文字からなるこの競技名はコンピューターセキュリティの(それ以外でも使われますが)実践的な脆弱性を突いて情報(旗、フラグ)を取る大会を指しています。<p>
+      <p>我々のサークルが参加しているCTFという競技において、以下のジャンルがよく見られています。</p>
+      <ul class="w3-ul w3-border">
+      <li><h2>forensic</h2><br><p>宝探しや警察のような作業を求められる情報の復元や推察問題が多い</p></li>
+      <li><h2>Crypto</h2><br><p>暗号解読を行なう。その汎用性から他の全てのジャンルの根幹にある時も。</p></li>
+      <li><h2>pwn</h2><br><p><delete>人の理を捨てるために挑戦される。</delete>機械(マシン語)となかよく</p></li>
+      <li><h2>reversing</h2><br><p>貴方はどれだけの情報に触れ、理解出来ますか？ひたすら解析!ghidraやradare2と戯れよう。</p></li>
+      <li><h2>misc</h2><br><p>多分一番楽しい。雑学を問われたり、他のジャンルでなんとなくmiscに分類されるやば問が出る。</p></li>
+      </ul>
+      <p>是非とも自分の得意分野を見つけてその問題の旗を取りましょう!</p>
     </div>
     <div class="w3-third w3-container">
     </div>
   </div>
+  <!-- END MAIN -->
+</div>
 
 
-
-
-  <!-- Pagination -->
-  <div class="w3-center w3-padding-32">
-    <div class="w3-bar">
-      <a class="w3-button w3-black" href="#">1</a>
-      <!-- <a class="w3-button w3-hover-black" href="#">2</a> -->
-      <!-- <a class="w3-button w3-hover-black" href="#">3</a> -->
-      <!-- <a class="w3-button w3-hover-black" href="#">4</a> -->
-      <!-- <a class="w3-button w3-hover-black" href="#">5</a> -->
-      <a class="w3-button w3-hover-black" href="#">»</a>
-    </div>
-  </div>
-
-  <footer id="myFooter">
-    <div class="w3-container w3-theme-l2 w3-padding-32">
-      <h4>Footer</h4>
-    </div>
-
-    <div class="w3-container w3-theme-l1">
+  <footer>
+    <div class="w3-container w3-theme-l1 w3-left-align w3-large">
       <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
     </div>
   </footer>
 
-  <!-- END MAIN -->
-</div>
 
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<script>
-  // Get the Sidebar
-  var mySidebar = document.getElementById("mySidebar");
-
-  // Get the DIV with overlay effect
-  var overlayBg = document.getElementById("myOverlay");
-
-  // Toggle between showing and hiding the sidebar, and add overlay effect
-  function w3_open() {
-      if (mySidebar.style.display === 'block') {
-	  mySidebar.style.display = 'none';
-	  overlayBg.style.display = "none";
-      } else {
-	  mySidebar.style.display = 'block';
-	  overlayBg.style.display = "block";
-      }
-  }
-
-  // Close the sidebar with the close button
-  function w3_close() {
-      mySidebar.style.display = "none";
-      overlayBg.style.display = "none";
-  }
-</script>
 </body>
 </html>
 
+<!-- dont show ./flag.txt -->
