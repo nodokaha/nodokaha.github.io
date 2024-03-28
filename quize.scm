@@ -33,6 +33,8 @@
 (sleep 0.5)
 (js-invoke (getelem term) "LoadingOverlay" "progress" 90)
 (display "見つけられますか？")
+(display "https://nodokaha.github.io/CTF.html")
+
 (sleep 0.5)
 (js-invoke (getelem term) "LoadingOverlay" "progress" 100)
 (display "\"(help)\"とタイプすると助けを求めれます。")
