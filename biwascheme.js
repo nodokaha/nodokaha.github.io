@@ -21808,7 +21808,7 @@ var BiwaScheme = (function () {
   BiwaScheme$1.Port.current_error = current_error;
   BiwaScheme$1.jsonp_receiver = jsonp_receiver;
   BiwaScheme$1.Dumper = Dumper;
-
+ 
   // TODO: ideally this should just be `window.BiwaScheme = BiwaScheme` but it will break test/spec.html (grep with `register_tests`)
   window.BiwaScheme = window.BiwaScheme || {};
   Object.assign(window.BiwaScheme, BiwaScheme$1);
