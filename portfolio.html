@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>nodokaha's Terminal Portfolio</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            // HackGen / モノスペースフォントを最優先指定
+            mono: ['HackGen', 'HackGen Console', 'Consolas', 'Courier New', 'monospace'],
+          },
+          colors: {
+            termbg: '#0d1117',
+            termgreen: '#00ff66',
+            termcard: '#161b22',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* 全要素の角丸を強制排除 & フォント適用 */
+    * {
+      border-radius: 0 !important;
+      font-family: HackGen, "HackGen Console", Consolas, "Courier New", monospace !important;
+    }
+    
+    /* ターミナル特有のカーソル点滅 */
+    .blink {
+      animation: blinker 1s steps(1) infinite;
+    }
+    @keyframes blinker {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body class="bg-termbg text-slate-200 font-mono antialiased min-h-screen border-t-4 border-termgreen">
+
+  <!-- Header / CLI Header style -->
+  <header class="border-b border-slate-700 bg-termcard p-4">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+      <div class="text-termgreen font-bold">
+        user@nodokaha-vrc:~# <span class="text-white">./show_portfolio.sh</span><span class="blink text-termgreen">_</span>
+      </div>
+      <nav class="flex gap-4 text-xs font-bold text-slate-400">
+        <a href="#about" class="hover:text-termgreen hover:underline">[ABOUT]</a>
+        <a href="#works" class="hover:text-termgreen hover:underline">[WORKS]</a>
+        <a href="#career" class="hover:text-termgreen hover:underline">[CAREER]</a>
+        <a href="#links" class="hover:text-termgreen hover:underline">[LINKS]</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-8 space-y-12">
+
+    <!-- Hero / CLI Welcome Message -->
+    <section class="border border-slate-700 bg-termcard p-6">
+      <pre class="text-termgreen text-xs md:text-sm overflow-x-auto leading-none mb-4 font-bold">
+ _  _ ____ ___  ____ _  _ ____ _  _ ____ 
+ |\ | |  | |  \ |  | |_/  |__| |__| |__| 
+ | \| |__| |__/ |__| | \_ |  | |  | |  | 
+      </pre>
+      <h1 class="text-xl md:text-2xl font-bold text-white mb-2">
+        nodokaha (Server-Side Engineer / VR Creator)
+      </h1>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        > 株式会社インフィニットループ サーバーサイドエンジニア(3年)<br>
+        > VRChat初CTF集会発案 / 世界初Basisコミュニティ設立 / アバターインフラ・フェイストラッキング
+      </p>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="space-y-3">
+      <h2 class="text-termgreen text-lg font-bold border-b border-termgreen/40 pb-1">
+        $ cat ./about_me.txt
+      </h2>
+      <div class="border border-slate-700 bg-termcard p-5 text-sm space-y-3 text-slate-300">
+        <p>
+          サーバーサイドエンジニアとしての3年間の開発経験を基礎に持ち、VRChat領域でのセキュリティイベント（CTF集会）の発案やワールド制作、コミュニティ運営（Basisコミュニティ）などを個人で展開。
+        </p>
+        <p>
+          アバターのフェイストラッキング実装やアニメーション、プロジェクト全体のインフラ整備・進行補佐まで幅広く対応しています。
+        </p>
+        <div class="text-xs text-slate-500 pt-2 border-t border-slate-800">
+          KEY_SKILLS = ["Server-Side", "VRChat World / Security", "Face Tracking", "Community Building"]
+        </div>
+      </div>
+    </section>
+
+    <!-- Works Section -->
+    <section id="works" class="space-y-3">
+      <h2 class="text-termgreen text-lg font-bold border-b border-termgreen/40 pb-1">
+        $ ls -la ./works/
+      </h2>
+
+      <div class="grid md:grid-cols-3 gap-4">
+        
+        <!-- Work 1 -->
+        <div class="border border-slate-700 bg-termcard p-4 flex flex-col justify-between hover:border-termgreen transition-colors">
+          <div>
+            <div class="text-xs text-termgreen mb-1">[VRChat / Security]</div>
+            <h3 class="font-bold text-white mb-2">VRChat初 CTF集会発案 & ワールド制作</h3>
+            <p class="text-xs text-slate-400 leading-relaxed mb-4">
+              VRChat上で初のCTF集会を発案。セキュリティの学びと交流の場として専用ワールドのデモを制作。
+            </p>
+          </div>
+          <a href="https://qiita.com/nodokaha/items/c5d8b48dc9d3b8053e15" target="_blank" rel="noopener noreferrer" class="text-xs text-termgreen hover:underline">
+            > View Qiita Article -->
+          </a>
+        </div>
+
+        <!-- Work 2 -->
+        <div class="border border-slate-700 bg-termcard p-4 flex flex-col justify-between hover:border-termgreen transition-colors">
+          <div>
+            <div class="text-xs text-termgreen mb-1">[Community / VR]</div>
+            <h3 class="font-bold text-white mb-2">世界初 Basisコミュニティ創設・サーバー運営</h3>
+            <p class="text-xs text-slate-400 leading-relaxed mb-4">
+              新規メタバースフレームワーク「Basis」にフォーカスした世界初の日本ユーザーコミュニティを発足・管理。
+            </p>
+          </div>
+          <a href="https://x.com/nodokaha_basis" target="_blank" rel="noopener noreferrer" class="text-xs text-termgreen hover:underline">
+            > View X Account -->
+          </a>
+        </div>
+
+        <!-- Work 3 -->
+        <div class="border border-slate-700 bg-termcard p-4 flex flex-col justify-between hover:border-termgreen transition-colors">
+          <div>
+            <div class="text-xs text-termgreen mb-1">[Avatar Tech / Infra]</div>
+            <h3 class="font-bold text-white mb-2">アバター技術・インフラ整備</h3>
+            <p class="text-xs text-slate-400 leading-relaxed mb-4">
+              フェイストラッキング実装、アニメーション制作、進行補佐および各種インフラ整備。
+            </p>
+          </div>
+          <a href="https://x.com/nodokaha_vrc" target="_blank" rel="noopener noreferrer" class="text-xs text-termgreen hover:underline">
+            > View X Account -->
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Career Section -->
+    <section id="career" class="space-y-3">
+      <h2 class="text-termgreen text-lg font-bold border-b border-termgreen/40 pb-1">
+        $ history | grep CAREER
+      </h2>
+      <div class="border border-slate-700 bg-termcard p-5 text-sm">
+        <div class="flex flex-col sm:flex-row justify-between mb-2">
+          <span class="font-bold text-white">株式会社インフィニットループ</span>
+          <span class="text-termgreen text-xs">[2023 - 2026 (3 Years)]</span>
+        </div>
+        <div class="text-xs text-slate-400">POSITION: サーバーサイドエンジニア</div>
+        <p class="text-xs text-slate-300 mt-3 leading-relaxed">
+          バックエンド開発の実務に従事。堅牢なサーバー設計と運用のノウハウを蓄積。
+        </p>
+      </div>
+    </section>
+
+    <!-- Links Section -->
+    <section id="links" class="space-y-3">
+      <h2 class="text-termgreen text-lg font-bold border-b border-termgreen/40 pb-1">
+        $ ping -c 1 ./external_links
+      </h2>
+      <div class="border border-slate-700 bg-termcard p-5 text-xs font-bold space-y-2">
+        <div>[GitHub] <a href="https://github.com/nodokaha" target="_blank" class="text-slate-300 hover:text-termgreen hover:underline">https://github.com/nodokaha</a></div>
+        <div>[Qiita] <a href="https://qiita.com/nodokaha/items/c5d8b48dc9d3b8053e15" target="_blank" class="text-slate-300 hover:text-termgreen hover:underline">https://qiita.com/nodokaha/items/c5d8b48dc9d3b8053e15</a></div>
+        <div>[X_Basis] <a href="https://x.com/nodokaha_basis" target="_blank" class="text-slate-300 hover:text-termgreen hover:underline">https://x.com/nodokaha_basis</a></div>
+        <div>[X_VRC] <a href="https://x.com/nodokaha_vrc" target="_blank" class="text-slate-300 hover:text-termgreen hover:underline">https://x.com/nodokaha_vrc</a></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-600">
+    nodokaha portfolio (C) 2026 -- Process exited with code 0
+  </footer>
+
+</body>
+</html>
