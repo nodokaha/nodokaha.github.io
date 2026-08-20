@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>nodokaha Portfolio</title>
+
+  <style>
+    :root {
+      --bg-termbg: #0d110d;
+      --bg-termcard: #111113;
+      --color-termgreen: #2ea043;
+      --color-accent-blue: #50a6ff;
+      --color-text-main: #e6edf3;
+      --color-text-sub: #2b949e;
+      --border-color: #30363d;
+    }
+
+    a {
+      color: var(--color-text-main);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: var(--color-accent-blue);
+    }
+
+    * {
+      border-radius: 0 !important;
+      font-family: HackGen, "HackGen Console", Consolas, "Courier New", monospace !important;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-termbg);
+      color: var(--color-text-main);
+      border-top: 4px solid var(--color-termgreen);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ASCIIアート・コード枠はみ出し防止 */
+    pre {
+      font-size: clamp(9px, 1.8vw, 13px);
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .term-card {
+      background-color: var(--bg-termcard);
+      border: 1px solid var(--border-color);
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .term-card-hover:hover {
+      border-color: var(--color-termgreen);
+    }
+
+    /* 画像・動画コンテナのレスポンシブ最適化 */
+    .media-container {
+      width: 100%;
+      height: auto;
+      background-color: #000;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .media-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .media-container video, .media-container iframe {
+      width: 100%;
+      height: auto;
+      max-height: 400px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .media-placeholder {
+      color: var(--color-text-sub);
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 1rem;
+      border: 1px dashed var(--border-color);
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.4rem;
+      font-size: 0.75rem;
+      border: 1px solid var(--color-termgreen);
+      color: var(--color-termgreen);
+      margin-right: 0.3rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .badge-sub {
+      border-color: var(--border-color);
+      color: var(--color-text-sub);
+    }
+
+    .text-green { color: var(--color-termgreen); }
+    .text-blue { color: var(--color-accent-blue); }
+    .text-sub { color: var(--color-text-sub); }
+
+    .btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: var(--bg-termbg);
+      color: var(--color-termgreen);
+      border: 1px solid var(--color-termgreen);
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+    .btn:hover {
+      background: var(--color-termgreen);
+      color: #000;
+    }
+
+    .blink { animation: blinker 1s steps(1) infinite; }
+    @keyframes blinker { 50% { opacity: 0; } }
+  </style>
+</head>
+
+<body class="antialiased min-h-screen">
+
+  <header class="border-b border-slate-700 bg-termcard p-4">
+    <div style="max-width:1000px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div class="text-green font-bold">
+        user@nodokaha-vrc:~# <span style="color:#fff;">./show_portfolio.sh</span><span class="blink text-green">_</span>
+      </div>
+      <nav style="display:flex; gap:1rem; font-size:0.8rem; font-weight:bold;" class="text-sub">
+        <a href="#hero-visual" class="text-green">[TOP VISUAL]</a>
+        <a href="#candidate-info" class="hover:underline">[PROFILE]</a>
+        <a href="#worlds" class="hover:underline">[WORLDS]</a>
+        <a href="#booth" class="hover:underline">[BOOTH]</a>
+        <a href="#stack" class="hover:underline">[TECH STACK]</a>
+        <a href="#career" class="hover:underline">[CAREER]</a>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width:1000px; margin:0 auto; padding: 2rem 1rem;">
+
+    <!-- TOP VISUAL / HERO SCREENSHOT -->
+    <section id="hero-visual" class="term-card" style="border: 2px solid var(--color-termgreen);">
+      <div style="margin-bottom: 0.8rem;" class="text-green font-bold text-sm">
+        [PRIMARY_WORK_PREVIEW] Avatar Face Tracking Booth
+      </div>
+
+      <div class="media-container" style="margin-bottom: 1rem;">
+        <img src="booth.png" alt="Avatar Face Tracking Booth">
+      </div>
+
+      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem; align-items:center;">
+        <div>
+          <h1 style="font-size:1.4rem; margin:0 0 0.3rem 0; color:#fff;">nodokaha</h1>
+          <div style="font-weight:bold; color:var(--color-termgreen); font-size:0.95rem;">
+            Unity & Server-Side Engineer
+          </div>
+        </div>
+        <a href="https://vrchat.com/home/world/wrld_f806d2ba-01f0-41ac-ab39-965c8a4e0198/info" target="_blank" rel="noopener noreferrer" class="btn">> Launch World on VRChat (デモ体験)</a>
+      </div>
+    </section>
+
+    <!-- 応募者情報 / 現職ステータス -->
+    <section id="candidate-info" class="term-card">
+      <div class="text-green font-bold" style="margin-bottom:0.8rem; border-bottom:1px solid rgba(46,160,67,0.4); padding-bottom:0.25rem;">
+        $ cat ./candidate_status.json
+      </div>
+      <div class="grid-2" style="font-size: 0.85rem; line-height: 1.6;">
+        <div>
+          <div><span class="text-sub">【VRChat プレイ時間】</span> 4000時間超 (ワールド巡り・初心者案内・コミュニティスタッフ)</div>
+          <div><span class="text-sub">【現職ステータス】</span> 株式会社インフィニットループ サーバーサイドエンジニア（2023年4月〜2026年3月 在職）</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. WORLDS & MAIN PROJECTS -->
+    <section id="worlds" style="margin-top:2rem;">
+      <h2 class="text-green font-bold text-lg" style="border-bottom:1px solid rgba(46,160,67,0.4); padding-bottom:0.3rem; margin-bottom:1rem;">
+        $ ls -la ./works/vrchat_worlds/
+      </h2>
+
+      <!-- WORK 1: 主要ゲームワールド -->
+      <article class="term-card term-card-hover">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem;">
+          <div>
+            <span class="badge">考案</span>
+            <span class="badge badge-sub">開発期間: 8ヶ月</span>
+            <h3 style="margin: 0.4rem 0 0 0; font-size:1.2rem; color:#fff;">VRChat初 CTF（セキュリティ体験）ゲームワールド</h3>
+          </div>
+          <span class="text-green text-xs font-bold">[企画・作成 / 未公開]</span>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 1rem;">
+          <div class="media-container">
+            <video controls preload="metadata"><source src="Video Project 23.mp4" type="video/mp4"></video>
+          </div>
+          <div class="media-container">
+            <img src="CTF-light.png" alt="CTF World Screenshot">
+          </div>
+        </div>
+
+        <div style="font-size:0.85rem; line-height:1.6; margin-bottom:1rem;">
+          <p style="margin:0 0 0.5rem 0;">
+            <strong>【概要・規模】</strong> VRChat上でセキュリティ知識をゲーム形式で学べる体験型ワールドを構想から一人で制作。全5ステージで構成され、参加者が協力して暗号を解く大型ゲームワールドです。
+          </p>
+          <p style="margin:0 0 0.5rem 0;">
+            <strong>【担当範囲】</strong> 企画構想 / ワールドデザイン / 仕様書作成 / UIレイアウト / Quest軽量化調整
+          </p>
+          <p style="margin:0;">
+            <strong>【CTF×VRChatの狙い】</strong> UdonSharpを用いてセキュリティ問題をVRChat内の3Dパズル空間として再構築しました。
+          </p>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <span class="badge badge-sub">Unity 2022.3</span>
+          <span class="badge badge-sub">VRChat SDK3</span>
+          <span class="badge badge-sub">UdonSharp (C#)</span>
+          <span class="badge badge-sub">Quest/PC Cross-platform</span>
+        </div>
+
+        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+          <a href="https://qiita.com/nodokaha/items/c5d8b48dc9d3b8053e15" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem;">> 開発解説記事 (Qiita)</a>
+          <a href="https://vrchat.com/home/world/wrld_f806d2ba-01f0-41ac-ab39-965c8a4e0198/info" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem;">> VRChatでワールドを訪れる</a>
+        </div>
+      </article>
+
+      <!-- WORK 2: 高度ギミック検証ワールド -->
+      <article class="term-card term-card-hover">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem;">
+          <div>
+            <span class="badge" style="border-color:var(--color-accent-blue); color:var(--color-accent-blue);">Public / 開発進行中</span>
+            <span class="badge badge-sub">UdonEmu検証プロジェクト</span>
+            <h3 style="margin: 0.4rem 0 0 0; font-size:1.15rem; color:#fff;">UdonEmuTestWorld≺Not Official≻</h3>
+          </div>
+          <span class="text-sub text-xs font-bold">Created by: nodokaha</span>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 1rem;">
+          <div class="media-container">
+            <video src="UdonEmuTestWorld.mp4" controls preload="metadata"></video>
+          </div>
+          <div style="font-size:0.85rem; line-height:1.6;">
+            <p style="margin:0 0 0.5rem 0;">
+              <strong>【コンセプト】</strong> Hoshino Labs․様の「UdonEmu」を用いて構築する、高度なスクリプト制御・動的ギミック一例集ワールド。VRChatにおけるインタラクティブワールドの可能性を拡張する検証・開発を行っています。
+            </p>
+            <p style="margin:0; font-size:0.8rem;" class="text-sub">
+              ※開発工程や構想設計・ロジックの安全性を評価するための公開プロトタイプです。
+            </p>
+          </div>
+        </div>
+
+        <!-- 開発予定ギミック一覧 -->
+        <div style="background:#000; border:1px solid var(--border-color); padding:0.8rem; margin-bottom:1rem; font-size:0.8rem; line-height:1.6;">
+          <div style="color:var(--color-termgreen); font-weight:bold; margin-bottom:0.3rem;">[作業予定・構想ギミック一覧]</div>
+          <ul style="margin:0; padding-left:1.2rem; color:var(--color-text-main);">
+            <li>オンラインソシャゲ or ダウンロード式ゲームカートリッジな筐体ギミック</li>
+            <li>課金されないとゲムワのスクリプトがダウンロードされないサードパーティゲムワギミック</li>
+            <li>アバターパラメーターを活用したワールドスクリプトのダウンロードコンテンツ</li>
+            <li>VRCワールドスクリプト作成ギミック（他のワールドのスクリプトを編集する）</li>
+            <li>サンドボックススクリプト実行によるセキュリティチェック</li>
+            <li>インタラクティブワールド作成</li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <span class="badge badge-sub">UdonEmu</span>
+          <span class="badge badge-sub">UdonSharp (C#)</span>
+          <span class="badge badge-sub">Sandbox & Security</span>
+          <span class="badge badge-sub">Dynamic Scripting</span>
+        </div>
+
+        <div>
+          <a href="https://vrchat.com/home/launch?worldId=wrld_f42a291e-9da7-4d6e-ae2b-80d9c7db538e" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem;">
+            > Launch World on VRChat (wrld_f42a291e...)
+          </a>
+        </div>
+      </article>
+
+      <!-- WORK 3: コミュニティ日常活動 -->
+      <article class="term-card term-card-hover">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem;">
+          <div>
+            <span class="badge">VRChat Activity</span>
+            <h3 style="margin: 0.4rem 0 0 0; font-size:1.1rem; color:#fff;">VRChat コミュニティ日常活動 & ユーザーカルチャーへの深い傾倒</h3>
+          </div>
+          <span class="text-green text-xs font-bold">[総プレイ時間: 4,000時間超]</span>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:1rem;">
+          <div class="media-container">
+            <img src="MyAvatar.png" alt="MyAvatar">
+          </div>
+          <div style="font-size:0.85rem; line-height:1.6;">
+            <p style="margin:0;">
+              <strong>【日常的ログ・活動頻度】</strong> ワールド巡り・週20時間以上のプレイを通して、ユーザー動向・アバター文化トレンド・新機能（OSC/Raycast等）のキャッチアップを日常的に実施。単なる開発者視点にとどまらず、ユーザーとして心地よい演出・UXへの理解を常に更新しています。
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <span class="badge badge-sub">Community Management</span>
+          <span class="badge badge-sub">User Culture & Trend</span>
+          <span class="badge badge-sub">Playtime: 4000h+</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- 2. BOOTH 頒布作品・VRChat向けアセット紹介 -->
+        <section id="booth" style="margin-top:2rem;">
+          <h2 class="text-green font-bold text-lg" style="border-bottom:1px solid rgba(46,160,67,0.4); padding-bottom:0.3rem; margin-bottom:1rem;">
+            $ ls -la ./booth_store/
+          </h2>
+          <div class="term-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+              <div>
+                <h3 style="margin:0; font-size:1.05rem; color:#fff;">【BOOTH】VRChat向けアセット・外部連携ツール頒布</h3>
+                <p class="text-sub" style="font-size:0.85rem; margin:0.3rem 0 0 0;">アバター機能拡張（Modular Avatar対応）やOSC通信外部ソフトを制作・公開しているショップです。</p>
+              </div>
+              <a href="https://nodokaha.booth.pm/" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem;">> BOOTHショップを見る</a>
+            </div>
+
+            <!-- 2. BOOTH 頒布作品・VRChat向けアセット紹介 -->
+                <section id="booth" style="margin-top:2rem;">
+                  <h2 class="text-green font-bold text-lg" style="border-bottom:1px solid rgba(46,160,67,0.4); padding-bottom:0.3rem; margin-bottom:1rem;">
+                    $ ls -la ./booth_store/
+                  </h2>
+                  <div class="term-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+                      <div>
+                        <h3 style="margin:0; font-size:1.05rem; color:#fff;">【BOOTH】VRChat向けアセット・外部連携ツール頒布</h3>
+                        <p class="text-sub" style="font-size:0.85rem; margin:0.3rem 0 0 0;">アバター機能拡張（Modular Avatar対応）やOSC通信外部ソフトを制作・公開しているショップです。</p>
+                      </div>
+                      <a href="https://nodokaha.booth.pm/" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem;">> BOOTHショップを見る</a>
+                    </div>
+
+                    <!-- BOOTH商品アイテムのグリッド表示 -->
+                    <div class="grid-2" style="gap:1rem;">
+
+                      <!-- 商品1: Lazuli FaceTracking Setting -->
+                      <div style="background:#000; border:1px solid var(--border-color); padding:0.8rem; font-size:0.8rem; display:flex; flex-direction:column; justify-space-between;">
+                        <div>
+                          <div class="media-container" style="margin-bottom:0.5rem;">
+                            <img src="lazuli_face.jpg" alt="Elychiffon様Lazuli(ラズリちゃん)-FaceTracking_Setting">
+                          </div>
+                          <div style="font-weight:bold; color:#fff; margin-bottom:0.3rem; line-height:1.4;">
+                            Elychiffon様Lazuli(ラズリちゃん)-FaceTracking_Setting
+                          </div>
+                          <p class="text-sub" style="font-size:0.75rem; margin:0 0 0.8rem 0; line-height:1.5;">
+                            オリジナル3Dモデル「ラズリ -Lazuli-」の標準FaceTracking用ブレンドシェイプにVRCFTパラメーターを設定。Modular Avatar（MA）化済みのため、アバター直下に置くだけで即座にワンクリック導入が可能です。
+                          </p>
+                        </div>
+                        <div>
+                          <div style="margin-bottom:0.6rem;">
+                            <span class="badge badge-sub">VRCFaceTracking</span>
+                            <span class="badge badge-sub">Modular Avatar</span>
+                            <span class="badge badge-sub">Unity</span>
+                          </div>
+                          <a href="https://nodokaha.booth.pm/items/7151162" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.7rem; padding:0.3rem 0.6rem; display:inline-block;">> BOOTHで見る</a>
+                        </div>
+                      </div>
+
+                      <!-- 商品2: えるしおんプレイヤー (YouTube埋め込み) -->
+                      <div style="background:#000; border:1px solid var(--border-color); padding:0.8rem; font-size:0.8rem; display:flex; flex-direction:column; justify-content:space-between;">
+                        <div>
+                          <div class="media-container" style="margin-bottom:0.5rem; background:transparent; border:none;">
+                            <iframe src="https://www.youtube.com/embed/a5iiLOLmJGs?si=TNbnqs89zsjQQGxR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width: 100%; aspect-ratio: 16/9; border: 1px solid var(--border-color);"></iframe>
+                          </div>
+                          <div style="font-weight:bold; color:#fff; margin-bottom:0.3rem; line-height:1.4;">
+                            えるしおんプレイヤー
+                          </div>
+                          <p class="text-sub" style="font-size:0.75rem; margin:0 0 0.8rem 0; line-height:1.5;">
+                            こまいぬ通り様制作の3Dモデル「エルシオン」にて、ベル鳴音時に事前入力した音声を外部からOSC通信経由で送信・同期制御するための連携アプリケーションです。
+                          </p>
+                        </div>
+                        <div>
+                          <div style="margin-bottom:0.6rem;">
+                            <span class="badge badge-sub">OSC (Open Sound Control)</span>
+                            <span class="badge badge-sub">外部連携App</span>
+                          </div>
+                          <a href="https://nodokaha.booth.pm/items/7305681" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.7rem; padding:0.3rem 0.6rem; display:inline-block;">> BOOTHで見る</a>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </section>
+
+    <!-- 3. 技術スタック一覧 -->
+    <section id="stack" style="margin-top:2rem;">
+      <h2 class="text-green font-bold text-lg" style="border-bottom:1px solid rgba(46,160,67,0.4); padding-bottom:0.3rem; margin-bottom:1rem;">
+        $ systeminfo --tech-stack
+      </h2>
+      <div class="term-card grid-2" style="font-size:0.85rem; line-height:1.6;">
+        <div>
+          <div class="text-green font-bold" style="margin-bottom:0.5rem; border-bottom:1px solid var(--border-color); padding-bottom:0.25rem;">
+            ■ VRChat & Unity Development
+          </div>
+          <ul style="padding-left:1.2rem; margin:0;">
+            <li><strong>Engine / SDK:</strong> Unity (2019/2022), VRChat SDK3 (Worlds / Avatars)</li>
+            <li><strong>Scripting:</strong> UdonSharp (C#)</li>
+            <li><strong>Optimization:</strong> Quest / PC Cross-Platform, Lightmap Baking</li>
+            <li><strong>Avatar / Tech:</strong> VRCFaceTracking (OSC), Animation Controller, UnityPackage Setting</li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-green font-bold" style="margin-bottom:0.5rem; border-bottom:1px solid var(--border-color); padding-bottom:0.25rem;">
+            ■ Server-Side & Infrastructure (実務経験3年)
+          </div>
+          <ul style="padding-left:1.2rem; margin:0;">
+            <li><strong>Languages:</strong> PHP</li>
+            <li><strong>Frameworks:</strong> Laravel</li>
+            <li><strong>Database / Cache:</strong> TiDB</li>
+            <li><strong>Infra & Cloud:</strong> GCP, Docker, Coolify, CI/CD</li>
+            <li><strong>Architecture:</strong> REST API設計, 決済システムバックエンド, 要件整理, アジャイル開発</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. コミュニティ活動 -->
+    <section id="community" style="margin-top:2rem;">
+      <h2 class="text-green font-bold text-lg" style="border-bottom:1px solid rgba(46,160,67,0.4); padding-bottom:0.3rem; margin-bottom:1rem;">
+        $ ls -la ./community_and_other_projects/
+      </h2>
+      <div class="term-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+          <h3 style="margin:0; font-size:1rem; color:#fff;">新規メタバース基盤「Basis」日本ユーザーコミュニティ創設・運営</h3>
+          <span class="text-green text-xs font-bold">[Discordメンバー数: 350名以上 / 運営期間: 1年6ヶ月]</span>
+        </div>
+        <p style="font-size:0.85rem; line-height:1.6; margin:0 0 0.5rem 0;">
+          VRChat以外の最新XR/メタバースフレームワークの技術調査の一環として、日本初の「Basis」コミュニティを発足。サーバー管理、技術情報の日本語共有、開発者交流イベントの企画・運営を行っています。
+        </p>
+        <div>
+          <span class="badge badge-sub">Community Management</span>
+          <span class="badge badge-sub">Cross-Platform XR Tech Research</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 職歴 (CAREER HISTORY) -->
+    <section id="career" style="margin-top:2rem;">
+      <h2 class="text-green font-bold text-lg" style="border-bottom:1px solid rgba(46,160,67,0.4); padding-bottom:0.3rem; margin-bottom:1rem;">
+        $ history | grep CAREER
+      </h2>
+      <div class="term-card text-sm">
+        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; margin-bottom:0.5rem;">
+          <span class="font-bold text-white" style="font-size:1rem;">株式会社インフィニットループ</span>
+          <span class="text-green text-xs">[2023年4月 - 2026年3月 (3年間) / 正社員・在職]</span>
+        </div>
+        <div class="text-xs text-sub" style="margin-bottom:0.5rem;">POSITION: サーバーサイドエンジニア</div>
+        <p class="text-xs leading-relaxed" style="margin:0;">
+          バックエンドシステムの設計、API開発、DBパフォーマンスチューニング、およびインフラ構築に従事。障害に強く高負荷に耐えうる堅牢なサーバーバックエンド運用のノウハウを蓄積。またセキュリティアドバイザーとしてシステムの安全性を担保。
+        </p>
+      </div>
+    </section>
+
+    <!-- 6. EXTERNAL LINKS -->
+    <section id="links" style="margin-top:2rem;">
+      <h2 class="text-green font-bold text-lg" style="border-bottom:1px solid rgba(46,160,67,0.4); padding-bottom:0.3rem; margin-bottom:1rem;">
+        $ ping -c 1 ./external_links
+      </h2>
+      <div class="term-card text-xs font-bold space-y-2" style="display:flex; flex-direction:column; gap:0.5rem;">
+        <div>[GitHub] <a href="https://github.com/nodokaha" target="_blank" rel="noopener noreferrer" class="text-blue hover:underline">https://github.com/nodokaha</a></div>
+        <div>[Qiita] <a href="https://qiita.com/nodokaha/items/c5d8b48dc9d3b8053e15" target="_blank" rel="noopener noreferrer" class="text-blue hover:underline">https://qiita.com/nodokaha/items/c5d8b48dc9d3b8053e15</a></div>
+        <div>[X (VRChat)] <a href="https://x.com/nodokaha_vrc" target="_blank" rel="noopener noreferrer" class="text-blue hover:underline">https://x.com/nodokaha_vrc</a></div>
+        <div>[X (Basis Community)] <a href="https://x.com/nodokaha_basis" target="_blank" rel="noopener noreferrer" class="text-blue hover:underline">https://x.com/nodokaha_basis</a></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="text-xs text-sub" style="border-top: 1px solid var(--border-color); padding: 1.5rem 0; text-align: center;">
+    nodokaha portfolio (C) 2026 -- Process exited with code 0
+  </footer>
+
+</body>
+</html>
