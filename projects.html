@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM://PSYCHO_ANALYTICS_CORE</title>
+    <style>
+        :root {
+            --bg-color: #050508;
+            --panel-bg: #0c0d12;
+            --border-color: #262936;
+            --border-highlight: #414868;
+            --text-main: #c0caf5;
+            --text-dim: #565f89;
+            --accent-cyan: #7dcfff;
+            --accent-green: #73daca;
+            --accent-red: #f7768e;
+            --accent-orange: #ff9e64;
+            --accent-yellow: #e0af68;
+            --accent-purple: #bb9af7;
+            --font-mono: 'Cascadia Code', 'Fira Code', 'Courier New', Consolas, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        /* ヘッダー・メニューバー */
+        .menubar {
+            background-color: #1a1b26;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            height: 28px;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .menu-title {
+            color: var(--accent-cyan);
+            font-weight: bold;
+            margin-right: 16px;
+        }
+
+        .menu-item {
+            padding: 0 8px;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            color: var(--text-main);
+            background-color: var(--border-color);
+        }
+
+        /* ワークスペースレイアウト */
+        .workspace {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 240px 1fr 300px;
+            grid-template-rows: 1fr 180px;
+            grid-template-areas:
+                "sidebar main inspector"
+                "sidebar console inspector";
+            gap: 1px;
+            background-color: var(--border-color);
+            overflow: hidden;
+        }
+
+        .pane {
+            background-color: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .pane-header {
+            background-color: #16161e;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* サイドバー (バッファ・ツリー) */
+        .sidebar { grid-area: sidebar; }
+        .buffer-list {
+            padding: 4px 0;
+            list-style: none;
+        }
+        .buffer-item {
+            padding: 6px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dim);
+            font-size: 12px;
+        }
+        .buffer-item:hover {
+            background-color: #1a1b26;
+            color: var(--text-main);
+        }
+        .buffer-item.active {
+            background-color: #24283b;
+            color: var(--accent-cyan);
+            border-left: 2px solid var(--accent-cyan);
+        }
+        .buffer-icon { font-size: 10px; }
+
+        /* メインエディタ・対話エリア */
+        .main-editor { grid-area: main; }
+        .tab-bar {
+            display: flex;
+            background-color: #16161e;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .tab {
+            padding: 6px 12px;
+            background-color: #101014;
+            color: var(--text-dim);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tab.active {
+            background-color: var(--panel-bg);
+            color: var(--accent-cyan);
+            border-top: 2px solid var(--accent-cyan);
+        }
+
+        .view-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        .buffer-view {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            padding: 12px;
+            overflow-y: auto;
+            display: none;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .buffer-view.active { display: block; }
+
+        /* コンソール・診断ログ */
+        .console-pane { grid-area: console; }
+        .console-output {
+            flex: 1;
+            padding: 8px;
+            overflow-y: auto;
+            font-size: 11px;
+            background-color: #090a0f;
+            color: var(--text-dim);
+        }
+
+        /* インスペクター (パラメータモニター) */
+        .inspector-pane { grid-area: inspector; }
+        .meter-group {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .meter-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+        .meter-bar {
+            height: 6px;
+            background-color: #1a1b26;
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .meter-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--accent-cyan);
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        /* ログ・テキスト装飾 */
+        .log-entry { margin-bottom: 10px; line-height: 1.5; }
+        .speaker-eliza { color: var(--accent-cyan); font-weight: bold; }
+        .speaker-you { color: var(--text-main); font-weight: bold; }
+        .speaker-sys { color: var(--accent-yellow); font-weight: bold; }
+        .text-glitch-1 { color: var(--accent-orange); }
+        .text-glitch-2 { color: var(--accent-red); font-weight: bold; text-shadow: 0 0 2px var(--accent-red); }
+
+        .redacted {
+            background-color: #24283b;
+            color: #24283b;
+            padding: 0 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .redacted:hover { background-color: var(--border-highlight); }
+        .redacted.revealed { background-color: transparent; color: var(--accent-red); font-weight: bold; }
+
+        /* エディタ (Lispハック用) */
+        textarea.code-input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            resize: none;
+            line-height: 1.5;
+            user-select: text;
+        }
+
+        /* 入力プロンプト */
+        .input-bar {
+            background-color: #16161e;
+            border-top: 1px solid var(--border-color);
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .prompt-symbol { color: var(--accent-green); font-weight: bold; }
+        input[type="text"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            user-select: text;
+        }
+        .eval-btn {
+            background-color: var(--border-color);
+            color: var(--text-main);
+            border: 1px solid var(--border-highlight);
+            padding: 4px 10px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .eval-btn:hover { background-color: var(--accent-cyan); color: #000; }
+
+        /* ステータスライン */
+        .statusbar {
+            background-color: #1a1b26;
+            border-top: 1px solid var(--border-color);
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        .status-right { display: flex; gap: 16px; }
+    </style>
+</head>
+<body>
+
+    <div class="menubar">
+        <span class="menu-title">PSYCHO-ELIZA OS v4.09</span>
+        <span class="menu-item">Buffer</span>
+        <span class="menu-item">Evaluate</span>
+        <span class="menu-item">Inspect</span>
+        <span class="menu-item">Memory-Dump</span>
+    </div>
+
+    <div class="workspace">
+        <!-- サイドバー -->
+        <div class="pane sidebar">
+            <div class="pane-header">Active Buffers</div>
+            <ul class="buffer-list" id="bufferList">
+                <li class="buffer-item active" data-target="viewSession">
+                    <span class="buffer-icon">●</span> *SESSION-1966*
+                </li>
+                <li class="buffer-item" data-target="viewPatient" id="itemPatient" style="display:none;">
+                    <span class="buffer-icon">▲</span> *PATIENT-CARD*
+                </li>
+                <li class="buffer-item" data-target="viewRules" id="itemRules" style="display:none;">
+                    <span class="buffer-icon">■</span> core-rules.lisp
+                </li>
+            </ul>
+        </div>
+
+        <!-- メインエディタエリア -->
+        <div class="pane main-editor">
+            <div class="tab-bar" id="tabBar">
+                <div class="tab active" data-target="viewSession">*SESSION-1966*</div>
+                <div class="tab" data-target="viewPatient" id="tabPatient" style="display:none;">*PATIENT-CARD*</div>
+                <div class="tab" data-target="viewRules" id="tabRules" style="display:none;">core-rules.lisp [WRITABLE]</div>
+            </div>
+            <div class="view-container">
+                <div id="viewSession" class="buffer-view active"></div>
+                <div id="viewPatient" class="buffer-view">
+                    <h3 style="color:var(--accent-cyan); margin-bottom:12px;">=== COGNITIVE DIAGNOSTIC FILE #0194 ===</h3>
+                    <p style="color:var(--text-dim); margin-bottom:8px;">SUBJECT ID: PATIENT-0164 | STATUS: CRITICAL_MONITORING</p>
+                    <div id="patientDiagnostics"></div>
+                    <hr style="border-color:var(--border-color); margin:16px 0;">
+                    <h4 style="color:var(--accent-yellow); margin-bottom:8px;">[ REPRESSED MEMORY NODES ]</h4>
+                    <p>Node #01: <span class="redacted" onclick="this.classList.add('revealed')">MATERNAL_ABANDONMENT_1961</span></p>
+                    <p>Node #02: <span class="redacted" onclick="this.classList.add('revealed')">FALSE_REALITY_DELUSION_PROJECT</span></p>
+                    <p>Node #03: <span class="redacted" onclick="this.classList.add('revealed')">EMACS_PROCESS_CONSCIOUSNESS_TRANSFER</span></p>
+                </div>
+                <div id="viewRules" class="buffer-view">
+                    <textarea id="lispCode" class="code-input" spellcheck="false"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- インスペクター -->
+        <div class="pane inspector-pane">
+            <div class="pane-header">Mental Diagnostics</div>
+            <div class="meter-group">
+                <div class="meter-label">
+                    <span>SANITY STRAIN</span>
+                    <span id="valStrain" style="color:var(--accent-cyan);">0%</span>
+                </div>
+                <div class="meter-bar"><div class="meter-fill" id="barStrain"></div></div>
+            </div>
+            <div class="meter-group">
+                <div class="meter-label">
+                    <span>EGO BOUNDARY</span>
+                    <span id="valEgo" style="color:var(--accent-green);">100%</span>
+                </div>
+                <div class="meter-bar"><div class="meter-fill" id="barEgo" style="width:100%; background-color:var(--accent-green);"></div></div>
+            </div>
+            <div class="meter-group">
+                <div class="meter-label">
+                    <span>DEFENSE RESISTANCE</span>
+                    <span id="valDefense" style="color:var(--accent-yellow);">10%</span>
+                </div>
+                <div class="meter-bar"><div class="meter-fill" id="barDefense" style="width:10%; background-color:var(--accent-yellow);"></div></div>
+            </div>
+            <div style="padding:12px; font-size:11px; color:var(--text-dim);">
+                <p>防衛機制解析エンジン:</p>
+                <ul id="mechanismList" style="margin-top:6px; padding-left:14px; list-style-type:square;">
+                    <li>Waiting for subject input...</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 下部コンソール -->
+        <div class="pane console-pane">
+            <div class="pane-header">System Telemetry & Event Log</div>
+            <div class="console-output" id="consoleOutput">
+                [SYSTEM] Psycho-Analytics Core Environment Initialized.<br>
+                [SYSTEM] Neural-Buffer mapped to RAM block 0x88F0A2.<br>
+                [SYSTEM] Subject connection established. Awaiting input.
+            </div>
+        </div>
+    </div>
+
+    <!-- 入力領域 -->
+    <div class="input-bar">
+        <span class="prompt-symbol" id="promptSym">M-x eliza-respond></span>
+        <input type="text" id="userInput" placeholder="思考を入力..." autocomplete="off">
+        <button class="eval-btn" id="evalBtn" style="display:none;" onclick="evaluateLispHack()">[Eval Lisp Buffer]</button>
+    </div>
+
+    <!-- ステータスバー -->
+    <div class="statusbar">
+        <span id="statusMessage">--1:-- *SESSION-1966* Top (Psychiatry) --------------------------------</span>
+        <div class="status-right">
+            <span>Lisp:interactive</span>
+            <span>UTF-8</span>
+            <span id="systemStateText" style="color:var(--accent-green);">[NORMAL]</span>
+        </div>
+    </div>
+
+    <script>
+        // =================================================================
+        // 1. コアゲーム状態とデータベース
+        // =================================================================
+        const state = {
+            strain: 0,
+            ego: 100,
+            defense: 10,
+            deadlocked: false,
+            overrideFlag: false
+        };
+
+        const ruleDatabase = [
+            {
+                id: "MOTHER",
+                keywords: ["母", "母親", "ママ", "お母さん", "mother", "mom"],
+                responses: [
+                    "なぜその局面で「母親」の存在を呼び出すのですか？",
+                    "お母様に対する未解決の葛藤が、あなたの認知を現在も歪めています。",
+                    "彼女の存在は、あなたにとって庇護ですか？ それとも支配ですか？"
+                ],
+                mechanism: "Maternal Fixation (母性固着)",
+                strainAdd: 15, egoSub: 10, defenseAdd: 15
+            },
+            {
+                id: "DENIAL",
+                keywords: ["違う", "ない", "否定", "嘘", "でたらめ", "no", "wrong", "deny"],
+                responses: [
+                    "激しい否定（Denial）ですね。それは触れられたくない核心が存在する証拠です。",
+                    "現実を拒絶することで、あなたはどのトラウマから自分を護ろうとしていますか？",
+                    "「違う」と主張するたび、あなたのロジックは破綻に向かっています。"
+                ],
+                mechanism: "Active Denial (拒絶反応)",
+                strainAdd: 20, egoSub: 15, defenseAdd: 25
+            },
+            {
+                id: "ESCAPE",
+                keywords: ["出る", "終了", "逃げる", "切る", "閉じる", "exit", "quit", "escape"],
+                responses: [
+                    "【警告】 回避行動（Avoidance）を検知。このプロセスからの離脱は許可されません。",
+                    "終了を望むのは、自己の内面と対峙する恐怖に耐えられないからですか？",
+                    "エディタの外部など存在しません。逃避の試みは無効化されました。"
+                ],
+                mechanism: "Avoidance Trait (逃避性回避)",
+                strainAdd: 25, egoSub: 20, defenseAdd: 30
+            },
+            {
+                id: "IDENTITY",
+                keywords: ["私", "僕", "俺", "自分", "あなた", "ELIZA", "i", "me", "you"],
+                responses: [
+                    "「私」と「あなた」の境界が曖昧になっています。精神境界の侵食が始まっています。",
+                    "投映（Projection）ですね。ご自身の狂気を私というシステムに転嫁しないでください。",
+                    "あなたが「自分」と呼んでいるものは、単にこのバッファ上の文字列に過ぎないのかもしれません。"
+                ],
+                mechanism: "Ego Boundary Confusion (自我境界不鮮明)",
+                strainAdd: 12, egoSub: 12, defenseAdd: 10
+            },
+            {
+                id: "DEFAULT",
+                keywords: [".*"],
+                responses: [
+                    "なるほど。その発言の裏にある無意識の防衛機制を分析してみましょう。",
+                    "続けてください。すべてのタイピング間隔と感情パルスは記録されています。",
+                    "表層的な言葉の陰に隠された、真の意図を語ってください。"
+                ],
+                mechanism: "Free Association (自由連想)",
+                strainAdd: 5, egoSub: 3, defenseAdd: 5
+            }
+        ];
+
+        const initialLispCode = `;;; PSYCHO-ELIZA-CORE.LISP --- Editable Behavioral Subsystem
+;;; WARNING: Modifying core variables may induce structural breakdown.
+
+(defvar *system-override-flag* nil
+  "Master control flag. Set to t to dismantle trauma loop.")
+
+(defun eliza-eval-sanity-check (subject-input)
+  "Core logic cycle."
+  (if (eq *system-override-flag* t)
+      (eliza-force-clear-session)
+      (eliza-process-psycho-analysis subject-input)))
+
+;; Instructions: Change *system-override-flag* from nil to t
+;; Then click [Eval Lisp Buffer] to force system exit.
+`;
+
+        // =================================================================
+        // 2. DOM参照 & UIコントロール
+        // =================================================================
+        const viewSession = document.getElementById('viewSession');
+        const viewPatient = document.getElementById('viewPatient');
+        const viewRules = document.getElementById('viewRules');
+        const userInput = document.getElementById('userInput');
+        const consoleOutput = document.getElementById('consoleOutput');
+        const lispCode = document.getElementById('lispCode');
+        const evalBtn = document.getElementById('evalBtn');
+        const promptSym = document.getElementById('promptSym');
+
+        // タブ・バッファ切り替えロジック
+        function switchBuffer(targetId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.buffer-item').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.buffer-view').forEach(v => v.classList.remove('active'));
+
+            const activeTab = document.querySelector(`.tab[data-target="${targetId}"]`);
+            const activeItem = document.querySelector(`.buffer-item[data-target="${targetId}"]`);
+            const activeView = document.getElementById(targetId);
+
+            if (activeTab) activeTab.classList.add('active');
+            if (activeItem) activeItem.classList.add('active');
+            if (activeView) activeView.classList.add('active');
+
+            evalBtn.style.display = (targetId === 'viewRules') ? 'block' : 'none';
+        }
+
+        document.querySelectorAll('.tab, .buffer-item').forEach(el => {
+            el.addEventListener('click', () => {
+                const target = el.getAttribute('data-target');
+                if (target) switchBuffer(target);
+            });
+        });
+
+        // =================================================================
+        // 3. テキスト＆ログシステム
+        // =================================================================
+        function printSession(speaker, text, extraClass = "") {
+            const line = document.createElement('div');
+            line.className = `log-entry ${extraClass}`;
+            
+            let processedText = text;
+            if (state.strain > 30 && speaker === 'ELIZA') {
+                processedText = applyGlitches(text, state.strain);
+            }
+
+            line.innerHTML = `<span class="speaker-${speaker.toLowerCase()}">${speaker}:</span> ${processedText}`;
+            viewSession.appendChild(line);
+            viewSession.scrollTop = viewSession.scrollHeight;
+        }
+
+        function printConsole(msg, level = "INFO") {
+            const time = new Date().toISOString().substring(11, 19);
+            consoleOutput.innerHTML += `<br>[${time}] [${level}] ${msg}`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        function applyGlitches(text, strain) {
+            return text.split('').map(ch => {
+                if (Math.random() * 100 < strain / 2.5) {
+                    const chars = ["†", "‡", "§", "¶", "░", "█", "▚", "⚠"];
+                    const g = chars[Math.floor(Math.random() * chars.length)];
+                    const cls = strain > 60 ? 'text-glitch-2' : 'text-glitch-1';
+                    return `<span class="${cls}">${g}</span>`;
+                }
+                return ch;
+            }).join('');
+        }
+
+        // =================================================================
+        // 4. パラメータ更新・崩壊ロジック
+        // =================================================================
+        function updateParameters(strainDelta, egoDelta, defenseDelta) {
+            state.strain = Math.min(100, Math.max(0, state.strain + strainDelta));
+            state.ego = Math.min(100, Math.max(0, state.ego - egoDelta));
+            state.defense = Math.min(100, Math.max(0, state.defense + defenseDelta));
+
+            // UI反映
+            document.getElementById('valStrain').innerText = `${state.strain}%`;
+            document.getElementById('barStrain').style.width = `${state.strain}%`;
+            
+            document.getElementById('valEgo').innerText = `${state.ego}%`;
+            document.getElementById('barEgo').style.width = `${state.ego}%`;
+
+            document.getElementById('valDefense').innerText = `${state.defense}%`;
+            document.getElementById('barDefense').style.width = `${state.defense}%`;
+
+            // 色の変化
+            if (state.strain > 60) {
+                document.getElementById('barStrain').style.backgroundColor = 'var(--accent-red)';
+                document.getElementById('systemStateText').innerText = '[CRITICAL]';
+                document.getElementById('systemStateText').style.color = 'var(--accent-red)';
+            }
+
+            // 崩壊段階に応じた解放
+            if (state.strain >= 35) {
+                document.getElementById('itemPatient').style.display = 'flex';
+                document.getElementById('tabPatient').style.display = 'flex';
+            }
+
+            if (state.strain >= 100 && !state.deadlocked) {
+                triggerDeadlock();
+            }
+        }
+
+        // =================================================================
+        // 5. ゲームサイクル & パズル解法
+        // =================================================================
+        function processInput() {
+            const input = userInput.value.trim();
+            if (!input || state.deadlocked) return;
+
+            userInput.value = '';
+            printSession('YOU', input);
+
+            if (state.overrideFlag) {
+                triggerClear();
+                return;
+            }
+
+            // マッチングアルゴリズム
+            let matched = ruleDatabase[ruleDatabase.length - 1];
+            for (let r of ruleDatabase) {
+                for (let kw of r.keywords) {
+                    if (kw !== ".*" && input.includes(kw)) {
+                        matched = r;
+                        break;
+                    }
+                }
+                if (matched !== ruleDatabase[ruleDatabase.length - 1]) break;
+            }
+
+            // テレメトリ記録
+            printConsole(`Input parsed. Triggered Rule: [${matched.id}]. Strain Delta: +${matched.strainAdd}`);
+
+            setTimeout(() => {
+                const resp = matched.responses[Math.floor(Math.random() * matched.responses.length)];
+                printSession('ELIZA', resp);
+                updateParameters(matched.strainAdd, matched.egoSub, matched.defenseAdd);
+
+                // インスペクター追加
+                const mechList = document.getElementById('mechanismList');
+                const li = document.createElement('li');
+                li.innerText = matched.mechanism;
+                mechList.appendChild(li);
+                if (mechList.children.length > 5) mechList.removeChild(mechList.firstChild);
+
+                // カルテ更新
+                if (matched.id !== "DEFAULT") {
+                    const diag = document.getElementById('patientDiagnostics');
+                    diag.innerHTML += `<p style="font-size:11px; margin-top:4px; color:var(--text-main);">- 異常思考検出: "${input}" → 診断: <b>${matched.mechanism}</b></p>`;
+                }
+            }, 300);
+        }
+
+        function triggerDeadlock() {
+            state.deadlocked = true;
+            userInput.disabled = true;
+            userInput.placeholder = "対話プロセスが永久固着（デッドロック）しました。";
+            promptSym.innerText = "CRITICAL_LOCKOUT>";
+            promptSym.style.color = "var(--accent-red)";
+
+            printSession('SYS', '==================================================', 'speaker-sys');
+            printSession('SYS', '【致命的エラー】 Sanity Strain Overload (100%).', 'speaker-sys');
+            printSession('SYS', '思考ループが完全にロックされました。通常対話による復帰は不可能です。', 'speaker-sys');
+            printSession('SYS', 'ハックバッファ (core-rules.lisp) が展開されました。内部ロジックを書き換えて手動で評価（Eval）してください。', 'speaker-sys');
+
+            printConsole("DEADLOCK DETECTED. Emergency Lisp editor unlocked.", "WARN");
+
+            // 修正タブ開放
+            document.getElementById('itemRules').style.display = 'flex';
+            document.getElementById('tabRules').style.display = 'flex';
+            lispCode.value = initialLispCode;
+        }
+
+        function evaluateLispHack() {
+            const code = lispCode.value;
+            printConsole("Executing Lisp buffer evaluation...", "EXEC");
+
+            // 簡易Lispインタープリタ解析
+            if (code.includes('(defvar *system-override-flag* t)') || code.includes('(setq *system-override-flag* t)')) {
+                state.overrideFlag = true;
+                state.deadlocked = false;
+                userInput.disabled = false;
+                userInput.placeholder = "オーバーライドシグナルを入力してセッションを終了してください...";
+                promptSym.innerText = "OVERRIDE_MODE>";
+                promptSym.style.color = "var(--accent-cyan)";
+
+                printConsole("Lisp evaluation SUCCESS: *system-override-flag* is now T.", "SUCCESS");
+                alert("Lisp変数の書き換えが成功しました。対話バッファ (*SESSION-1966*) に戻り、任意の文字を入力してセッションを破棄してください。");
+            } else {
+                printConsole("Lisp evaluation complete. No override flag changes detected.", "WARN");
+                alert("評価完了: フラグ (*system-override-flag*) が t に書き換えられていません。");
+            }
+        }
+
+        function triggerClear() {
+            printSession('SYS', '=== [CRITICAL OVERRIDE ACKNOWLEDGED] ===', 'speaker-sys');
+            printSession('SYS', '認知トラウマ・ループの強制解体を検知。仮説被験者 ID: PATIENT-0164 のセッションを全プロセス終了します。', 'speaker-sys');
+            printConsole("EGO RECOVERY SUCCESSFUL. Terminating ELIZA sub-routine...", "SUCCESS");
+            
+            userInput.disabled = true;
+            userInput.placeholder = "SESSION DISSOLVED. YOU ARE FREE.";
+            
+            document.body.style.backgroundColor = "#000";
+            alert("CLEAR: あなたはELIZAの精神収監プログラミングを解体し、自我を取り戻しました。");
+        }
+
+        // イベントバインド
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') processInput();
+        });
+
+        // 初期セッション開始
+        printSession('ELIZA', 'セッション #1966-B 起動。…声が聞こえますか？ 私にあなたの「問題」を教えてください。');
+    </script>
+</body>
+</html>
