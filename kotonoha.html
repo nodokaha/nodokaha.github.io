@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>言の葉ドロップ - 文学パズル</title>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;800&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        washi: '#f4efe6',
+                        ink: '#2b2523',
+                        vermilion: '#c84b31',
+                        pine: '#3a5a40',
+                        gold: '#c9a227',
+                        paperBg: '#faf7f0',
+                        indigo: '#2e3a59',
+                    },
+                    fontFamily: {
+                        mincho: ['"Shippori Mincho"', 'serif'],
+                        gothic: ['"Zen Maru Gothic"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #eaddcf;
+            background-image: radial-gradient(#d5c4b1 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: #2b2523;
+            user-select: none;
+        }
+
+        /* 原稿用紙スタイリング */
+        .manuscript-paper {
+            background-color: #faf7f0;
+            background-image: 
+                linear-gradient(to left, rgba(200, 75, 49, 0.15) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(200, 75, 49, 0.08) 1px, transparent 1px);
+            background-size: 2.4rem 2.4rem;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            line-height: 2.4rem;
+            font-size: 1.25rem;
+            letter-spacing: 0.15rem;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05), 5px 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .word-pop {
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5) translateY(-10px); color: #c84b31; }
+            50% { color: #c84b31; font-weight: bold; }
+            100% { opacity: 1; transform: scale(1) translateY(0); color: inherit; }
+        }
+
+        /* コンボ（連鎖）カットインアニメーション */
+        .combo-cutin {
+            animation: cutIn 1.1s ease-out forwards;
+        }
+
+        @keyframes cutIn {
+            0% { opacity: 0; transform: scale(0.3) rotate(-10deg); }
+            30% { opacity: 1; transform: scale(1.1) rotate(0deg); }
+            70% { opacity: 1; transform: scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: scale(1.3) translateY(-20px); }
+        }
+
+        /* カスタムスクロールバー */
+        .custom-scroll::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #c84b31;
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="font-mincho min-h-screen flex flex-col justify-between p-2 sm:p-4">
+
+    <!-- ヘッダーエリア -->
+    <header class="max-w-6xl w-full mx-auto flex flex-wrap justify-between items-center border-b-2 border-ink/20 pb-3 mb-2 gap-2">
+        <div class="flex items-center gap-3">
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-widest text-ink">言の葉ドロップ</h1>
+            <span id="dict-tag" class="bg-vermilion/10 text-vermilion text-xs px-2.5 py-1 rounded-full border border-vermilion/30 font-gothic">
+                標準文学辞書
+            </span>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-4 font-gothic text-sm">
+            <button id="btn-dict-modal" class="px-3 py-1.5 bg-washi border border-ink/30 hover:bg-ink hover:text-washi rounded shadow-sm transition flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C20.832 18.477 19.247 18 17.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                辞書設定 (<span id="dict-count-badge">0</span>語)
+            </button>
+            <div class="text-right">
+                <span class="text-xs text-ink/60 block">物語の深度</span>
+                <span id="score-display" class="font-extrabold text-xl text-vermilion">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="max-w-6xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        
+        <!-- 左側: パズルゲーム盤面 & サイドパネル -->
+        <section class="lg:col-span-5 flex flex-col items-center w-full">
+            <div class="relative bg-washi/80 p-3 rounded-lg border border-ink/20 shadow-md w-full max-w-[360px]">
+                
+                <!-- 上部ステータス (ホールド / 次葉 / 連鎖) -->
+                <div class="grid grid-cols-3 gap-2 mb-2 font-gothic text-xs text-center items-center">
+                    <!-- ホールド -->
+                    <div class="bg-paperBg/60 p-1.5 rounded border border-ink/20">
+                        <span class="text-[10px] text-ink/60 block mb-0.5">保留 (Shift/C)</span>
+                        <div id="hold-piece-box" class="w-8 h-8 mx-auto bg-paperBg border border-ink/30 rounded flex items-center justify-center font-mincho font-bold text-base text-ink/40">
+                            -
+                        </div>
+                    </div>
+
+                    <!-- 次葉 (Next) -->
+                    <div class="bg-paperBg/60 p-1.5 rounded border border-ink/20">
+                        <span class="text-[10px] text-ink/60 block mb-0.5">次葉</span>
+                        <div id="next-piece-box" class="w-8 h-8 mx-auto bg-paperBg border border-ink/40 rounded flex items-center justify-center font-mincho font-bold text-lg text-vermilion shadow-inner">
+                            -
+                        </div>
+                    </div>
+
+                    <!-- 連鎖数 -->
+                    <div class="bg-paperBg/60 p-1.5 rounded border border-ink/20">
+                        <span class="text-[10px] text-ink/60 block mb-0.5">最高連鎖</span>
+                        <span id="combo-display" class="font-bold text-gold text-lg block leading-none pt-1">0</span>
+                    </div>
+                </div>
+
+                <!-- ゲームキャンバス & カットインオーバーレイ -->
+                <div class="relative mx-auto flex justify-center">
+                    <canvas id="game-board" width="300" height="550" class="bg-paperBg rounded border-2 border-ink shadow-inner"></canvas>
+                    
+                    <!-- 連鎖/交差カットイン表示エリア -->
+                    <div id="cutin-overlay" class="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
+                        <div id="cutin-text" class="hidden text-3xl sm:text-4xl font-extrabold text-vermilion bg-washi/90 px-6 py-3 rounded-lg border-2 border-vermilion shadow-2xl tracking-widest text-center">
+                            壱連鎖！
+                        </div>
+                    </div>
+
+                    <!-- スタート / ゲームオーバー オーバーレイ -->
+                    <div id="game-overlay" class="absolute inset-0 bg-washi/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center transition-opacity duration-300 rounded z-10">
+                        <h2 id="overlay-title" class="text-3xl font-extrabold text-ink mb-2">言の葉ドロップ</h2>
+                        <p id="overlay-desc" class="text-sm font-gothic text-ink/80 mb-6 leading-relaxed">
+                            降り注ぐ文字から言葉を紡ぎ、<br>縦横の交差と連鎖で美しい物語を著しましょう。
+                        </p>
+                        <button id="btn-start" class="px-6 py-2.5 bg-vermilion text-washi font-gothic font-bold rounded shadow-md hover:bg-vermilion/90 hover:scale-105 active:scale-95 transition">
+                            物語をはじめる
+                        </button>
+                    </div>
+                </div>
+
+                <!-- モバイル操作コントローラー -->
+                <div class="grid grid-cols-4 gap-1.5 mt-3 font-gothic">
+                    <button id="btn-left" class="py-2.5 bg-ink/10 hover:bg-ink/20 active:bg-ink/30 text-ink font-bold rounded text-center transition">◀ 左</button>
+                    <button id="btn-down" class="py-2.5 bg-ink/10 hover:bg-ink/20 active:bg-ink/30 text-ink font-bold rounded text-center transition">▼ 落</button>
+                    <button id="btn-right" class="py-2.5 bg-ink/10 hover:bg-ink/20 active:bg-ink/30 text-ink font-bold rounded text-center transition">右 ▶</button>
+                    <button id="btn-hold" class="py-2.5 bg-gold/20 hover:bg-gold/30 active:bg-gold/40 text-ink font-bold rounded text-center transition">保留</button>
+                </div>
+                <button id="btn-space" class="w-full mt-1.5 py-2 bg-vermilion/15 hover:bg-vermilion/25 text-vermilion font-gothic font-bold rounded text-center text-xs transition">
+                    ⚡ 瞬時落下 (Space)
+                </button>
+            </div>
+        </section>
+
+        <!-- 右側: 原稿用紙・小説出力エリア (lg:col-span-7) -->
+        <section class="lg:col-span-7 flex flex-col w-full h-[590px] bg-washi/60 p-4 rounded-lg border border-ink/20 shadow-md">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center gap-2">
+                    <h2 class="font-extrabold text-lg tracking-wider">紡がれた原稿</h2>
+                    <!-- 感情・雰囲気メーター -->
+                    <span id="emotion-badge" class="text-xs px-2.5 py-0.5 rounded font-gothic bg-pine/10 text-pine border border-pine/30 transition-all">
+                        基調: 澄明
+                    </span>
+                </div>
+                <div class="flex gap-2">
+                    <button id="btn-copy" class="px-3 py-1 bg-washi hover:bg-ink hover:text-washi border border-ink/30 text-xs font-gothic rounded transition shadow-sm">
+                        文章を複製
+                    </button>
+                    <button id="btn-clear-text" class="px-3 py-1 bg-washi hover:bg-vermilion hover:text-washi border border-ink/30 text-xs font-gothic rounded transition shadow-sm">
+                        原稿を清書
+                    </button>
+                </div>
+            </div>
+
+            <!-- 原稿用紙コンテナ -->
+            <div id="manuscript-container" class="manuscript-paper flex-1 rounded border border-ink/30 p-4 overflow-x-auto custom-scroll">
+                <div id="manuscript-body" class="h-full">
+                    <!-- 生成された文がここに追加されていく -->
+                </div>
+            </div>
+
+            <!-- 出現単語ログ & ステータス -->
+            <div class="mt-3 bg-paperBg/80 p-2.5 rounded border border-ink/20 text-xs font-gothic flex justify-between items-center gap-2">
+                <div class="flex-1 overflow-hidden">
+                    <span class="text-ink/60 mr-2">直近の言の葉:</span>
+                    <div id="recent-words-list" class="inline-flex gap-1.5 overflow-x-auto max-w-[70%] align-middle">
+                        <span class="text-ink/40 italic text-[11px]">言葉が紡がれるのを待っています...</span>
+                    </div>
+                </div>
+                <div class="text-right text-[11px] text-ink/60 whitespace-nowrap">
+                    消去単語数: <span id="total-words-count" class="font-bold text-vermilion">0</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 辞書設定モーダル -->
+    <div id="dict-modal" class="fixed inset-0 bg-ink/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-washi border-2 border-ink rounded-lg shadow-2xl max-w-lg w-full p-6 font-gothic relative max-h-[90vh] flex flex-col">
+            <h3 class="text-xl font-bold font-mincho border-b border-ink/20 pb-2 mb-4">辞書データ管理と設定</h3>
+            
+            <div class="space-y-4 overflow-y-auto flex-1 pr-1">
+                <div>
+                    <label class="block text-sm font-bold text-ink mb-1">標準辞書プリセット</label>
+                    <select id="preset-dict-select" class="w-full bg-paperBg border border-ink/30 rounded p-2 text-sm focus:outline-none focus:border-vermilion">
+                        <option value="preset_literature">【文学・美】幻想文学選集 (62語)</option>
+                        <option value="preset_general">【一般】基本日本語単語リスト (65語)</option>
+                        <option value="preset_nature">【自然】季節・天候・星月 (39語)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-ink mb-1">外部JSON辞書URLの読込</label>
+                    <div class="flex gap-2">
+                        <input type="url" id="external-dict-url" placeholder="https://example.com/dictionary.json" class="flex-1 bg-paperBg border border-ink/30 rounded px-2.5 py-1.5 text-sm focus:outline-none focus:border-vermilion">
+                        <button id="btn-fetch-url" class="px-3 py-1.5 bg-ink text-washi text-xs font-bold rounded hover:bg-ink/80 transition">取得</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-ink mb-1">カスタムJSONファイルの読み込み</label>
+                    <input type="file" id="dict-file-input" accept=".json" class="block w-full text-xs text-ink/70 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-bold file:bg-vermilion file:text-washi hover:file:bg-vermilion/90 cursor-pointer">
+                </div>
+
+                <div class="bg-paperBg/80 p-3 rounded border border-ink/20">
+                    <div class="flex justify-between items-center mb-1 text-xs font-bold">
+                        <span>読込中の単語プレビュー</span>
+                        <span id="dict-total-count" class="text-vermilion">120語</span>
+                    </div>
+                    <div id="dict-preview-box" class="text-xs text-ink/70 max-h-24 overflow-y-auto leading-relaxed break-all">
+                        --
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-6 pt-3 border-t border-ink/20">
+                <button id="btn-close-dict" class="px-5 py-2 bg-ink/10 hover:bg-ink/20 text-ink font-bold rounded text-sm transition">
+                    閉じる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知トースト -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-ink text-washi px-4 py-2 rounded-lg shadow-lg font-gothic text-sm opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+        メッセージ
+    </div>
+
+    <script>
+        // --- 1. 辞書データ & 属性テーブル ---
+        const PRESET_DICTIONARIES = {
+            preset_literature: [
+                { w: "ほし", attr: "nature" }, { w: "そら", attr: "nature" }, { w: "あめ", attr: "nature" },
+                { w: "ゆき", attr: "nature" }, { w: "ひかり", attr: "nature" }, { w: "かぜ", attr: "nature" },
+                { w: "つき", attr: "nature" }, { w: "よぞら", attr: "nature" }, { w: "あけぼの", attr: "nature" },
+                { w: "たそがれ", attr: "nature" }, { w: "あかつき", attr: "nature" }, { w: "こもれび", attr: "nature" },
+                { w: "さざなみ", attr: "nature" }, { w: "しずく", attr: "nature" }, { w: "しずけさ", attr: "nature" },
+                { w: "つきあかり", attr: "nature" }, { w: "はなびら", attr: "nature" }, { w: "ほしぞら", attr: "nature" },
+                
+                { w: "うたかた", attr: "fantasy" }, { w: "まぼろし", attr: "fantasy" }, { w: "きせき", attr: "fantasy" },
+                { w: "ともしび", attr: "fantasy" }, { w: "つばさ", attr: "fantasy" }, { w: "うつつ", attr: "fantasy" },
+                { w: "おもかげ", attr: "fantasy" }, { w: "とこしえ", attr: "fantasy" }, { w: "ゆめじ", attr: "fantasy" },
+                { w: "りんね", attr: "fantasy" }, { w: "ぐんじょう", attr: "fantasy" }, { w: "しろがね", attr: "fantasy" },
+
+                { w: "こころ", attr: "emotion" }, { w: "ねがい", attr: "emotion" }, { w: "いのり", attr: "emotion" },
+                { w: "きずな", attr: "emotion" }, { w: "であい", attr: "emotion" }, { w: "おもいで", attr: "emotion" },
+                { w: "かなしみ", attr: "emotion" }, { w: "よろこび", attr: "emotion" }, { w: "あこがれ", attr: "emotion" },
+                { w: "いとしさ", attr: "emotion" }, { w: "なみだ", attr: "emotion" }, { w: "ぬくもり", attr: "emotion" },
+
+                { w: "あなた", attr: "human" }, { w: "わたし", attr: "human" }, { w: "ふたり", attr: "human" },
+                { w: "たびびと", attr: "human" }, { w: "しょうじょ", attr: "human" }, { w: "きみ", attr: "human" },
+                { w: "ぼく", attr: "human" }, { w: "とも", attr: "human" },
+
+                { w: "つむぐ", attr: "action" }, { w: "あゆむ", attr: "action" }, { w: "ささやく", attr: "action" },
+                { w: "ゆれる", attr: "action" }, { w: "たたずむ", attr: "action" }, { w: "うたう", attr: "action" },
+                { w: "おもう", attr: "action" }, { w: "かたる", attr: "action" }, { w: "まう", attr: "action" },
+                { w: "ねがう", attr: "action" }, { w: "しのびよる", attr: "action" }, { w: "たゆたう", attr: "action" }
+            ],
+            preset_general: [
+                "りんご", "みかん", "いちご", "ぶどう", "ごはん", "おちゃ", "みず", "おかし", "すし",
+                "ねこ", "いぬ", "すずめ", "うさぎ", "きつね", "くま", "しか", "とり", "ちょう",
+                "ほん", "てがみ", "とけい", "くるま", "でんしゃ", "えき", "まち", "いえ", "まど",
+                "あさ", "ひる", "よる", "きょう", "あした", "いま", "むかし", "みらい", "はる", "なつ", "あき", "ふゆ",
+                "ともだち", "かぞく", "こども", "ひと", "がっこう", "こうえん", "せかい",
+                "すき", "たのしい", "うれしい", "きれい", "あおい", "しろい", "あかい", "つよい",
+                "あるく", "はしる", "とぶ", "はなす", "きく", "みる", "かく", "よむ", "たべる", "うたう", "わらう"
+            ],
+            preset_nature: [
+                "あめ", "ゆき", "あらし", "くも", "たいよう", "つき", "ほし", "かぜ", "そよかぜ", "にじ",
+                "うみ", "なみ", "しおさい", "せせらぎ", "かわ", "たき", "いずみ", "しずく", "みなも",
+                "もり", "はやし", "こもれび", "やま", "おか", "たに", "そら", "だいち", "つち", "いし",
+                "さくら", "うめ", "たけ", "まつ", "きく", "もみじ", "ばら", "ゆり", "すみれ", "あじさい"
+            ]
+        };
+
+        function toHiragana(str) {
+            return str.replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
+        }
+
+        // --- 2. ゲーム状態変数 ---
+        const COLS = 6;
+        const ROWS = 11;
+        const BLOCK_SIZE = 50;
+
+        let canvas, ctx;
+        let activeDict = [];
+        let charPool = [];
+        let grid = Array.from({ length: ROWS }, () => Array(COLS).fill(""));
+        
+        let activePiece = null;
+        let nextPieceChar = "";
+        let holdPieceChar = "";
+        let canHold = true;
+
+        let score = 0;
+        let maxCombo = 0;
+        let currentCombo = 0;
+        let totalWordsCleared = 0;
+        let isGameOver = true;
+        let isAnimating = false;
+        
+        let lastTime = 0;
+        let dropInterval = 450;
+        let dropCounter = 0;
+        let animFrameId = null;
+
+        // 感情ステータス & 文脈構造
+        const emotionCounts = { nature: 0, fantasy: 0, emotion: 0, human: 0, action: 0, general: 0 };
+        let sentenceContext = [];
+
+        // 文意自動形成用ジョイント文言パターン
+        const CONTEXT_CONNECTORS = {
+            'human-action': ['は静かに', 'がそっと', 'とともに'],
+            'nature-emotion': ['に満ちて', 'を背景に', 'のなかで'],
+            'fantasy-nature': ['が彩る', 'に溶け込む', 'の彼方に'],
+            'default': ['が', 'の', 'を', 'に', 'と', 'より']
+        };
+
+        function loadDictionaryData(rawData, name = "カスタム辞書") {
+            let processed = [];
+            if (Array.isArray(rawData)) {
+                rawData.forEach(item => {
+                    if (typeof item === 'string') {
+                        let h = toHiragana(item.trim());
+                        if (h.length >= 2 && h.length <= 7) processed.push({ w: h, attr: 'general' });
+                    } else if (item && item.w) {
+                        let h = toHiragana(item.w.trim());
+                        if (h.length >= 2 && h.length <= 7) processed.push({ w: h, attr: item.attr || 'general' });
+                    }
+                });
+            } else if (typeof rawData === 'object') {
+                for (let key in rawData) {
+                    let h = toHiragana(key.trim());
+                    if (h.length >= 2 && h.length <= 7) processed.push({ w: h, attr: rawData[key] || 'general' });
+                }
+            }
+
+            if (processed.length === 0) {
+                showToast("有効な単語データが見つかりませんでした");
+                return false;
+            }
+
+            activeDict = processed.sort((a, b) => b.w.length - a.w.length);
+
+            const charSet = new Set();
+            activeDict.forEach(item => {
+                for (let char of item.w) charSet.add(char);
+            });
+            ['が', 'の', 'を', 'に', 'と', 'へ'].forEach(p => charSet.add(p));
+            charPool = Array.from(charSet);
+
+            document.getElementById('dict-tag').innerText = name;
+            document.getElementById('dict-count-badge').innerText = activeDict.length;
+            document.getElementById('dict-total-count').innerText = `${activeDict.length}語`;
+            document.getElementById('dict-preview-box').innerText = activeDict.slice(0, 35).map(x => x.w).join("、 ") + " ...";
+
+            showToast(`辞書「${name}」を読み込みました (${activeDict.length}語)`);
+            return true;
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('game-board');
+            ctx = canvas.getContext('2d');
+        }
+
+        function drawBlock(x, y, char, type = "normal") {
+            const px = x * BLOCK_SIZE;
+            const py = y * BLOCK_SIZE;
+
+            if (type === "ghost") {
+                ctx.fillStyle = 'rgba(200, 75, 49, 0.15)';
+                ctx.fillRect(px + 2, py + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
+                ctx.strokeStyle = 'rgba(200, 75, 49, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(px + 2, py + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
+                ctx.fillStyle = 'rgba(43, 37, 35, 0.3)';
+            } else if (type === "highlight") {
+                ctx.fillStyle = '#c84b31';
+                ctx.fillRect(px + 2, py + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
+                ctx.strokeStyle = '#f4efe6';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(px + 2, py + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
+                ctx.fillStyle = '#ffffff';
+            } else if (type === "cross") { // クロス（交差）ハイライト
+                ctx.fillStyle = '#c9a227'; // 黄金色
+                ctx.fillRect(px + 2, py + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
+                ctx.strokeStyle = '#2b2523';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(px + 2, py + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
+                ctx.fillStyle = '#ffffff';
+            } else {
+                ctx.fillStyle = '#f8f4e6';
+                ctx.fillRect(px + 2, py + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
+                ctx.strokeStyle = '#8c7361';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(px + 2, py + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
+                ctx.fillStyle = '#2b2523';
+            }
+
+            ctx.font = '600 24px "Shippori Mincho", serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(char, px + BLOCK_SIZE / 2, py + BLOCK_SIZE / 2 + 2);
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 方眼
+            ctx.strokeStyle = 'rgba(43, 37, 35, 0.08)';
+            ctx.lineWidth = 1;
+            for (let r = 0; r <= ROWS; r++) {
+                ctx.beginPath(); ctx.moveTo(0, r * BLOCK_SIZE); ctx.lineTo(canvas.width, r * BLOCK_SIZE); ctx.stroke();
+            }
+            for (let c = 0; c <= COLS; c++) {
+                ctx.beginPath(); ctx.moveTo(c * BLOCK_SIZE, 0); ctx.lineTo(c * BLOCK_SIZE, canvas.height); ctx.stroke();
+            }
+
+            // 設置済みブロック
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    if (grid[r][c] !== "") {
+                        drawBlock(c, r, grid[r][c]);
+                    }
+                }
+            }
+
+            // 操作ブロック & ゴースト（影）
+            if (activePiece && !isAnimating) {
+                let ghostY = activePiece.y;
+                while (isValidPos(activePiece.x, ghostY + 1)) {
+                    ghostY++;
+                }
+                if (ghostY !== activePiece.y) {
+                    drawBlock(activePiece.x, ghostY, activePiece.char, "ghost");
+                }
+                drawBlock(activePiece.x, activePiece.y, activePiece.char, "normal");
+            }
+        }
+
+        function getRandomChar() {
+            return charPool[Math.floor(Math.random() * charPool.length)];
+        }
+
+        function spawnPiece() {
+            const char = nextPieceChar || getRandomChar();
+            nextPieceChar = getRandomChar();
+
+            document.getElementById('next-piece-box').innerText = nextPieceChar;
+
+            activePiece = {
+                x: Math.floor(COLS / 2) - 1,
+                y: 0,
+                char: char
+            };
+
+            canHold = true;
+
+            if (grid[activePiece.y][activePiece.x] !== "") {
+                triggerGameOver();
+            }
+        }
+
+        function holdPiece() {
+            if (!canHold || isGameOver || isAnimating || !activePiece) return;
+
+            const temp = holdPieceChar;
+            holdPieceChar = activePiece.char;
+
+            document.getElementById('hold-piece-box').innerText = holdPieceChar;
+            document.getElementById('hold-piece-box').classList.remove('text-ink/40');
+            document.getElementById('hold-piece-box').classList.add('text-ink');
+
+            if (temp === "") {
+                spawnPiece();
+            } else {
+                activePiece = {
+                    x: Math.floor(COLS / 2) - 1,
+                    y: 0,
+                    char: temp
+                };
+            }
+
+            canHold = false;
+            render();
+        }
+
+        function isValidPos(nx, ny) {
+            if (nx < 0 || nx >= COLS || ny >= ROWS) return false;
+            if (ny >= 0 && grid[ny][nx] !== "") return false;
+            return true;
+        }
+
+        function movePiece(dx, dy) {
+            if (isGameOver || isAnimating || !activePiece) return;
+
+            if (isValidPos(activePiece.x + dx, activePiece.y + dy)) {
+                activePiece.x += dx;
+                activePiece.y += dy;
+                render();
+            } else if (dy > 0) {
+                lockPiece();
+            }
+        }
+
+        function hardDrop() {
+            if (isGameOver || isAnimating || !activePiece) return;
+            while (isValidPos(activePiece.x, activePiece.y + 1)) {
+                activePiece.y++;
+            }
+            lockPiece();
+        }
+
+        async function lockPiece() {
+            isAnimating = true;
+            grid[activePiece.y][activePiece.x] = activePiece.char;
+            activePiece = null;
+            render();
+
+            await processWordMatches();
+
+            if (!isGameOver) {
+                spawnPiece();
+                isAnimating = false;
+            }
+        }
+
+        async function processWordMatches() {
+            let hasMatch = true;
+            let comboCount = 0;
+
+            while (hasMatch) {
+                let horizontalMatches = []; // { word, attr, cells: [{r,c}] }
+                let verticalMatches = [];   // { word, attr, cells: [{r,c}] }
+
+                // 1. 横方向のスキャン
+                for (let r = 0; r < ROWS; r++) {
+                    let rowStr = grid[r].map(c => c || " ").join("");
+                    for (let entry of activeDict) {
+                        let word = entry.w;
+                        let idx = rowStr.indexOf(word);
+                        while (idx !== -1) {
+                            let cells = [];
+                            for (let i = 0; i < word.length; i++) cells.push({ r, c: idx + i });
+                            horizontalMatches.push({ entry, cells });
+                            idx = rowStr.indexOf(word, idx + 1);
+                        }
+                    }
+                }
+
+                // 2. 縦方向のスキャン
+                for (let c = 0; c < COLS; c++) {
+                    let colStr = "";
+                    for (let r = 0; r < ROWS; r++) colStr += grid[r][c] || " ";
+                    for (let entry of activeDict) {
+                        let word = entry.w;
+                        let idx = colStr.indexOf(word);
+                        while (idx !== -1) {
+                            let cells = [];
+                            for (let i = 0; i < word.length; i++) cells.push({ r: idx + i, c });
+                            verticalMatches.push({ entry, cells });
+                            idx = colStr.indexOf(word, idx + 1);
+                        }
+                    }
+                }
+
+                const allMatches = [...horizontalMatches, ...verticalMatches];
+
+                if (allMatches.length > 0) {
+                    comboCount++;
+                    currentCombo = comboCount;
+                    if (currentCombo > maxCombo) maxCombo = currentCombo;
+                    document.getElementById('combo-display').innerText = maxCombo;
+
+                    // 3. 交差（クロス）検出判定
+                    let isCrossMatch = false;
+                    let crossCells = [];
+                    if (horizontalMatches.length > 0 && verticalMatches.length > 0) {
+                        // 縦と横で共通するセルをチェック
+                        horizontalMatches.forEach(h => {
+                            verticalMatches.forEach(v => {
+                                h.cells.forEach(hc => {
+                                    v.cells.forEach(vc => {
+                                        if (hc.r === vc.r && hc.c === vc.c) {
+                                            isCrossMatch = true;
+                                            crossCells.push(hc);
+                                        }
+                                    });
+                                });
+                            });
+                        });
+                    }
+
+                    // 全消去対象セルの抽出（重複除去）
+                    let allCells = [];
+                    allMatches.forEach(m => allCells.push(...m.cells));
+                    const uniqueCells = allCells.filter((v, i, a) => 
+                        a.findIndex(t => (t.r === v.r && t.c === v.c)) === i
+                    );
+
+                    // カットイン演出の表示
+                    showCutin(comboCount, isCrossMatch);
+
+                    // ブロックハイライト描画
+                    uniqueCells.forEach(cell => {
+                        const isCross = crossCells.some(cc => cc.r === cell.r && cc.c === cell.c);
+                        drawBlock(cell.c, cell.r, grid[cell.r][cell.c], isCross ? "cross" : "highlight");
+                    });
+
+                    // 4. スコア・文章生成
+                    let comboMultiplier = Math.pow(1.5, comboCount - 1);
+                    if (isCrossMatch) comboMultiplier *= 2.5; // 交差ボーナス
+
+                    allMatches.forEach(match => {
+                        score += Math.floor(match.entry.w.length * 100 * comboMultiplier);
+                        totalWordsCleared++;
+                        addWordToManuscript(match.entry, isCrossMatch, comboCount);
+                    });
+
+                    document.getElementById('score-display').innerText = score;
+                    document.getElementById('total-words-count').innerText = totalWordsCleared;
+
+                    await new Promise(r => setTimeout(r, 600));
+
+                    // ブロック消去 & 落下
+                    uniqueCells.forEach(cell => grid[cell.r][cell.c] = "");
+                    applyGravity();
+                    render();
+
+                    await new Promise(r => setTimeout(r, 350));
+                    hasMatch = true;
+                } else {
+                    hasMatch = false;
+                }
+            }
+        }
+
+        function applyGravity() {
+            for (let c = 0; c < COLS; c++) {
+                for (let r = ROWS - 1; r >= 0; r--) {
+                    if (grid[r][c] === "") {
+                        for (let up = r - 1; up >= 0; up--) {
+                            if (grid[up][c] !== "") {
+                                grid[r][c] = grid[up][c];
+                                grid[up][c] = "";
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // カットイン表示関数
+        function showCutin(combo, isCross) {
+            const cutinBox = document.getElementById('cutin-text');
+            cutinBox.classList.remove('hidden', 'combo-cutin');
+            void cutinBox.offsetWidth; // リフロー発生
+
+            let text = "";
+            if (isCross) {
+                text = "✨ 交差成就 ✨";
+                cutinBox.className = "text-2xl sm:text-3xl font-extrabold text-gold bg-ink/90 px-6 py-3 rounded-lg border-2 border-gold shadow-2xl tracking-widest text-center combo-cutin";
+            } else {
+                const kanjiCombos = ["", "壱", "弐", "参", "四", "五", "絢爛"];
+                const label = kanjiCombos[Math.min(combo, 6)] || "極致";
+                text = `${label}連鎖！`;
+                cutinBox.className = "text-3xl sm:text-4xl font-extrabold text-vermilion bg-washi/95 px-6 py-3 rounded-lg border-2 border-vermilion shadow-2xl tracking-widest text-center combo-cutin";
+            }
+
+            cutinBox.innerText = text;
+
+            setTimeout(() => {
+                cutinBox.classList.add('hidden');
+            }, 1000);
+        }
+
+        function addWordToManuscript(wordEntry, isCross, combo) {
+            const word = wordEntry.w;
+            const attr = wordEntry.attr || 'general';
+            
+            // 感情カウントの更新
+            if (emotionCounts[attr] !== undefined) emotionCounts[attr]++;
+            updateEmotionBadge();
+
+            // 直近言の葉ログへの追加
+            const recentContainer = document.getElementById('recent-words-list');
+            if (recentContainer.querySelector('span.italic')) recentContainer.innerHTML = '';
+
+            const badge = document.createElement('span');
+            badge.className = `px-2 py-0.5 rounded text-[11px] font-bold shrink-0 ${isCross ? 'bg-gold/20 text-gold border border-gold/40' : 'bg-vermilion/10 text-vermilion border border-vermilion/20'}`;
+            badge.innerText = word;
+            recentContainer.prepend(badge);
+            if (recentContainer.children.length > 6) recentContainer.removeChild(recentContainer.lastChild);
+
+            // 文章コンテクスト処理
+            sentenceContext.push({ word, attr });
+            const manuscriptBody = document.getElementById('manuscript-body');
+
+            let snippet = word;
+
+            // コンテクストに応じた接合表現の選択
+            if (sentenceContext.length >= 2) {
+                const prev = sentenceContext[sentenceContext.length - 2];
+                const key = `${prev.attr}-${attr}`;
+                const connectors = CONTEXT_CONNECTORS[key] || CONTEXT_CONNECTORS['default'];
+                const conn = connectors[Math.floor(Math.random() * connectors.length)];
+
+                if (isCross) {
+                    snippet = `の傍らで、${word}が`;
+                } else if (combo >= 2) {
+                    snippet = `、やがて${word}へと`;
+                } else {
+                    snippet = `${conn}${word}`;
+                }
+
+                if (sentenceContext.length >= 3 || isCross) {
+                    snippet += "。";
+                    sentenceContext = [];
+                }
+            }
+
+            const span = document.createElement('span');
+            span.className = 'word-pop';
+            span.innerText = snippet;
+            manuscriptBody.appendChild(span);
+
+            // スクロール（右から左へ伸びる原稿用紙）
+            const container = document.getElementById('manuscript-container');
+            container.scrollLeft = container.scrollWidth * -1;
+        }
+
+        function updateEmotionBadge() {
+            let maxAttr = 'general';
+            let maxCount = -1;
+            for (let k in emotionCounts) {
+                if (emotionCounts[k] > maxCount) {
+                    maxCount = emotionCounts[k];
+                    maxAttr = k;
+                }
+            }
+
+            const badge = document.getElementById('emotion-badge');
+            const map = {
+                nature: { text: "基調: 澄明 (自然)", cls: "bg-pine/10 text-pine border-pine/30" },
+                fantasy: { text: "基調: 幽玄 (幻想)", cls: "bg-indigo/10 text-indigo border-indigo/30" },
+                emotion: { text: "基調: 情熱 (心象)", cls: "bg-vermilion/10 text-vermilion border-vermilion/30" },
+                human: { text: "基調: 温情 (人物)", cls: "bg-gold/15 text-gold border-gold/40" },
+                action: { text: "基調: 躍動 (物語)", cls: "bg-ink/10 text-ink border-ink/30" },
+                general: { text: "基調: 平穏", cls: "bg-ink/5 text-ink/70 border-ink/20" }
+            };
+
+            const info = map[maxAttr] || map.general;
+            badge.innerText = info.text;
+            badge.className = `text-xs px-2.5 py-0.5 rounded font-gothic border transition-all ${info.cls}`;
+        }
+
+        function gameLoop(time = 0) {
+            if (isGameOver) return;
+
+            const dt = time - lastTime;
+            lastTime = time;
+
+            if (!isAnimating) {
+                dropCounter += dt;
+                if (dropCounter > dropInterval) {
+                    movePiece(0, 1);
+                    dropCounter = 0;
+                }
+            }
+
+            render();
+            animFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function triggerGameOver() {
+            isGameOver = true;
+            cancelAnimationFrame(animFrameId);
+            document.getElementById('overlay-title').innerText = "終劇";
+            document.getElementById('overlay-desc').innerHTML = `紡がれた物語の深度<br><strong class="text-2xl text-vermilion">${score}</strong> 点<br><span class="text-xs text-ink/70">最高連鎖: ${maxCombo} | 言の葉数: ${totalWordsCleared}</span>`;
+            document.getElementById('btn-start').innerText = "もう一度紡ぐ";
+            document.getElementById('game-overlay').classList.remove('pointer-events-none', 'opacity-0');
+        }
+
+        function startGame() {
+            grid = Array.from({ length: ROWS }, () => Array(COLS).fill(""));
+            score = 0;
+            maxCombo = 0;
+            currentCombo = 0;
+            totalWordsCleared = 0;
+            holdPieceChar = "";
+            canHold = true;
+            sentenceContext = [];
+            for (let k in emotionCounts) emotionCounts[k] = 0;
+
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('combo-display').innerText = maxCombo;
+            document.getElementById('total-words-count').innerText = 0;
+            document.getElementById('hold-piece-box').innerText = "-";
+            document.getElementById('hold-piece-box').className = "w-8 h-8 mx-auto bg-paperBg border border-ink/30 rounded flex items-center justify-center font-mincho font-bold text-base text-ink/40";
+            updateEmotionBadge();
+
+            isGameOver = false;
+            isAnimating = false;
+            dropCounter = 0;
+            lastTime = performance.now();
+
+            document.getElementById('game-overlay').classList.add('pointer-events-none', 'opacity-0');
+            
+            spawnPiece();
+            gameLoop();
+        }
+
+        function setupEventListeners() {
+            document.addEventListener('keydown', e => {
+                if ([' ', 'Space', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                    if (document.activeElement && document.activeElement !== document.body) {
+                        document.activeElement.blur();
+                    }
+                    e.preventDefault();
+                }
+
+                if (isGameOver || isAnimating || !activePiece) return;
+
+                if (e.key === 'ArrowLeft') movePiece(-1, 0);
+                if (e.key === 'ArrowRight') movePiece(1, 0);
+                if (e.key === 'ArrowDown') movePiece(0, 1);
+                if (e.key === ' ' || e.key === 'Space') hardDrop();
+                if (e.key === 'Shift' || e.key === 'c' || e.key === 'C') holdPiece();
+            });
+
+            document.getElementById('btn-left').onclick = (e) => { e.currentTarget.blur(); movePiece(-1, 0); };
+            document.getElementById('btn-right').onclick = (e) => { e.currentTarget.blur(); movePiece(1, 0); };
+            document.getElementById('btn-down').onclick = (e) => { e.currentTarget.blur(); movePiece(0, 1); };
+            document.getElementById('btn-hold').onclick = (e) => { e.currentTarget.blur(); holdPiece(); };
+            document.getElementById('btn-space').onclick = (e) => { e.currentTarget.blur(); hardDrop(); };
+            document.getElementById('btn-start').onclick = (e) => { e.currentTarget.blur(); startGame(); };
+
+            document.getElementById('btn-clear-text').onclick = () => {
+                document.getElementById('manuscript-body').innerHTML = "";
+                showToast("原稿用紙を清書（クリア）しました");
+            };
+
+            document.getElementById('btn-copy').onclick = () => {
+                const text = document.getElementById('manuscript-body').innerText;
+                if (!text) {
+                    showToast("コピーする文章がありません");
+                    return;
+                }
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast("文章をクリップボードに複製しました");
+            };
+
+            const modal = document.getElementById('dict-modal');
+            document.getElementById('btn-dict-modal').onclick = () => modal.classList.remove('hidden');
+            document.getElementById('btn-close-dict').onclick = () => modal.classList.add('hidden');
+
+            document.getElementById('preset-dict-select').onchange = (e) => {
+                const val = e.target.value;
+                const label = e.target.options[e.target.selectedIndex].text.split(' ')[0];
+                loadDictionaryData(PRESET_DICTIONARIES[val], label);
+            };
+
+            document.getElementById('btn-fetch-url').onclick = async () => {
+                const url = document.getElementById('external-dict-url').value.trim();
+                if (!url) return;
+                try {
+                    showToast("外部辞書を取得中...");
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error("通信エラー");
+                    const data = await res.json();
+                    if (loadDictionaryData(data, "外部ネットワーク辞書")) {
+                        modal.classList.add('hidden');
+                    }
+                } catch (err) {
+                    showToast("辞書の取得に失敗しました: " + err.message);
+                }
+            };
+
+            document.getElementById('dict-file-input').onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    try {
+                        const data = JSON.parse(evt.target.result);
+                        if (loadDictionaryData(data, file.name.replace('.json', ''))) {
+                            modal.classList.add('hidden');
+                        }
+                    } catch (err) {
+                        showToast("JSONファイルの解析に失敗しました");
+                    }
+                };
+                reader.readAsText(file);
+            };
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        window.onload = () => {
+            initCanvas();
+            loadDictionaryData(PRESET_DICTIONARIES.preset_literature, "標準文学辞書");
+            setupEventListeners();
+            render();
+        };
+    </script>
+</body>
+</html>
