@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[LOGIC-GRID] 第3回 あいえる音楽祭 - OFFICIAL COUNTDOWN</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brutal: {
+                            black: '#000000',
+                            white: '#ffffff',
+                            gray: '#111111',
+                            accent: '#FFEA00', // Electric Yellow
+                            signal: '#00FF66', // Signal Green
+                            muted: '#e5e5e5'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['Courier New', 'Monaco', 'ui-monospace', 'monospace'],
+                        sans: ['Helvetica Neue', 'Arial', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome for minimal UI icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            border-radius: 0px !important; /* Strict zero radius rule */
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Courier New', Monaco, monospace;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Hard Brutalist Borders & Shadows */
+        .border-brutal {
+            border: 3px solid #000000;
+        }
+
+        .border-brutal-sm {
+            border: 2px solid #000000;
+        }
+
+        .shadow-brutal {
+            box-shadow: 5px 5px 0px #000000;
+        }
+
+        .shadow-brutal-sm {
+            box-shadow: 3px 3px 0px #000000;
+        }
+
+        .button-brutal {
+            background-color: #ffffff;
+            border: 2px solid #000000;
+            box-shadow: 3px 3px 0px #000000;
+            transition: all 0.05s ease-in-out;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .button-brutal:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px #000000;
+            background-color: #FFEA00;
+        }
+
+        .button-brutal:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #000000;
+        }
+
+        /* Scanline Texture Overlay */
+        .scanline-bg {
+            background: linear-gradient(
+                rgba(0, 0, 0, 0) 50%, 
+                rgba(0, 0, 0, 0.04) 50%
+            );
+            background-size: 100% 4px;
+        }
+
+        /* Fixed Grid Template for VU Meters */
+        .vu-grid {
+            display: grid;
+            grid-template-columns: repeat(20, minmax(0, 1fr));
+            gap: 2px;
+        }
+    </style>
+</head>
+<body class="min-h-screen scanline-bg flex flex-col justify-between p-4 sm:p-6 lg:p-10">
+
+    <!-- TOP STATUS HEADER -->
+    <header class="w-full max-w-5xl mx-auto border-brutal bg-white p-4 shadow-brutal mb-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs font-mono font-bold uppercase tracking-wider">
+            <div class="flex items-center gap-3">
+                <span class="bg-black text-white px-2 py-1">[SYS.LOGIC]</span>
+                <span>第3回 あいえる音楽祭</span>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-4 border-t md:border-t-0 pt-2 md:pt-0 border-black w-full md:w-auto">
+                <span class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 bg-brutal-signal border border-black animate-pulse"></span>
+                    <span id="sync-status">BPM: 128 | SYNC: LOCKED</span>
+                </span>
+                <span class="hidden sm:inline">|</span>
+                <span>TARGET: 10.31_00:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="w-full max-w-5xl mx-auto space-y-6 my-auto">
+
+        <!-- TITLE BLOCK -->
+        <section class="border-brutal bg-brutal-accent p-6 sm:p-8 shadow-brutal">
+            <div class="space-y-2">
+                <div class="text-xs font-mono font-bold tracking-widest uppercase bg-black text-white inline-block px-2 py-1">
+                    SPECIFICATION / MUSIC FESTIVAL
+                </div>
+                <h1 class="text-3xl sm:text-5xl md:text-6xl font-black font-mono tracking-tight text-black uppercase leading-none">
+                    第3回 あいえる音楽祭
+                </h1>
+                <p class="text-xs sm:text-sm font-mono font-bold text-black pt-1">
+                    DATE: 2026.10.31 (SAT) / VENUE: XENON / ORGANIZER: IL音楽祭提供委員会
+                </p>
+            </div>
+        </section>
+
+        <!-- COUNTDOWN & VU METER BLOCK -->
+        <section class="border-brutal bg-white p-6 sm:p-8 shadow-brutal space-y-6">
+            
+            <!-- LOGICAL STATE SWITCH CONTAINER -->
+            <div id="countdown-wrapper">
+                <!-- COUNTDOWN ACTIVE MODE -->
+                <div id="countdown-view" class="space-y-6">
+                    <div class="flex justify-between items-center border-b-2 border-black pb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider">[TIMECODE COUNTDOWN]</span>
+                        <span class="text-xs font-bold font-mono text-black">T-MINUS UNTIL 10/31 00:00:00</span>
+                    </div>
+
+                    <!-- TIMECODE GRID -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <!-- DAYS -->
+                        <div class="border-brutal p-4 bg-white shadow-brutal-sm">
+                            <div id="cnt-days" class="text-4xl sm:text-6xl font-black font-mono tracking-tight">00</div>
+                            <div class="text-[10px] font-bold border-t-2 border-black pt-1 mt-2 uppercase bg-brutal-muted">DAYS</div>
+                        </div>
+                        <!-- HOURS -->
+                        <div class="border-brutal p-4 bg-white shadow-brutal-sm">
+                            <div id="cnt-hours" class="text-4xl sm:text-6xl font-black font-mono tracking-tight">00</div>
+                            <div class="text-[10px] font-bold border-t-2 border-black pt-1 mt-2 uppercase bg-brutal-muted">HOURS</div>
+                        </div>
+                        <!-- MINUTES -->
+                        <div class="border-brutal p-4 bg-white shadow-brutal-sm">
+                            <div id="cnt-minutes" class="text-4xl sm:text-6xl font-black font-mono tracking-tight">00</div>
+                            <div class="text-[10px] font-bold border-t-2 border-black pt-1 mt-2 uppercase bg-brutal-muted">MINUTES</div>
+                        </div>
+                        <!-- SECONDS -->
+                        <div class="border-brutal p-4 bg-black text-white shadow-brutal-sm">
+                            <div id="cnt-seconds" class="text-4xl sm:text-6xl font-black font-mono tracking-tight text-brutal-accent">00</div>
+                            <div class="text-[10px] font-bold border-t-2 border-white pt-1 mt-2 uppercase bg-brutal-gray text-white">SECONDS</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EVENT DAY ACTIVE BANNER (Triggered on 10/31) -->
+                <div id="event-active-view" class="hidden border-brutal bg-brutal-signal p-6 text-center space-y-3 shadow-brutal-sm">
+                    <div class="inline-block bg-black text-white text-xs font-bold px-3 py-1 uppercase tracking-widest">
+                        [STATUS: EVENT ACTIVE]
+                    </div>
+                    <h2 class="text-2xl sm:text-4xl font-black font-mono uppercase text-black">
+                        本日 10/31 第3回 あいえる音楽祭 開催中
+                    </h2>
+                    <p class="text-xs sm:text-sm font-bold text-black max-w-xl mx-auto">
+                        本日はフェスティバル当日です。会場 XENON にてお待ちしております。
+                    </p>
+                </div>
+            </div>
+
+            <!-- STEREO VU LEVEL METER (Minimal Audio Element) -->
+            <div class="border-brutal bg-black p-4 space-y-2">
+                <div class="flex justify-between text-[10px] font-mono font-bold text-white tracking-widest">
+                    <span>AUDIO LEVEL / VU-METER (L/R)</span>
+                    <span id="vu-peak-text">PEAK: -1.2 dB</span>
+                </div>
+                
+                <!-- LEFT CHANNEL -->
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-mono text-white font-bold w-3">L</span>
+                    <div class="flex-1 vu-grid h-3 bg-brutal-gray p-0.5 border border-white" id="vu-channel-l">
+                        <!-- Generated via JS -->
+                    </div>
+                </div>
+
+                <!-- RIGHT CHANNEL -->
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-mono text-white font-bold w-3">R</span>
+                    <div class="flex-1 vu-grid h-3 bg-brutal-gray p-0.5 border border-white" id="vu-channel-r">
+                        <!-- Generated via JS -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- DATA GRID / EVENT INFORMATION -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- LEFT PANEL: TIMELINE & VENUE -->
+            <div class="border-brutal bg-white p-6 shadow-brutal space-y-4">
+                <div class="border-b-2 border-black pb-2 flex justify-between items-center">
+                    <span class="text-xs font-bold uppercase tracking-wider">[01] SCHEDULE & LOCATION</span>
+                    <span class="text-xs font-bold bg-black text-white px-1.5 py-0.5">XENON</span>
+                </div>
+
+                <table class="w-full text-xs font-mono border-collapse">
+                    <tbody>
+                        <tr class="border-b border-black">
+                            <td class="py-2.5 font-bold uppercase bg-brutal-muted px-2 w-28">開催日</td>
+                            <td class="py-2.5 px-3 font-bold">10月31日 (土)</td>
+                        </tr>
+                        <tr class="border-b border-black">
+                            <td class="py-2.5 font-bold uppercase bg-brutal-muted px-2">音楽祭時間</td>
+                            <td class="py-2.5 px-3 font-bold">17:00 〜 23:00</td>
+                        </tr>
+                        <tr class="border-b border-black">
+                            <td class="py-2.5 font-bold uppercase bg-brutal-muted px-2">打ち上げ</td>
+                            <td class="py-2.5 px-3 font-bold">23:00 〜 25:00</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2.5 font-bold uppercase bg-brutal-muted px-2">会場名</td>
+                            <td class="py-2.5 px-3 font-bold">XENON (ゼノン)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- RIGHT PANEL: DETAILS & INSTRUCTIONS -->
+            <div class="border-brutal bg-white p-6 shadow-brutal space-y-4">
+                <div class="border-b-2 border-black pb-2 flex justify-between items-center">
+                    <span class="text-xs font-bold uppercase tracking-wider">[02] FEE & INSTRUCTIONS</span>
+                    <span class="text-xs font-bold bg-brutal-accent text-black px-1.5 py-0.5 border border-black">NOTICE</span>
+                </div>
+
+                <div class="space-y-3 text-xs font-mono">
+                    <div class="p-3 border-brutal-sm bg-brutal-accent">
+                        <span class="font-bold block uppercase text-[10px] text-black">打ち上げプラン</span>
+                        <p class="font-extrabold text-sm text-black">1000円で 3ドリンク付きます</p>
+                    </div>
+
+                    <div class="p-3 border-brutal-sm bg-white space-y-1">
+                        <span class="font-bold block uppercase text-[10px] text-black">参加確認事項</span>
+                        <p class="font-bold text-black leading-relaxed">
+                            会社外の方は Discord にてお名前を確認させていただきます。
+                        </p>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-1 text-[11px]">
+                        <span class="font-bold">主催団体:</span>
+                        <span class="font-bold bg-black text-white px-2 py-0.5">IL 音楽祭提供委員会</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ACTION BUTTONS GRID -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button onclick="addToGoogleCalendar()" class="button-brutal py-3 px-4 text-xs font-mono flex items-center justify-center gap-2">
+                <i class="fa-regular fa-calendar-plus"></i>
+                <span>[GOOGLE CALENDAR] カレンダーに追加</span>
+            </button>
+
+            <button onclick="copyEventUrl()" class="button-brutal py-3 px-4 text-xs font-mono flex items-center justify-center gap-2">
+                <i class="fa-regular fa-copy"></i>
+                <span id="copy-btn-text">[COPY LINK] イベントURLを共有</span>
+            </button>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full max-w-5xl mx-auto mt-8 pt-4 border-t-2 border-black flex flex-col sm:flex-row justify-between items-center gap-2 text-[10px] font-mono font-bold uppercase">
+        <div>© 3RD IL MUSIC FESTIVAL COMMITTEE</div>
+        <div>STRICT BRUTALIST LOGIC GRID v3.0</div>
+    </footer>
+
+    <script>
+        // --- TARGET DATE SETUP: October 31st 00:00:00 ---
+        const nowInitial = new Date();
+        let targetYear = nowInitial.getFullYear();
+
+        // Target Date: Oct 31, 00:00:00 JST
+        let targetDate = new Date(`${targetYear}-10-31T00:00:00+09:00`);
+
+        // If current date is past Oct 31st of this year, roll over to next year
+        const rolloverBoundary = new Date(`${targetYear}-11-02T00:00:00+09:00`);
+        if (nowInitial > rolloverBoundary) {
+            targetYear += 1;
+            targetDate = new Date(`${targetYear}-10-31T00:00:00+09:00`);
+        }
+
+        let isEventActive = false;
+
+        // --- COUNTDOWN LOGIC ENGINE ---
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const diff = targetDate.getTime() - now;
+
+            // Trigger active mode if target date reached or passed
+            if (diff <= 0) {
+                document.getElementById("cnt-days").innerText = "00";
+                document.getElementById("cnt-hours").innerText = "00";
+                document.getElementById("cnt-minutes").innerText = "00";
+                document.getElementById("cnt-seconds").innerText = "00";
+
+                if (!isEventActive) {
+                    isEventActive = true;
+                    document.getElementById("countdown-view").classList.add("hidden");
+                    document.getElementById("event-active-view").classList.remove("hidden");
+                }
+                return;
+            }
+
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById("cnt-days").innerText = String(d).padStart(2, '0');
+            document.getElementById("cnt-hours").innerText = String(h).padStart(2, '0');
+            document.getElementById("cnt-minutes").innerText = String(m).padStart(2, '0');
+            document.getElementById("cnt-seconds").innerText = String(s).padStart(2, '0');
+        }
+
+        // --- VU METER ANIMATION LOGIC ---
+        function initVUMeter() {
+            const leftChannel = document.getElementById("vu-channel-l");
+            const rightChannel = document.getElementById("vu-channel-r");
+            const totalBars = 20;
+
+            leftChannel.innerHTML = '';
+            rightChannel.innerHTML = '';
+
+            for (let i = 0; i < totalBars; i++) {
+                const barL = document.createElement('div');
+                const barR = document.createElement('div');
+                
+                barL.className = 'vu-bar-l h-full bg-black border border-black';
+                barR.className = 'vu-bar-r h-full bg-black border border-black';
+
+                leftChannel.appendChild(barL);
+                rightChannel.appendChild(barR);
+            }
+        }
+
+        function animateVUMeter() {
+            const barsL = document.querySelectorAll(".vu-bar-l");
+            const barsR = document.querySelectorAll(".vu-bar-r");
+            const total = barsL.length;
+
+            const activeL = Math.floor(Math.random() * (total - 4)) + 4;
+            const activeR = Math.floor(Math.random() * (total - 4)) + 4;
+
+            barsL.forEach((bar, idx) => {
+                if (idx < activeL) {
+                    bar.style.backgroundColor = idx > 15 ? '#FFEA00' : (idx > 12 ? '#ffffff' : '#00FF66');
+                } else {
+                    bar.style.backgroundColor = '#111111';
+                }
+            });
+
+            barsR.forEach((bar, idx) => {
+                if (idx < activeR) {
+                    bar.style.backgroundColor = idx > 15 ? '#FFEA00' : (idx > 12 ? '#ffffff' : '#00FF66');
+                } else {
+                    bar.style.backgroundColor = '#111111';
+                }
+            });
+
+            // Update peak readout
+            const peakVal = (-1.2 + (Math.random() * 0.8 - 0.4)).toFixed(1);
+            document.getElementById("vu-peak-text").innerText = `PEAK: ${peakVal} dB`;
+        }
+
+        // --- CALENDAR & SHARE FUNCTIONS ---
+        function addToGoogleCalendar() {
+            const title = encodeURIComponent("第3回 あいえる音楽祭");
+            const details = encodeURIComponent("会場: XENON (ゼノン)\n音楽祭: 17:00〜23:00\n打ち上げ: 23:00〜25:00 (1000円/3ドリンク)\n※会社外の方はDiscordにてお名前を確認いたします。");
+            const location = encodeURIComponent("XENON");
+            const startTime = `${targetYear}1031T170000JST`;
+            const endTime = `${targetYear}1031T230000JST`;
+            const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startTime}/${endTime}&details=${details}&location=${location}`;
+            window.open(url, '_blank');
+        }
+
+        function copyEventUrl() {
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = window.location.href;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+
+            const btnText = document.getElementById("copy-btn-text");
+            const originalText = btnText.innerText;
+            btnText.innerText = "[COPIED!] URLをコピーしました";
+            setTimeout(() => {
+                btnText.innerText = originalText;
+            }, 2000);
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+
+            initVUMeter();
+            setInterval(animateVUMeter, 120);
+        };
+    </script>
+</body>
+</html>
