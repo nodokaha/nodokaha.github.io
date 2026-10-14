@@ -477,8 +477,9 @@
             const title = encodeURIComponent("第3回 あいえる音楽祭");
             const details = encodeURIComponent("会場: XENON (札幌)\n時間: 16:30〜23:00\n打ち上げ: 23:00〜25:00 (1000円/3ドリンク)\n※会社外の方はDiscordにてお名前を確認いたします。");
             const location = encodeURIComponent("XENON 〒064-0807 北海道札幌市中央区南7条西4丁目2-5 LC7番館3F");
-            const startTime = `${targetYear}1031T163000JST`;
-            const endTime = `${targetYear}1031T230000JST`;
+            // Google Calendar requires UTC format (YYYYMMDDTHHmmssZ)
+            const startTime = `${targetYear}1031T073000Z`; // 16:30 JST = 07:30 UTC
+            const endTime = `${targetYear}1031T140000Z`;   // 23:00 JST = 14:00 UTC
             const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startTime}/${endTime}&details=${details}&location=${location}`;
             window.open(url, '_blank');
         }
@@ -488,15 +489,24 @@
                 "BEGIN:VCALENDAR",
                 "VERSION:2.0",
                 "PRODID:-//IL Music Festival//EN",
+                "CALSCALE:GREGORIAN",
+                "BEGIN:VTIMEZONE",
+                "TZID:Asia/Tokyo",
+                "BEGIN:STANDARD",
+                "DTSTART:19700101T000000",
+                "TZOFFSETFROM:+0900",
+                "TZOFFSETTO:+0900",
+                "END:STANDARD",
+                "END:VTIMEZONE",
                 "BEGIN:VEVENT",
                 `SUMMARY:第3回 あいえる音楽祭`,
-                `DTSTART:${targetYear}1031T073000Z`, // 16:30 JST in UTC
-                `DTEND:${targetYear}1031T140000Z`,   // 23:00 JST in UTC
+                `DTSTART;TZID=Asia/Tokyo:${targetYear}1031T163000`,
+                `DTEND;TZID=Asia/Tokyo:${targetYear}1031T230000`,
                 "LOCATION:XENON 〒064-0807 北海道札幌市中央区南7条西4丁目2-5 LC7番館3F",
                 "DESCRIPTION:会場: XENON (札幌)\\n時間: 16:30〜23:00\\n打ち上げ: 23:00〜25:00 (1000円/3ドリンク)\\n※会社外の方はDiscordにてお名前を確認いたします。",
                 "END:VEVENT",
                 "END:VCALENDAR"
-            ].join("\n");
+            ].join("\r\n"); // ics spec strict CRLF
 
             const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8;' });
             const link = document.createElement('a');
