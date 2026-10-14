@@ -30,12 +30,12 @@
         }
     </script>
 
-    <!-- FontAwesome for minimal UI icons -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         * {
-            border-radius: 0px !important; /* Strict zero radius rule */
+            border-radius: 0px !important; /* Strict Brutalist Rule */
             box-sizing: border-box;
         }
 
@@ -83,7 +83,7 @@
             box-shadow: 1px 1px 0px #000000;
         }
 
-        /* Scanline Texture Overlay */
+        /* Scanline Overlay Effect */
         .scanline-bg {
             background: linear-gradient(
                 rgba(0, 0, 0, 0) 50%, 
@@ -116,7 +116,7 @@
                     <span id="sync-status">BPM: 128 | SYNC: LOCKED</span>
                 </span>
                 <span class="hidden sm:inline">|</span>
-                <span>TARGET: 10.31_00:00</span>
+                <span>TARGET: 10.31_16:30:00 JST</span>
             </div>
         </div>
     </header>
@@ -134,7 +134,7 @@
                     第3回 あいえる音楽祭
                 </h1>
                 <p class="text-xs sm:text-sm font-mono font-bold text-black pt-1">
-                    DATE: 2026.10.31 (SAT) / VENUE: XENON / ORGANIZER: IL音楽祭提供委員会
+                    DATE: 2026.10.31 (土) / VENUE: XENON (札幌) / ORGANIZER: IL音楽祭提供委員会
                 </p>
             </div>
         </section>
@@ -148,49 +148,57 @@
                 <div id="countdown-view" class="space-y-6">
                     <div class="flex justify-between items-center border-b-2 border-black pb-2">
                         <span class="text-xs font-bold uppercase tracking-wider">[TIMECODE COUNTDOWN]</span>
-                        <span class="text-xs font-bold font-mono text-black">T-MINUS UNTIL 10/31 00:00:00</span>
+                        <span class="text-xs font-bold font-mono text-black">TARGET: 10/31 16:30:00 JST</span>
                     </div>
 
                     <!-- TIMECODE GRID -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
                         <!-- DAYS -->
-                        <div class="border-brutal p-4 bg-white shadow-brutal-sm">
-                            <div id="cnt-days" class="text-4xl sm:text-6xl font-black font-mono tracking-tight">00</div>
+                        <div class="border-brutal p-3 bg-white shadow-brutal-sm">
+                            <div id="cnt-days" class="text-3xl sm:text-5xl font-black font-mono tracking-tight">00</div>
                             <div class="text-[10px] font-bold border-t-2 border-black pt-1 mt-2 uppercase bg-brutal-muted">DAYS</div>
                         </div>
                         <!-- HOURS -->
-                        <div class="border-brutal p-4 bg-white shadow-brutal-sm">
-                            <div id="cnt-hours" class="text-4xl sm:text-6xl font-black font-mono tracking-tight">00</div>
+                        <div class="border-brutal p-3 bg-white shadow-brutal-sm">
+                            <div id="cnt-hours" class="text-3xl sm:text-5xl font-black font-mono tracking-tight">00</div>
                             <div class="text-[10px] font-bold border-t-2 border-black pt-1 mt-2 uppercase bg-brutal-muted">HOURS</div>
                         </div>
                         <!-- MINUTES -->
-                        <div class="border-brutal p-4 bg-white shadow-brutal-sm">
-                            <div id="cnt-minutes" class="text-4xl sm:text-6xl font-black font-mono tracking-tight">00</div>
+                        <div class="border-brutal p-3 bg-white shadow-brutal-sm">
+                            <div id="cnt-minutes" class="text-3xl sm:text-5xl font-black font-mono tracking-tight">00</div>
                             <div class="text-[10px] font-bold border-t-2 border-black pt-1 mt-2 uppercase bg-brutal-muted">MINUTES</div>
                         </div>
                         <!-- SECONDS -->
-                        <div class="border-brutal p-4 bg-black text-white shadow-brutal-sm">
-                            <div id="cnt-seconds" class="text-4xl sm:text-6xl font-black font-mono tracking-tight text-brutal-accent">00</div>
-                            <div class="text-[10px] font-bold border-t-2 border-white pt-1 mt-2 uppercase bg-brutal-gray text-white">SECONDS</div>
+                        <div class="border-brutal p-3 bg-white shadow-brutal-sm">
+                            <div id="cnt-seconds" class="text-3xl sm:text-5xl font-black font-mono tracking-tight">00</div>
+                            <div class="text-[10px] font-bold border-t-2 border-black pt-1 mt-2 uppercase bg-brutal-muted">SECONDS</div>
+                        </div>
+                        <!-- MILLISECONDS -->
+                        <div class="border-brutal p-3 bg-black text-white shadow-brutal-sm col-span-2 sm:col-span-1">
+                            <div id="cnt-ms" class="text-3xl sm:text-5xl font-black font-mono tracking-tight text-brutal-accent">000</div>
+                            <div class="text-[10px] font-bold border-t-2 border-white pt-1 mt-2 uppercase bg-brutal-gray text-white">MS</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- EVENT DAY ACTIVE BANNER (Triggered on 10/31) -->
-                <div id="event-active-view" class="hidden border-brutal bg-brutal-signal p-6 text-center space-y-3 shadow-brutal-sm">
-                    <div class="inline-block bg-black text-white text-xs font-bold px-3 py-1 uppercase tracking-widest">
-                        [STATUS: EVENT ACTIVE]
+                <!-- EVENT DAY ACTIVE BANNER (Triggered on/after 10/31 16:30) -->
+                <div id="event-active-view" class="hidden border-brutal bg-brutal-signal p-6 text-center space-y-3 shadow-brutal-sm relative overflow-hidden">
+                    <canvas id="brutal-canvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-40"></canvas>
+                    <div class="relative z-10 space-y-2">
+                        <div class="inline-block bg-black text-white text-xs font-bold px-3 py-1 uppercase tracking-widest">
+                            [STATUS: EVENT ACTIVE]
+                        </div>
+                        <h2 class="text-2xl sm:text-4xl font-black font-mono uppercase text-black">
+                            🎉 第3回 あいえる音楽祭 開催中 🎉
+                        </h2>
+                        <p class="text-xs sm:text-sm font-bold text-black max-w-xl mx-auto">
+                            本日はフェスティバル当日です。会場 XENON (札幌) にて皆様のお越しをお待ちしております！
+                        </p>
                     </div>
-                    <h2 class="text-2xl sm:text-4xl font-black font-mono uppercase text-black">
-                        本日 10/31 第3回 あいえる音楽祭 開催中
-                    </h2>
-                    <p class="text-xs sm:text-sm font-bold text-black max-w-xl mx-auto">
-                        本日はフェスティバル当日です。会場 XENON にてお待ちしております。
-                    </p>
                 </div>
             </div>
 
-            <!-- STEREO VU LEVEL METER (Minimal Audio Element) -->
+            <!-- STEREO VU LEVEL METER (Minimal Rack Element) -->
             <div class="border-brutal bg-black p-4 space-y-2">
                 <div class="flex justify-between text-[10px] font-mono font-bold text-white tracking-widest">
                     <span>AUDIO LEVEL / VU-METER (L/R)</span>
@@ -200,93 +208,111 @@
                 <!-- LEFT CHANNEL -->
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] font-mono text-white font-bold w-3">L</span>
-                    <div class="flex-1 vu-grid h-3 bg-brutal-gray p-0.5 border border-white" id="vu-channel-l">
-                        <!-- Generated via JS -->
-                    </div>
+                    <div class="flex-1 vu-grid h-3 bg-brutal-gray p-0.5 border border-white" id="vu-channel-l"></div>
                 </div>
 
                 <!-- RIGHT CHANNEL -->
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] font-mono text-white font-bold w-3">R</span>
-                    <div class="flex-1 vu-grid h-3 bg-brutal-gray p-0.5 border border-white" id="vu-channel-r">
-                        <!-- Generated via JS -->
-                    </div>
+                    <div class="flex-1 vu-grid h-3 bg-brutal-gray p-0.5 border border-white" id="vu-channel-r"></div>
                 </div>
             </div>
 
         </section>
 
-        <!-- DATA GRID / EVENT INFORMATION -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- DATA GRID / EVENT INFORMATION & MAP -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
-            <!-- LEFT PANEL: TIMELINE & VENUE -->
+            <!-- LEFT PANEL: TIMELINE & DETAILS -->
             <div class="border-brutal bg-white p-6 shadow-brutal space-y-4">
                 <div class="border-b-2 border-black pb-2 flex justify-between items-center">
-                    <span class="text-xs font-bold uppercase tracking-wider">[01] SCHEDULE & LOCATION</span>
-                    <span class="text-xs font-bold bg-black text-white px-1.5 py-0.5">XENON</span>
+                    <span class="text-xs font-bold uppercase tracking-wider">[01] SCHEDULE & PLAN</span>
+                    <span class="text-xs font-bold bg-black text-white px-1.5 py-0.5">TIMELINE</span>
                 </div>
 
                 <table class="w-full text-xs font-mono border-collapse">
                     <tbody>
                         <tr class="border-b border-black">
-                            <td class="py-2.5 font-bold uppercase bg-brutal-muted px-2 w-28">開催日</td>
-                            <td class="py-2.5 px-3 font-bold">10月31日 (土)</td>
+                            <td class="py-2.5 font-bold uppercase bg-brutal-muted px-2 w-28">開催日時</td>
+                            <td class="py-2.5 px-3 font-bold">10月31日 (土) 16:30 開場</td>
                         </tr>
                         <tr class="border-b border-black">
                             <td class="py-2.5 font-bold uppercase bg-brutal-muted px-2">音楽祭時間</td>
-                            <td class="py-2.5 px-3 font-bold">17:00 〜 23:00</td>
+                            <td class="py-2.5 px-3 font-bold">16:30 〜 23:00</td>
                         </tr>
                         <tr class="border-b border-black">
                             <td class="py-2.5 font-bold uppercase bg-brutal-muted px-2">打ち上げ</td>
-                            <td class="py-2.5 px-3 font-bold">23:00 〜 25:00</td>
+                            <td class="py-2.5 px-3 font-bold">23:00 〜 25:00 (01:00)</td>
+                        </tr>
+                        <tr class="border-b border-black">
+                            <td class="py-2.5 font-bold uppercase bg-brutal-muted px-2">打ち上げプラン</td>
+                            <td class="py-2.5 px-3 font-bold bg-brutal-accent">1000円で 3ドリンク付き</td>
                         </tr>
                         <tr>
-                            <td class="py-2.5 font-bold uppercase bg-brutal-muted px-2">会場名</td>
-                            <td class="py-2.5 px-3 font-bold">XENON (ゼノン)</td>
+                            <td class="py-2.5 font-bold uppercase bg-brutal-muted px-2">主催団体</td>
+                            <td class="py-2.5 px-3 font-bold">IL 音楽祭提供委員会</td>
                         </tr>
                     </tbody>
                 </table>
+
+                <div class="p-3 border-brutal-sm bg-brutal-muted space-y-1 text-xs font-mono">
+                    <span class="font-bold block uppercase text-[10px] text-black"><i class="fa-solid fa-triangle-exclamation mr-1"></i> 参加案内</span>
+                    <p class="font-bold text-black leading-relaxed">
+                        会社外の方は Discord にてお名前を確認させていただきます。
+                    </p>
+                </div>
             </div>
 
-            <!-- RIGHT PANEL: DETAILS & INSTRUCTIONS -->
-            <div class="border-brutal bg-white p-6 shadow-brutal space-y-4">
-                <div class="border-b-2 border-black pb-2 flex justify-between items-center">
-                    <span class="text-xs font-bold uppercase tracking-wider">[02] FEE & INSTRUCTIONS</span>
-                    <span class="text-xs font-bold bg-brutal-accent text-black px-1.5 py-0.5 border border-black">NOTICE</span>
+            <!-- RIGHT PANEL: VENUE MAP (XENON SAPPORO) -->
+            <div class="border-brutal bg-white p-6 shadow-brutal space-y-4 flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="border-b-2 border-black pb-2 flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase tracking-wider">[02] VENUE LOCATION</span>
+                        <span class="text-xs font-bold bg-brutal-accent text-black px-1.5 py-0.5 border border-black">XENON</span>
+                    </div>
+
+                    <div class="text-xs font-mono space-y-1">
+                        <div class="font-extrabold text-sm text-black">XENON (ゼノン)</div>
+                        <div class="text-black font-bold">〒064-0807 北海道札幌市中央区南7条西4丁目2-5 LC7番館3F</div>
+                    </div>
+
+                    <!-- GOOGLE MAPS IFRAME EMBED -->
+                    <div class="border-brutal-sm bg-brutal-muted overflow-hidden h-48 w-full relative">
+                        <iframe 
+                            title="XENON Sapporo Map"
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            loading="lazy" 
+                            allowfullscreen 
+                            src="https://maps.google.com/maps?q=XENON%20%E6%9C%AD%E5%B9%8C%20%E5%8D%977%E6%9D%A1%E8%A5%BF4%E4%B8%81%E7%9B%AE2-5&t=&z=16&ie=UTF8&iwloc=&output=embed">
+                        </iframe>
+                    </div>
                 </div>
 
-                <div class="space-y-3 text-xs font-mono">
-                    <div class="p-3 border-brutal-sm bg-brutal-accent">
-                        <span class="font-bold block uppercase text-[10px] text-black">打ち上げプラン</span>
-                        <p class="font-extrabold text-sm text-black">1000円で 3ドリンク付きます</p>
-                    </div>
-
-                    <div class="p-3 border-brutal-sm bg-white space-y-1">
-                        <span class="font-bold block uppercase text-[10px] text-black">参加確認事項</span>
-                        <p class="font-bold text-black leading-relaxed">
-                            会社外の方は Discord にてお名前を確認させていただきます。
-                        </p>
-                    </div>
-
-                    <div class="flex justify-between items-center pt-1 text-[11px]">
-                        <span class="font-bold">主催団体:</span>
-                        <span class="font-bold bg-black text-white px-2 py-0.5">IL 音楽祭提供委員会</span>
-                    </div>
-                </div>
+                <a href="https://maps.google.com/?cid=7777282680128200219" target="_blank" rel="noopener noreferrer" class="button-brutal py-2.5 px-4 text-xs font-mono flex items-center justify-center gap-2 mt-2 text-black no-underline">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>Google Maps で開く (XENON 札幌)</span>
+                </a>
             </div>
 
         </section>
 
         <!-- ACTION BUTTONS GRID -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button onclick="addToGoogleCalendar()" class="button-brutal py-3 px-4 text-xs font-mono flex items-center justify-center gap-2">
+        <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <button onclick="addToGoogleCalendar()" class="button-brutal py-3.5 px-4 text-xs font-mono flex items-center justify-center gap-2">
                 <i class="fa-regular fa-calendar-plus"></i>
-                <span>[GOOGLE CALENDAR] カレンダーに追加</span>
+                <span>Google カレンダーに追加</span>
             </button>
 
-            <button onclick="copyEventUrl()" class="button-brutal py-3 px-4 text-xs font-mono flex items-center justify-center gap-2">
+            <button onclick="downloadICSFile()" class="button-brutal py-3.5 px-4 text-xs font-mono flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-arrow-down"></i>
+                <span>iCal / Outlook (.ics) 出力</span>
+            </button>
+
+            <button onclick="copyEventUrl()" class="button-brutal py-3.5 px-4 text-xs font-mono flex items-center justify-center gap-2">
                 <i class="fa-regular fa-copy"></i>
-                <span id="copy-btn-text">[COPY LINK] イベントURLを共有</span>
+                <span id="copy-btn-text">[COPY LINK] URLを共有</span>
             </button>
         </section>
 
@@ -295,42 +321,34 @@
     <!-- FOOTER -->
     <footer class="w-full max-w-5xl mx-auto mt-8 pt-4 border-t-2 border-black flex flex-col sm:flex-row justify-between items-center gap-2 text-[10px] font-mono font-bold uppercase">
         <div>© 3RD IL MUSIC FESTIVAL COMMITTEE</div>
-        <div>STRICT BRUTALIST LOGIC GRID v3.0</div>
+        <div>STRICT BRUTALIST LOGIC GRID v3.2</div>
     </footer>
 
     <script>
-        // --- TARGET DATE SETUP: October 31st 00:00:00 ---
-        const nowInitial = new Date();
-        let targetYear = nowInitial.getFullYear();
-
-        // Target Date: Oct 31, 00:00:00 JST
-        let targetDate = new Date(`${targetYear}-10-31T00:00:00+09:00`);
-
-        // If current date is past Oct 31st of this year, roll over to next year
-        const rolloverBoundary = new Date(`${targetYear}-11-02T00:00:00+09:00`);
-        if (nowInitial > rolloverBoundary) {
-            targetYear += 1;
-            targetDate = new Date(`${targetYear}-10-31T00:00:00+09:00`);
-        }
+        // --- TARGET DATE SETUP: October 31st, 2026 16:30:00 JST ---
+        const targetYear = 2026;
+        const targetDate = new Date(`${targetYear}-10-31T16:30:00+09:00`);
 
         let isEventActive = false;
 
-        // --- COUNTDOWN LOGIC ENGINE ---
+        // --- HIGH-PRECISION COUNTDOWN ENGINE ---
         function updateCountdown() {
             const now = new Date().getTime();
             const diff = targetDate.getTime() - now;
 
-            // Trigger active mode if target date reached or passed
+            // Active State Trigger
             if (diff <= 0) {
                 document.getElementById("cnt-days").innerText = "00";
                 document.getElementById("cnt-hours").innerText = "00";
                 document.getElementById("cnt-minutes").innerText = "00";
                 document.getElementById("cnt-seconds").innerText = "00";
+                document.getElementById("cnt-ms").innerText = "000";
 
                 if (!isEventActive) {
                     isEventActive = true;
                     document.getElementById("countdown-view").classList.add("hidden");
                     document.getElementById("event-active-view").classList.remove("hidden");
+                    startBrutalParticles();
                 }
                 return;
             }
@@ -339,14 +357,16 @@
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const s = Math.floor((diff % (1000 * 60)) / 1000);
+            const ms = Math.floor(diff % 1000);
 
             document.getElementById("cnt-days").innerText = String(d).padStart(2, '0');
             document.getElementById("cnt-hours").innerText = String(h).padStart(2, '0');
             document.getElementById("cnt-minutes").innerText = String(m).padStart(2, '0');
             document.getElementById("cnt-seconds").innerText = String(s).padStart(2, '0');
+            document.getElementById("cnt-ms").innerText = String(ms).padStart(3, '0');
         }
 
-        // --- VU METER ANIMATION LOGIC ---
+        // --- VU METER ANIMATION ENGINE ---
         function initVUMeter() {
             const leftChannel = document.getElementById("vu-channel-l");
             const rightChannel = document.getElementById("vu-channel-r");
@@ -391,20 +411,100 @@
                 }
             });
 
-            // Update peak readout
             const peakVal = (-1.2 + (Math.random() * 0.8 - 0.4)).toFixed(1);
             document.getElementById("vu-peak-text").innerText = `PEAK: ${peakVal} dB`;
+        }
+
+        // --- GEOMETRIC BRUTALIST CONFETTI CANVAS ---
+        function startBrutalParticles() {
+            const canvas = document.getElementById('brutal-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            function resize() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const shapes = [];
+            const colors = ['#000000', '#FFFFFF', '#FFEA00'];
+
+            for (let i = 0; i < 40; i++) {
+                shapes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 12 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: Math.random() * 2 + 1,
+                    angle: Math.random() * Math.PI * 2,
+                    vAngle: (Math.random() - 0.5) * 0.1
+                });
+            }
+
+            function loop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                shapes.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.angle += p.vAngle;
+
+                    if (p.y > canvas.height) p.y = -10;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.angle);
+                    ctx.fillStyle = p.color;
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 1.5;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.strokeRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                requestAnimationFrame(loop);
+            }
+            loop();
         }
 
         // --- CALENDAR & SHARE FUNCTIONS ---
         function addToGoogleCalendar() {
             const title = encodeURIComponent("第3回 あいえる音楽祭");
-            const details = encodeURIComponent("会場: XENON (ゼノン)\n音楽祭: 17:00〜23:00\n打ち上げ: 23:00〜25:00 (1000円/3ドリンク)\n※会社外の方はDiscordにてお名前を確認いたします。");
-            const location = encodeURIComponent("XENON");
-            const startTime = `${targetYear}1031T170000JST`;
+            const details = encodeURIComponent("会場: XENON (札幌)\n時間: 16:30〜23:00\n打ち上げ: 23:00〜25:00 (1000円/3ドリンク)\n※会社外の方はDiscordにてお名前を確認いたします。");
+            const location = encodeURIComponent("XENON 〒064-0807 北海道札幌市中央区南7条西4丁目2-5 LC7番館3F");
+            const startTime = `${targetYear}1031T163000JST`;
             const endTime = `${targetYear}1031T230000JST`;
             const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startTime}/${endTime}&details=${details}&location=${location}`;
             window.open(url, '_blank');
+        }
+
+        function downloadICSFile() {
+            const icsData = [
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//IL Music Festival//EN",
+                "BEGIN:VEVENT",
+                `SUMMARY:第3回 あいえる音楽祭`,
+                `DTSTART:${targetYear}1031T073000Z`, // 16:30 JST in UTC
+                `DTEND:${targetYear}1031T140000Z`,   // 23:00 JST in UTC
+                "LOCATION:XENON 〒064-0807 北海道札幌市中央区南7条西4丁目2-5 LC7番館3F",
+                "DESCRIPTION:会場: XENON (札幌)\\n時間: 16:30〜23:00\\n打ち上げ: 23:00〜25:00 (1000円/3ドリンク)\\n※会社外の方はDiscordにてお名前を確認いたします。",
+                "END:VEVENT",
+                "END:VCALENDAR"
+            ].join("\n");
+
+            const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', 'il-music-festival-3.ics');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function copyEventUrl() {
@@ -426,10 +526,10 @@
         // --- INITIALIZATION ---
         window.onload = function() {
             updateCountdown();
-            setInterval(updateCountdown, 1000);
+            setInterval(updateCountdown, 41); // Fast update loop for millisecond precision
 
             initVUMeter();
-            setInterval(animateVUMeter, 120);
+            setInterval(animateVUMeter, 100);
         };
     </script>
 </body>
